@@ -375,7 +375,10 @@ export default {
     },
     startAnimation() {
       const animate = () => {
-        this.animationFrameId = requestAnimationFrame(animate);
+        // limit animation to 60 FPS
+        setTimeout(() => {
+          this.animationFrameId = requestAnimationFrame(animate);
+        }, 1000 / 60);
         this.renderer.render(this.scene, this.camera);
       };
       animate();
