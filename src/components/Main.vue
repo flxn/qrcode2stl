@@ -52,7 +52,12 @@
             </ul>
           </div>
           <div class="option-pane" v-if="activeTabIndex === 0">
-            <textarea class="textarea" placeholder="The text for your QR code e.g. Hello world" v-model="text" style="width: 100%"></textarea>
+            <textarea
+              class="textarea"
+              placeholder="The text for your QR code e.g. Hello world"
+              v-model="text"
+              style="width: 100%"
+            ></textarea>
           </div>
           <div class="option-pane" v-if="activeTabIndex === 1">
             <div class="field is-horizontal">
@@ -62,7 +67,12 @@
               <div class="field-body">
                 <div class="field">
                   <div class="control">
-                    <input class="input" type="text" placeholder="The name of the Wifi network" v-model="wifi.ssid">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="The name of the Wifi network"
+                      v-model="wifi.ssid"
+                    />
                   </div>
                 </div>
               </div>
@@ -74,7 +84,12 @@
               <div class="field-body">
                 <div class="field">
                   <div class="control">
-                    <input class="input" type="text" placeholder="The password of the Wifi network" v-model="wifi.password">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="The password of the Wifi network"
+                      v-model="wifi.password"
+                    />
                   </div>
                 </div>
               </div>
@@ -96,7 +111,30 @@
                 </div>
               </div>
             </div>
+          </div>
 
+
+          <div class="option-pane">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">Error Correction</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <div class="select is-small">
+                      <select v-model="errorCorrectionLevel">
+                        <option value="L">L (Low, 7% redundant)</option>
+                        <option value="M">M (Medium, 15% redundant)</option>
+                        <option value="Q">Q (Quartile, 25% redundant)</option>
+                        <option value="H">H (High, 30% redundant)</option>
+                      </select>
+                    </div>
+                    <p class="help">The higher the error correction level, the denser the QR code.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </nav>
 
@@ -238,6 +276,7 @@ export default {
   data() {
     return {
       activeTabIndex: 0,
+      errorCorrectionLevel: 'M',
       text: '',
       wifi: {
         name: '',
@@ -394,6 +433,7 @@ export default {
       await qrcode.toCanvas(document.getElementById('qr-canvas'), this.text, {
         margin: 0,
         scale: 1,
+        errorCorrectionLevel: this.errorCorrectionLevel,
       });
 
       this.init3d();
