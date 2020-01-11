@@ -111,6 +111,21 @@
                 </div>
               </div>
             </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Security</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="wifi.hidden">
+                      Hidden
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
 
@@ -279,9 +294,10 @@ export default {
       errorCorrectionLevel: 'M',
       text: '',
       wifi: {
-        name: '',
+        ssid: '',
         password: '',
         security: 'WPA',
+        hidden: false,
       },
       outputText: '',
       workCanvas: null,
@@ -428,9 +444,7 @@ export default {
       animate();
     },
     async generate3dModel() {
-      console.log(this.base);
-      console.log(this.code);
-      await qrcode.toCanvas(document.getElementById('qr-canvas'), this.text, {
+      await qrcode.toCanvas(document.getElementById('qr-canvas'), this.getQRText(), {
         margin: 0,
         scale: 1,
         errorCorrectionLevel: this.errorCorrectionLevel,
@@ -467,6 +481,28 @@ export default {
     },
     setActiveTab(tabIdx) {
       this.activeTabIndex = tabIdx;
+    },
+    wifiQREscape(str) {
+      const regex = /([:|\\|;|,|"])/gm;
+      const subst = '\\$1';
+      const result = str.replace(regex, subst);
+      return result;
+    },
+    getQRText() {
+      let ret = '';
+      switch (this.activeTabIndex) {
+        case 0:
+          ret = this.text;
+          break;
+        case 1:
+          ret = `WIFI:S:${this.wifiQREscape(this.wifi.ssid)};T:${this.wifiQREscape(this.wifi.security)};P:${this.wifiQREscape(this.wifi.password)};H:${this.wifi.hidden ? 'true' : 'false'};`;
+          break;
+        default:
+          break;
+      }
+
+      console.log('QR Code String:', ret);
+      return ret;
     },
   },
   async mounted() {
