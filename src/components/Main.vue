@@ -271,6 +271,9 @@
         </div>
         <hr />
         <div id="container3d"></div>
+        <div id="notifications">
+          <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"><strong>Warning for 3D printing:</strong> At least one edge of the smallest cube in 3D model is very small {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -318,6 +321,8 @@ export default {
       renderer: null,
       animationFrameId: null,
       animationTimer: null,
+      blockWidth: null,
+      blockHeight: null,
     };
   },
 
@@ -396,9 +401,9 @@ export default {
       const canvasWidth = this.workCanvas.width;
       const canvasHeight = this.workCanvas.height;
       const availableWidth = this.base.width - 2 * this.code.margin;
-      const blockWidth = availableWidth / canvasWidth;
+      this.blockWidth = availableWidth / canvasWidth;
       const availableHeight = this.base.height - 2 * this.code.margin;
-      const blockHeight = availableHeight / canvasHeight;
+      this.blockHeight = availableHeight / canvasHeight;
 
       const ctx = this.workCanvas.getContext('2d');
       for (let y = 0; y < canvasHeight; y += 1) {
@@ -407,19 +412,19 @@ export default {
           const isBlack = pixel[0] === 0;
           if (isBlack) {
             const qrBlock = new THREE.BoxGeometry(
-              blockWidth,
-              blockHeight,
+              this.blockWidth,
+              this.blockHeight,
               this.code.depth,
             );
             const qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
 
             let blockX = (x / canvasWidth) * availableWidth;
             blockX -= availableWidth / 2;
-            blockX += blockWidth / 2;
+            blockX += this.blockWidth / 2;
 
             let blockY = (y / canvasHeight) * availableHeight;
             blockY -= availableHeight / 2;
-            blockY += blockHeight / 2;
+            blockY += this.blockHeight / 2;
 
             const blockZ = this.base.depth + this.code.depth / 2;
 
@@ -525,20 +530,13 @@ export default {
 #container3d {
   width: 100%;
   height: 600px;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 #qr-canvas {
   display: none;
-}
-
-#qr-preview-canvas {
-  border: 1px solid #aaa;
-  border-radius: 10px;
-  padding: 5px;
-  margin-top: 20px;
 }
 
 .model-options-title {
@@ -562,5 +560,9 @@ export default {
 
 .option-pane {
   padding: 10px;
+}
+
+#notifications {
+  margin-top: 10px;
 }
 </style>
