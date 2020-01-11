@@ -262,11 +262,13 @@ export default {
       scene: null,
       renderer: null,
       animationFrameId: null,
+      animationTimer: null,
     };
   },
 
   methods: {
     init3d() {
+      this.reset3d();
       const container = document.getElementById('container3d');
 
       this.scene = new THREE.Scene();
@@ -286,14 +288,6 @@ export default {
       directionalLight.shadow.camera.right = 120;
       directionalLight.rotation.x = Math.PI / 2;
       this.scene.add(directionalLight);
-
-      // const ground = new THREE.Mesh(
-      //   new THREE.PlaneBufferGeometry(2000, 2000),
-      //   new THREE.MeshPhongMaterial({ color: 0x333377, depthWrite: false }),
-      // );
-      // ground.rotation.x = 0;
-      // ground.receiveShadow = true;
-      // this.scene.add(ground);
 
       const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
       grid.material.opacity = 0.2;
@@ -315,6 +309,17 @@ export default {
       const controls = new OrbitControls(this.camera, this.renderer.domElement);
       controls.target.set(0, 0, 0);
       controls.update();
+    },
+    reset3d() {
+      clearTimeout(this.animationTimer);
+      cancelAnimationFrame(this.animationFrameId);
+      this.scene = null;
+      this.mesh = null;
+      this.camera = null;
+      this.scene = null;
+      this.renderer = null;
+      const elem = document.getElementById('container3d');
+      while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
       const modelBase = new THREE.BoxGeometry(
@@ -376,7 +381,7 @@ export default {
     startAnimation() {
       const animate = () => {
         // limit animation to 60 FPS
-        setTimeout(() => {
+        this.animationTimer = setTimeout(() => {
           this.animationFrameId = requestAnimationFrame(animate);
         }, 1000 / 60);
         this.renderer.render(this.scene, this.camera);
@@ -390,14 +395,7 @@ export default {
         margin: 0,
         scale: 1,
       });
-      cancelAnimationFrame(this.animationFrameId);
-      this.scene = null;
-      this.mesh = null;
-      this.camera = null;
-      this.scene = null;
-      this.renderer = null;
-      const elem = document.getElementById('container3d');
-      while (elem.lastChild) elem.removeChild(elem.lastChild);
+
       this.init3d();
       this.setup3dObject();
       this.startAnimation();
