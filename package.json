@@ -13,6 +13,7 @@
     "core-js": "^3.4.4",
     "qrcode": "^1.4.4",
     "three": "^0.112.1",
+    "vcards-js": "^2.10.0",
     "vue": "^2.6.10"
   },
   "devDependencies": {

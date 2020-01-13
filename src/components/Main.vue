@@ -1,7 +1,7 @@
 <template>
   <div id="main" class="container is-fluid">
-    <div class="columns">
-      <div class="column is-4">
+    <div class="columns is-multiline">
+      <div class="column is-5-widescreen is-5-fullhd is-12">
         <h1 class="title">QR Code Generator</h1>
         <h2 class="subtitle">Export your QR code as STL for 3D printing</h2>
         <hr />
@@ -14,7 +14,7 @@
                   <span class="icon is-small">
                     <i class="fas fa-font" aria-hidden="true"></i>
                   </span>
-                  <span>Text</span>
+                  <span>Text/URL</span>
                 </a>
               </li>
               <li v-bind:class="{ 'is-active': activeTabIndex === 1 }" @click="setActiveTab(1)">
@@ -38,7 +38,7 @@
                   <span class="icon is-small">
                     <i class="far fa-address-card" aria-hidden="true"></i>
                   </span>
-                  <span>Contact</span>
+                  <span>Contact (vCard)</span>
                 </a>
               </li>
               <li v-bind:class="{ 'is-active': activeTabIndex === 4 }" @click="setActiveTab(4)">
@@ -56,7 +56,7 @@
           <div class="option-pane" v-if="activeTabIndex === 0">
             <textarea
               class="textarea"
-              placeholder="The text for your QR code e.g. Hello world"
+              placeholder="The text for your QR code e.g. Hello World or https://flxn.de"
               v-model="text"
               style="width: 100%"
             ></textarea>
@@ -134,6 +134,7 @@
 
           <!-- E-Mail -->
           <div class="option-pane" v-if="activeTabIndex === 2">
+            <div class="field has-text-centered">Not all fields have to be filled in.</div>
             <div class="field is-horizontal">
               <div class="field-label is-normal">
                 <label class="label">Recipient</label>
@@ -187,6 +188,191 @@
             </div>
           </div>
 
+          <!-- Contact -->
+          <div class="option-pane" v-if="activeTabIndex === 3">
+            <div class="field has-text-centered">Not all fields have to be filled in.</div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Your Name:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="Firstname" v-model="contact.firstName">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="Lastname" v-model="contact.lastName">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Organization:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="ACME Inc." v-model="contact.organization">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Role:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="Senior Money Maker" v-model="contact.role">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Numbers:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="Cell" v-model="contact.cell">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label for="" class="label"></label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="Phone" v-model="contact.phone">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="Fax" v-model="contact.fax">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">E-Mail:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="you@example.com" v-model="contact.email">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Street:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="My Street 31" v-model="contact.street">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">City:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="12345" v-model="contact.postcode">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="My Town" v-model="contact.city">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">State:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="My State" v-model="contact.state">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="My Country" v-model="contact.country">
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Website:</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" placeholder="www.mysite.com" v-model="contact.website">
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SMS -->
+          <div class="option-pane" v-if="activeTabIndex === 4">
+            <div class="field has-text-centered">Not all fields have to be filled in.</div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Phone</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="The phone number of the recipient"
+                      v-model="sms.recipient"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Message</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <textarea
+                      class="textarea"
+                      placeholder="The sms content"
+                      v-model="sms.message"
+                      style="width: 100%"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Correction -->
           <div class="option-pane">
             <div class="field is-horizontal">
               <div class="field-label is-small">
@@ -211,6 +397,7 @@
           </div>
         </nav>
 
+        <!-- 3D Options -->
         <nav class="panel">
           <p class="panel-heading">3D Model Options</p>
           <div class="panel-block">
@@ -343,7 +530,7 @@
         <p>{{outputText}}</p>
         <canvas id="qr-canvas"></canvas>
       </div>
-      <div class="column">
+      <div class="column is-7-widescreen is-7-fullhd is-12">
         <div class="is-pulled-right">
           <button class="button export-button is-primary is-medium" @click="exportASCII">
             <span class="icon">
@@ -365,7 +552,11 @@
         <hr />
         <div id="container3d"></div>
         <div id="notifications">
-          <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"><strong>Warning for 3D printability:</strong> At least one edge of the smallest element in the 3D model is very small {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.</div>
+          <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)">
+            <strong>Warning for 3D printability:</strong>
+            At least one edge of the smallest element in the 3D model is very small {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.
+            Depending on your setup, this could make printing harder.
+          </div>
         </div>
       </div>
     </div>
@@ -377,6 +568,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import qrcode from 'qrcode';
+import vcardjs from 'vcards-js';
 
 export default {
   name: 'Main',
@@ -400,6 +592,26 @@ export default {
         recipient: '',
         subject: '',
         body: '',
+      },
+      contact: {
+        firstName: '',
+        lastName: '',
+        organization: '',
+        role: '',
+        cell: '',
+        phone: '',
+        fax: '',
+        email: '',
+        street: '',
+        postcode: '',
+        city: '',
+        state: '',
+        country: '',
+        website: '',
+      },
+      sms: {
+        recipient: '',
+        message: '',
       },
       outputText: '',
       workCanvas: null,
@@ -608,6 +820,7 @@ export default {
       return result;
     },
     getQRText() {
+      const vCard = vcardjs();
       let ret = '';
       switch (this.activeTabIndex) {
         case 0: // Text
@@ -618,6 +831,38 @@ export default {
           break;
         case 2: // E-Mail
           ret = `mailto:${this.email.recipient.split(',').map(x => x.trim()).join(',')}?subject=${encodeURI(this.email.subject)}&body=${encodeURI(this.email.body)}`;
+          break;
+        case 3: // Contact
+          vCard.firstName = this.contact.firstName;
+          vCard.lastName = this.contact.lastName;
+          vCard.organization = this.contact.organization;
+          vCard.url = this.contact.website;
+          vCard.role = this.contact.role;
+
+          vCard.homePhone = this.contact.phone;
+          vCard.cellPhone = this.contact.cell;
+          vCard.homeFax = this.contact.fax;
+
+          vCard.email = this.contact.email;
+
+          vCard.homeAddress.street = this.contact.street;
+          vCard.homeAddress.city = this.contact.city;
+          vCard.homeAddress.stateProvince = this.contact.state;
+          vCard.homeAddress.postalCode = this.contact.postcode;
+          vCard.homeAddress.countryRegion = this.contact.country;
+
+          // vCard.socialUrls.facebook = 'https://...';
+          // vCard.socialUrls.linkedIn = 'https://...';
+          // vCard.socialUrls.twitter = 'https://...';
+          // vCard.socialUrls.flickr = 'https://...';
+          // vCard.socialUrls.custom = 'https://...';
+
+          vCard.version = '3.0'; // can also support 2.1 and 4.0, certain versions only support certain fields
+
+          ret = vCard.getFormattedString();
+          break;
+        case 4: // SMS
+          ret = `SMSTO:${this.sms.recipient}:${this.sms.message}`;
           break;
         default:
           break;
