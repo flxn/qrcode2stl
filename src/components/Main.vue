@@ -401,7 +401,7 @@
         <nav class="panel">
           <p class="panel-heading">3D Model Options</p>
           <div class="panel-block">
-            <div class="columns">
+            <div class="columns" style="width: 100%">
               <div class="column">
                 <div class="model-options-title">
                   <div class="title is-size-5">Base</div>
@@ -492,12 +492,15 @@
                   </div>
                   <div class="field-body">
                     <div class="field">
-                      <div class="control">
+                      <div class="control has-icons-left">
                         <div class="select is-small">
                           <select v-model="qrcodeBlockStyle">
                             <option>square</option>
                             <option>round</option>
                           </select>
+                          <span class="icon is-small is-left">
+                            <i class="fa fa-shapes"></i>
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -522,16 +525,23 @@
                   </div>
                 </div>
               </div>
+
+
             </div>
           </div>
         </nav>
-        <button class="button is-success is-medium" @click="generate3dModel">Generate 3D Model</button>
+        <button class="button is-success is-large" v-bind:class="{'is-loading': isGenerating}" @click="generate3dModel">
+          <span class="icon">
+            <i class="fa fa-cube"></i>
+          </span>
+          <span>Generate 3D Model</span>
+        </button>
 
         <p>{{outputText}}</p>
         <canvas id="qr-canvas"></canvas>
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
-        <div class="is-pulled-right">
+        <div class="is-pulled-right" v-if="this.mesh">
           <button class="button export-button is-primary is-medium" @click="exportASCII">
             <span class="icon">
               <i class="fa fa-download"></i>
@@ -554,7 +564,7 @@
         <div id="notifications">
           <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)">
             <strong>Warning for 3D printability:</strong>
-            At least one edge of the smallest element in the 3D model is very small {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.
+            At least one edge of the smallest element in the 3D model is very small: {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.
             Depending on your setup, this could make printing harder.
           </div>
         </div>
@@ -635,6 +645,7 @@ export default {
       animationTimer: null,
       blockWidth: null,
       blockHeight: null,
+      isGenerating: false,
     };
   },
 
@@ -694,7 +705,7 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
-      const modelBase = new THREE.BoxGeometry(
+      const modelBase = new THREE.BoxBufferGeometry(
         this.base.width,
         this.base.height,
         this.base.depth,
@@ -706,7 +717,7 @@ export default {
       baseMesh.position.set(0, 0, this.base.depth / 2);
       this.scene.add(baseMesh);
 
-      const combinedGeometry = new THREE.Geometry();
+      const combinedGeometry = new THREE.BufferGeometry();
       baseMesh.updateMatrix();
       combinedGeometry.merge(baseMesh.geometry, baseMesh.matrix);
 
@@ -725,14 +736,14 @@ export default {
             let qrBlock;
             // Determine basic block element
             if (this.qrcodeBlockStyle === 'round') {
-              qrBlock = new THREE.CylinderGeometry(
+              qrBlock = new THREE.CylinderBufferGeometry(
                 this.blockWidth / 2,
                 this.blockWidth / 2,
                 this.code.depth,
                 16,
               );
             } else {
-              qrBlock = new THREE.BoxGeometry(
+              qrBlock = new THREE.BoxBufferGeometry(
                 this.blockWidth,
                 this.blockHeight,
                 this.code.depth,
@@ -775,15 +786,24 @@ export default {
       animate();
     },
     async generate3dModel() {
-      await qrcode.toCanvas(document.getElementById('qr-canvas'), this.getQRText(), {
+      this.isGenerating = true;
+      const txt = this.getQRText();
+      if (txt === '') {
+        this.isGenerating = false;
+        return;
+      }
+      await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
         margin: 0,
         scale: 1,
         errorCorrectionLevel: this.errorCorrectionLevel,
       });
+      setTimeout(() => {
+        this.init3d();
+        this.setup3dObject();
+        this.startAnimation();
 
-      this.init3d();
-      this.setup3dObject();
-      this.startAnimation();
+        this.isGenerating = false;
+      }, 100);
     },
     exportASCII() {
       const result = this.exporter.parse(this.mesh);
