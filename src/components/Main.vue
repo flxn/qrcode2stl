@@ -468,8 +468,8 @@ export default {
         this.base.height,
         this.base.depth,
       );
-      const materialBase = new THREE.MeshBasicMaterial({ color: 0xffffff });
-      const materialBlock = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      const materialBase = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
+      const materialBlock = new THREE.MeshBasicMaterial({ color: 0x111111 });
 
       const baseMesh = new THREE.Mesh(modelBase, materialBase);
       baseMesh.position.set(0, 0, this.base.depth / 2);
@@ -493,24 +493,23 @@ export default {
           const isBlack = pixel[0] === 0;
           if (isBlack) {
             let qrBlock;
-            let qrBlockMesh;
+            // Determine basic block element
             if (this.qrcodeBlockStyle === 'round') {
               qrBlock = new THREE.CylinderGeometry(
-                this.blockWidth / 2 * 0.9,
-                this.blockWidth / 2 * 0.9,
+                this.blockWidth / 2,
+                this.blockWidth / 2,
                 this.code.depth,
-                24,
+                16,
               );
-              qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
-              // qrBlockMesh.rotation.x = Math.PI / 2;
             } else {
               qrBlock = new THREE.BoxGeometry(
                 this.blockWidth,
                 this.blockHeight,
                 this.code.depth,
               );
-              qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
             }
+
+            const qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
 
             let blockX = (x / canvasWidth) * availableWidth;
             blockX -= availableWidth / 2;
@@ -523,6 +522,9 @@ export default {
             const blockZ = this.base.depth + this.code.depth / 2;
 
             qrBlockMesh.position.set(blockX, blockY, blockZ);
+            if (this.qrcodeBlockStyle === 'round') {
+              qrBlockMesh.rotation.set(Math.PI / 2, Math.PI / 2, 0);
+            }
             this.scene.add(qrBlockMesh);
             qrBlockMesh.updateMatrix();
             combinedGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
