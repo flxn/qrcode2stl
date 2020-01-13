@@ -51,6 +51,8 @@
               </li>
             </ul>
           </div>
+
+          <!-- Text -->
           <div class="option-pane" v-if="activeTabIndex === 0">
             <textarea
               class="textarea"
@@ -59,6 +61,8 @@
               style="width: 100%"
             ></textarea>
           </div>
+
+          <!-- Wifi -->
           <div class="option-pane" v-if="activeTabIndex === 1">
             <div class="field is-horizontal">
               <div class="field-label is-normal">
@@ -128,6 +132,60 @@
             </div>
           </div>
 
+          <!-- E-Mail -->
+          <div class="option-pane" v-if="activeTabIndex === 2">
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Recipient</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="The address that sould receive the mail"
+                      v-model="email.recipient"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Subject</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="The e-mail subject line"
+                      v-model="email.subject"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Body</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <textarea
+                      class="textarea"
+                      placeholder="The e-mail content"
+                      v-model="email.body"
+                      style="width: 100%"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="option-pane">
             <div class="field is-horizontal">
@@ -301,6 +359,11 @@ export default {
         password: '',
         security: 'WPA',
         hidden: false,
+      },
+      email: {
+        recipient: '',
+        subject: '',
+        body: '',
       },
       outputText: '',
       workCanvas: null,
@@ -496,11 +559,14 @@ export default {
     getQRText() {
       let ret = '';
       switch (this.activeTabIndex) {
-        case 0:
+        case 0: // Text
           ret = this.text;
           break;
-        case 1:
+        case 1: // Wifi
           ret = `WIFI:S:${this.wifiQREscape(this.wifi.ssid)};T:${this.wifiQREscape(this.wifi.security)};P:${this.wifiQREscape(this.wifi.password)};H:${this.wifi.hidden ? 'true' : 'false'};`;
+          break;
+        case 2: // E-Mail
+          ret = `mailto:${this.email.recipient.split(',').map(x => x.trim()).join(',')}?subject=${encodeURI(this.email.subject)}&body=${encodeURI(this.email.body)}`;
           break;
         default:
           break;
