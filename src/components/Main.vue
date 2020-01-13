@@ -306,13 +306,31 @@
                   <div class="field-body">
                     <div class="field">
                       <div class="control">
-                        <div class="select">
+                        <div class="select is-small">
                           <select v-model="qrcodeBlockStyle">
                             <option>square</option>
                             <option>round</option>
                           </select>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="field is-horizontal">
+                  <div class="field-label is-small">
+                    <label class="label">Block Size</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field has-addons">
+                      <div class="control">
+                        <input class="input is-small" type="number" v-model.number="blockSizeMultiplier" />
+                      </div>
+                      <p class="control">
+                        <a class="button is-static is-small">%</a>
+                      </p>
+                      <span class="help-icon icon has-text-info" title="This value modifies the size of the individual QR code blocks. Play around with this value to achieve unique visual looks but keep in mind that this could impact readability of the QR code.">
+                        <i class="fas fa-info-circle"></i>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -347,7 +365,7 @@
         <hr />
         <div id="container3d"></div>
         <div id="notifications">
-          <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"><strong>Warning for 3D printing:</strong> At least one edge of the smallest cube in 3D model is very small {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.</div>
+          <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"><strong>Warning for 3D printability:</strong> At least one edge of the smallest element in the 3D model is very small {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.</div>
         </div>
       </div>
     </div>
@@ -370,6 +388,7 @@ export default {
     return {
       activeTabIndex: 0,
       errorCorrectionLevel: 'M',
+      blockSizeMultiplier: 100,
       text: '',
       wifi: {
         ssid: '',
@@ -482,10 +501,9 @@ export default {
       const canvasWidth = this.workCanvas.width;
       const canvasHeight = this.workCanvas.height;
       const availableWidth = this.base.width - 2 * this.code.margin;
-      this.blockWidth = availableWidth / canvasWidth;
+      this.blockWidth = availableWidth / canvasWidth * (this.blockSizeMultiplier / 100);
       const availableHeight = this.base.height - 2 * this.code.margin;
-      this.blockHeight = availableHeight / canvasHeight;
-
+      this.blockHeight = availableHeight / canvasHeight * (this.blockSizeMultiplier / 100);
       const ctx = this.workCanvas.getContext('2d');
       for (let y = 0; y < canvasHeight; y += 1) {
         for (let x = 0; x < canvasWidth; x += 1) {
@@ -663,5 +681,10 @@ export default {
 
 #notifications {
   margin-top: 10px;
+}
+
+.help-icon {
+  margin-top: 3px;
+  margin-left: 5px;
 }
 </style>
