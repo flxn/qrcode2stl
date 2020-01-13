@@ -299,6 +299,23 @@
                     </div>
                   </div>
                 </div>
+                <div class="field is-horizontal">
+                  <div class="field-label is-small">
+                    <label class="label">Block Style</label>
+                  </div>
+                  <div class="field-body">
+                    <div class="field">
+                      <div class="control">
+                        <div class="select">
+                          <select v-model="qrcodeBlockStyle">
+                            <option>square</option>
+                            <option>round</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -379,6 +396,7 @@ export default {
         depth: 2,
         margin: 3,
       },
+      qrcodeBlockStyle: 'square',
       camera: null,
       scene: null,
       renderer: null,
@@ -474,12 +492,25 @@ export default {
           const pixel = ctx.getImageData(x, y, 1, 1).data;
           const isBlack = pixel[0] === 0;
           if (isBlack) {
-            const qrBlock = new THREE.BoxGeometry(
-              this.blockWidth,
-              this.blockHeight,
-              this.code.depth,
-            );
-            const qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
+            let qrBlock;
+            let qrBlockMesh;
+            if (this.qrcodeBlockStyle === 'round') {
+              qrBlock = new THREE.CylinderGeometry(
+                this.blockWidth / 2 * 0.9,
+                this.blockWidth / 2 * 0.9,
+                this.code.depth,
+                24,
+              );
+              qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
+              // qrBlockMesh.rotation.x = Math.PI / 2;
+            } else {
+              qrBlock = new THREE.BoxGeometry(
+                this.blockWidth,
+                this.blockHeight,
+                this.code.depth,
+              );
+              qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
+            }
 
             let blockX = (x / canvasWidth) * availableWidth;
             blockX -= availableWidth / 2;
