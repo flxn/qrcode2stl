@@ -6,12 +6,20 @@
           src="../assets/logo.png"
         />
       </a>
-
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <a class="button" href="https://github.com/flxn/qrcode2stl" target="_blank">
+              <span class="icon">
+                <i class="fab fa-github"></i>
+              </span>
+              <span>View on GitHub</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 </template>
