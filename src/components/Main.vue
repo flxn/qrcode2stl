@@ -935,11 +935,6 @@ export default {
   margin-bottom: 0;
 }
 
-.field {
-  width: 100%;
-  display: block;
-}
-
 .option-pane {
   padding: 10px;
 }
