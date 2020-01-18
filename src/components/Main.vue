@@ -7,50 +7,9 @@
         <hr />
         <nav class="panel">
           <p class="panel-heading">QR Code Options</p>
-          <div id="option-tabs" class="panel-tabs tabs">
-            <ul>
-              <li v-bind:class="{ 'is-active': activeTabIndex === 0 }" @click="setActiveTab(0)">
-                <a>
-                  <span class="icon is-small">
-                    <i class="fas fa-font" aria-hidden="true"></i>
-                  </span>
-                  <span>Text/URL</span>
-                </a>
-              </li>
-              <li v-bind:class="{ 'is-active': activeTabIndex === 1 }" @click="setActiveTab(1)">
-                <a>
-                  <span class="icon is-small">
-                    <i class="fas fa-wifi" aria-hidden="true"></i>
-                  </span>
-                  <span>Wifi</span>
-                </a>
-              </li>
-              <li v-bind:class="{ 'is-active': activeTabIndex === 2 }" @click="setActiveTab(2)">
-                <a>
-                  <span class="icon is-small">
-                    <i class="far fa-envelope" aria-hidden="true"></i>
-                  </span>
-                  <span>E-Mail</span>
-                </a>
-              </li>
-              <li v-bind:class="{ 'is-active': activeTabIndex === 3 }" @click="setActiveTab(3)">
-                <a>
-                  <span class="icon is-small">
-                    <i class="far fa-address-card" aria-hidden="true"></i>
-                  </span>
-                  <span>Contact (vCard)</span>
-                </a>
-              </li>
-              <li v-bind:class="{ 'is-active': activeTabIndex === 4 }" @click="setActiveTab(4)">
-                <a>
-                  <span class="icon is-small">
-                    <i class="far fa-comment" aria-hidden="true"></i>
-                  </span>
-                  <span>SMS</span>
-                </a>
-              </li>
-            </ul>
-          </div>
+
+          <!-- QR Code settings tabs -->
+          <TabsQR :active-tab-index="activeTabIndex" @tabChanged="setActiveTab" />
 
           <!-- Text -->
           <div class="option-pane" v-if="activeTabIndex === 0">
@@ -64,312 +23,22 @@
 
           <!-- Wifi -->
           <div class="option-pane" v-if="activeTabIndex === 1">
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">SSID</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder="The name of the Wifi network"
-                      v-model="wifi.ssid"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Password</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder="The password of the Wifi network"
-                      v-model="wifi.password"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Security</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <div class="select">
-                      <select v-model="wifi.security">
-                        <option>WPA</option>
-                        <option>WEP</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Security</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="wifi.hidden">
-                      Hidden
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <WifiForm :wifi="wifi" />
           </div>
 
           <!-- E-Mail -->
           <div class="option-pane" v-if="activeTabIndex === 2">
-            <div class="field has-text-centered">Not all fields have to be filled in.</div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Recipient</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder="The address that sould receive the mail"
-                      v-model="email.recipient"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Subject</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder="The e-mail subject line"
-                      v-model="email.subject"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Body</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <textarea
-                      class="textarea"
-                      placeholder="The e-mail content"
-                      v-model="email.body"
-                      style="width: 100%"
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <EmailForm :email="email" />
           </div>
 
           <!-- Contact -->
           <div class="option-pane" v-if="activeTabIndex === 3">
-            <div class="field has-text-centered">Not all fields have to be filled in.</div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Your Name:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="Firstname" v-model="contact.firstName">
-                  </p>
-                </div>
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="Lastname" v-model="contact.lastName">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Organization:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="ACME Inc." v-model="contact.organization">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Role:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="Senior Money Maker" v-model="contact.role">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Numbers:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="Cell" v-model="contact.cell">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label for="" class="label"></label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="Phone" v-model="contact.phone">
-                  </p>
-                </div>
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="Fax" v-model="contact.fax">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">E-Mail:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="you@example.com" v-model="contact.email">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Street:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="My Street 31" v-model="contact.street">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">City:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="12345" v-model="contact.postcode">
-                  </p>
-                </div>
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="My Town" v-model="contact.city">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">State:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="My State" v-model="contact.state">
-                  </p>
-                </div>
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="My Country" v-model="contact.country">
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Website:</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control">
-                    <input class="input" type="text" placeholder="www.mysite.com" v-model="contact.website">
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ContactForm :contact="contact" />
           </div>
 
           <!-- SMS -->
           <div class="option-pane" v-if="activeTabIndex === 4">
-            <div class="field has-text-centered">Not all fields have to be filled in.</div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Phone</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input
-                      class="input"
-                      type="text"
-                      placeholder="The phone number of the recipient"
-                      v-model="sms.recipient"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Message</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <textarea
-                      class="textarea"
-                      placeholder="The sms content"
-                      v-model="sms.message"
-                      style="width: 100%"
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SMSForm :sms="sms" />
           </div>
 
           <!-- Error Correction -->
@@ -398,139 +67,13 @@
         </nav>
 
         <!-- 3D Options -->
-        <nav class="panel">
-          <p class="panel-heading">3D Model Options</p>
-          <div class="panel-block">
-            <div class="columns" style="width: 100%">
-              <div class="column">
-                <div class="model-options-title">
-                  <div class="title is-size-5">Base</div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Width</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input class="input is-small" type="number" v-model.number="base.width" />
-                      </div>
-                      <p class="control">
-                        <a class="button is-static is-small">{{unit}}</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Height</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input class="input is-small" type="number" v-model.number="base.height" />
-                      </div>
-                      <p class="control">
-                        <a class="button is-static is-small">{{unit}}</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Depth</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input class="input is-small" type="number" v-model.number="base.depth" />
-                      </div>
-                      <p class="control">
-                        <a class="button is-static is-small">{{unit}}</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="column">
-                <div class="model-options-title">
-                  <div class="title is-size-5">QR Code</div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Depth</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input class="input is-small" type="number" v-model.number="code.depth" />
-                      </div>
-                      <p class="control">
-                        <a class="button is-static is-small">{{unit}}</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Margin</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input class="input is-small" type="number" v-model.number="code.margin" />
-                      </div>
-                      <p class="control">
-                        <a class="button is-static is-small">{{unit}}</a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Block Style</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
-                      <div class="control has-icons-left">
-                        <div class="select is-small">
-                          <select v-model="qrcodeBlockStyle">
-                            <option>square</option>
-                            <option>round</option>
-                          </select>
-                          <span class="icon is-small is-left">
-                            <i class="fa fa-shapes"></i>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="field is-horizontal">
-                  <div class="field-label is-small">
-                    <label class="label">Block Size</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field has-addons">
-                      <div class="control">
-                        <input class="input is-small" type="number" v-model.number="blockSizeMultiplier" />
-                      </div>
-                      <p class="control">
-                        <a class="button is-static is-small">%</a>
-                      </p>
-                      <span class="help-icon icon has-text-info" title="This value modifies the size of the individual QR code blocks. Play around with this value to achieve unique visual looks but keep in mind that this could impact readability of the QR code.">
-                        <i class="fas fa-info-circle"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <Panel3dOptions :options="options3d" :unit="unit" />
 
-
-            </div>
-          </div>
-        </nav>
-        <button class="button is-success is-large" v-bind:class="{'is-loading': isGenerating}" @click="generate3dModel">
+        <button
+          class="button is-success is-large"
+          v-bind:class="{'is-loading': isGenerating}"
+          @click="generate3dModel"
+        >
           <span class="icon">
             <i class="fa fa-cube"></i>
           </span>
@@ -562,7 +105,10 @@
         <hr />
         <div id="container3d"></div>
         <div id="notifications">
-          <div class="notification is-warning is-light" v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)">
+          <div
+            class="notification is-warning is-light"
+            v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"
+          >
             <strong>Warning for 3D printability:</strong>
             At least one edge of the smallest element in the 3D model is very small: {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.
             Depending on your setup, this could make printing harder.
@@ -580,17 +126,35 @@ import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 
+// QR Code settings tabs
+import TabsQR from './TabsQR.vue';
+
+// QR Code settings forms
+import WifiForm from './forms/Wifi.vue';
+import EmailForm from './forms/Email.vue';
+import ContactForm from './forms/Contact.vue';
+import SMSForm from './forms/SMS.vue';
+
+// 3D settings panel
+import Panel3dOptions from './Panel3dOptions.vue';
+
 export default {
   name: 'Main',
   props: {
     msg: String,
   },
-
+  components: {
+    WifiForm,
+    EmailForm,
+    ContactForm,
+    SMSForm,
+    Panel3dOptions,
+    TabsQR,
+  },
   data() {
     return {
       activeTabIndex: 0,
       errorCorrectionLevel: 'M',
-      blockSizeMultiplier: 100,
       text: '',
       wifi: {
         ssid: '',
@@ -628,16 +192,20 @@ export default {
       exporter: null,
       unit: 'mm',
       mesh: null,
-      base: {
-        width: 100,
-        height: 100,
-        depth: 3,
+
+      options3d: {
+        base: {
+          width: 100,
+          height: 100,
+          depth: 3,
+        },
+        code: {
+          depth: 2,
+          margin: 3,
+          qrcodeBlockStyle: 'square',
+          blockSizeMultiplier: 100,
+        },
       },
-      code: {
-        depth: 2,
-        margin: 3,
-      },
-      qrcodeBlockStyle: 'square',
       camera: null,
       scene: null,
       renderer: null,
@@ -706,15 +274,15 @@ export default {
     },
     setup3dObject() {
       const modelBase = new THREE.BoxBufferGeometry(
-        this.base.width,
-        this.base.height,
-        this.base.depth,
+        this.options3d.base.width,
+        this.options3d.base.height,
+        this.options3d.base.depth,
       );
       const materialBase = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
       const materialBlock = new THREE.MeshBasicMaterial({ color: 0x111111 });
 
       const baseMesh = new THREE.Mesh(modelBase, materialBase);
-      baseMesh.position.set(0, 0, this.base.depth / 2);
+      baseMesh.position.set(0, 0, this.options3d.base.depth / 2);
       this.scene.add(baseMesh);
 
       const combinedGeometry = new THREE.BufferGeometry();
@@ -723,10 +291,10 @@ export default {
 
       const canvasWidth = this.workCanvas.width;
       const canvasHeight = this.workCanvas.height;
-      const availableWidth = this.base.width - 2 * this.code.margin;
-      this.blockWidth = availableWidth / canvasWidth * (this.blockSizeMultiplier / 100);
-      const availableHeight = this.base.height - 2 * this.code.margin;
-      this.blockHeight = availableHeight / canvasHeight * (this.blockSizeMultiplier / 100);
+      const availableWidth = this.options3d.base.width - 2 * this.options3d.code.margin;
+      this.blockWidth = (availableWidth / canvasWidth) * (this.options3d.code.blockSizeMultiplier / 100);
+      const availableHeight = this.options3d.base.height - 2 * this.options3d.code.margin;
+      this.blockHeight = (availableHeight / canvasHeight) * (this.options3d.code.blockSizeMultiplier / 100);
       const ctx = this.workCanvas.getContext('2d');
       for (let y = 0; y < canvasHeight; y += 1) {
         for (let x = 0; x < canvasWidth; x += 1) {
@@ -735,18 +303,18 @@ export default {
           if (isBlack) {
             let qrBlock;
             // Determine basic block element
-            if (this.qrcodeBlockStyle === 'round') {
+            if (this.options3d.code.qrcodeBlockStyle === 'round') {
               qrBlock = new THREE.CylinderBufferGeometry(
                 this.blockWidth / 2,
                 this.blockWidth / 2,
-                this.code.depth,
+                this.options3d.code.depth,
                 16,
               );
             } else {
               qrBlock = new THREE.BoxBufferGeometry(
                 this.blockWidth,
                 this.blockHeight,
-                this.code.depth,
+                this.options3d.code.depth,
               );
             }
 
@@ -760,10 +328,10 @@ export default {
             blockY -= availableHeight / 2;
             blockY += this.blockHeight / 2;
 
-            const blockZ = this.base.depth + this.code.depth / 2;
+            const blockZ = this.options3d.base.depth + this.options3d.code.depth / 2;
 
             qrBlockMesh.position.set(blockX, blockY, blockZ);
-            if (this.qrcodeBlockStyle === 'round') {
+            if (this.options3d.code.qrcodeBlockStyle === 'round') {
               qrBlockMesh.rotation.set(Math.PI / 2, Math.PI / 2, 0);
             }
             this.scene.add(qrBlockMesh);
@@ -830,9 +398,6 @@ export default {
         filename,
       );
     },
-    setActiveTab(tabIdx) {
-      this.activeTabIndex = tabIdx;
-    },
     wifiQREscape(str) {
       const regex = /([:|\\|;|,|"])/gm;
       const subst = '\\$1';
@@ -847,10 +412,19 @@ export default {
           ret = this.text;
           break;
         case 1: // Wifi
-          ret = `WIFI:S:${this.wifiQREscape(this.wifi.ssid)};T:${this.wifiQREscape(this.wifi.security)};P:${this.wifiQREscape(this.wifi.password)};H:${this.wifi.hidden ? 'true' : 'false'};`;
+          ret = `WIFI:S:${this.wifiQREscape(
+            this.wifi.ssid,
+          )};T:${this.wifiQREscape(this.wifi.security)};P:${this.wifiQREscape(
+            this.wifi.password,
+          )};H:${this.wifi.hidden ? 'true' : 'false'};`;
           break;
         case 2: // E-Mail
-          ret = `mailto:${this.email.recipient.split(',').map(x => x.trim()).join(',')}?subject=${encodeURI(this.email.subject)}&body=${encodeURI(this.email.body)}`;
+          ret = `mailto:${this.email.recipient
+            .split(',')
+            .map(x => x.trim())
+            .join(',')}?subject=${encodeURI(
+            this.email.subject,
+          )}&body=${encodeURI(this.email.body)}`;
           break;
         case 3: // Contact
           vCard.firstName = this.contact.firstName;
@@ -890,6 +464,9 @@ export default {
 
       console.log('QR Code String:', ret);
       return ret;
+    },
+    setActiveTab(idx) {
+      this.activeTabIndex = idx;
     },
   },
   async mounted() {
