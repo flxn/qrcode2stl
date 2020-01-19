@@ -125,7 +125,11 @@
                 </p>
                 <span
                   class="help-icon icon has-text-info"
-                  title="This value modifies the size of the individual QR code blocks. Play around with this value to achieve unique visual looks but keep in mind that this could impact readability of the QR code."
+                  title="This settings modifies the size of the individual QR code blocks.
+Play around with this value to achieve unique visual looks but keep in mind that this could impact readability of the QR code.
+Check the preview with your phone before printing to see if you have gone too far.
+
+Tip: If you increase this value above 100% (e.g. 120%) the blocks will form connected islands that make the QR code easier to print."
                 >
                   <i class="fas fa-info-circle"></i>
                 </span>
@@ -149,4 +153,8 @@ export default {
 </script>
 
 <style>
+.help-icon {
+  margin-top: 3px;
+  margin-left: 5px;
+}
 </style>

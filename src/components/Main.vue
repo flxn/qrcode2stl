@@ -200,7 +200,7 @@ export default {
           depth: 3,
         },
         code: {
-          depth: 2,
+          depth: 1,
           margin: 3,
           qrcodeBlockStyle: 'square',
           blockSizeMultiplier: 100,
@@ -480,7 +480,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 #main {
   margin-top: 20px;
@@ -518,10 +517,5 @@ export default {
 
 #notifications {
   margin-top: 10px;
-}
-
-.help-icon {
-  margin-top: 3px;
-  margin-left: 5px;
 }
 </style>
