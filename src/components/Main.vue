@@ -273,7 +273,7 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
-      const modelBase = new THREE.BoxBufferGeometry(
+      const modelBase = new THREE.BoxGeometry(
         this.options3d.base.width,
         this.options3d.base.height,
         this.options3d.base.depth,
@@ -285,7 +285,7 @@ export default {
       baseMesh.position.set(0, 0, this.options3d.base.depth / 2);
       this.scene.add(baseMesh);
 
-      const combinedGeometry = new THREE.BufferGeometry();
+      const combinedGeometry = new THREE.Geometry();
       baseMesh.updateMatrix();
       combinedGeometry.merge(baseMesh.geometry, baseMesh.matrix);
 
@@ -304,14 +304,14 @@ export default {
             let qrBlock;
             // Determine basic block element
             if (this.options3d.code.qrcodeBlockStyle === 'round') {
-              qrBlock = new THREE.CylinderBufferGeometry(
+              qrBlock = new THREE.CylinderGeometry(
                 this.blockWidth / 2,
                 this.blockWidth / 2,
                 this.options3d.code.depth,
                 16,
               );
             } else {
-              qrBlock = new THREE.BoxBufferGeometry(
+              qrBlock = new THREE.BoxGeometry(
                 this.blockWidth,
                 this.blockHeight,
                 this.options3d.code.depth,
