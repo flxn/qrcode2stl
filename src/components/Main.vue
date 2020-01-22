@@ -84,23 +84,68 @@
         <canvas id="qr-canvas"></canvas>
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
-        <div class="is-pulled-right" v-if="this.mesh">
-          <button class="button export-button is-primary is-medium" @click="exportASCII">
-            <span class="icon">
-              <i class="fa fa-download"></i>
-            </span>
-            <span>Save As STL (ASCII)</span>
-          </button>
-          <button class="button export-button is-primary is-medium" @click="exportBinary">
-            <span class="icon">
-              <i class="fa fa-download"></i>
-            </span>
-            <span>Save As STL (binary)</span>
-          </button>
-        </div>
-        <div>
-          <p class="title">Preview</p>
-          <p class="subtitle">Use your mouse to rotate.</p>
+        <div class="columns">
+          <div class="column">
+            <p class="title">Preview</p>
+            <p class="subtitle">Use your mouse to rotate.</p>
+          </div>
+          <div class="column is-2" v-if="mesh">
+            <div class="field">
+              <div class="field-label is-normal">
+                <label class="label"
+                    title="Just leave this as 'binary' to keep file size low.
+If your software has issues with the generated file, you can try to change this option.">
+                  STL file
+                  <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
+                </label>
+
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <div class="select">
+                      <select v-model="stlType">
+                        <option>binary</option>
+                        <option>ASCII</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column is-3" v-if="mesh">
+            <div class="field">
+              <div class="field-label is-normal">
+                <label class="label" title="If set to 'yes' the base and the qr code will be saved as two separate parts
+for printers with dual extrusion printing.
+Your browser may ask for permissions to download multiple files.">
+                  Export 2 parts?
+                  <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
+                </label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <div class="select">
+                      <select v-model="dualExtrusion">
+                        <option value="false">no</option>
+                        <option value="true">yes</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column is-3" style="padding-top: 2rem" v-if="mesh">
+            <button class="button export-button is-primary is-medium" @click="exportSTL">
+              <span class="icon">
+                <i class="fa fa-download"></i>
+              </span>
+              <span>Save As STL</span>
+            </button>
+          </div>
         </div>
         <hr />
         <div id="container3d"></div>
@@ -188,11 +233,6 @@ export default {
         message: '',
       },
       outputText: '',
-      workCanvas: null,
-      exporter: null,
-      unit: 'mm',
-      mesh: null,
-
       options3d: {
         base: {
           width: 100,
@@ -206,6 +246,14 @@ export default {
           blockSizeMultiplier: 100,
         },
       },
+      workCanvas: null,
+      exporter: null,
+      unit: 'mm',
+      mesh: null,
+      baseMesh: null,
+      qrcodeMesh: null,
+      stlType: 'binary',
+      dualExtrusion: false,
       camera: null,
       scene: null,
       renderer: null,
@@ -285,6 +333,7 @@ export default {
       baseMesh.position.set(0, 0, this.options3d.base.depth / 2);
       this.scene.add(baseMesh);
 
+      const qrcodeGeometry = new THREE.Geometry();
       const combinedGeometry = new THREE.Geometry();
       baseMesh.updateMatrix();
       combinedGeometry.merge(baseMesh.geometry, baseMesh.matrix);
@@ -336,11 +385,15 @@ export default {
             }
             this.scene.add(qrBlockMesh);
             qrBlockMesh.updateMatrix();
+            qrcodeGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
             combinedGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
           }
         }
       }
-
+      // separate meshes for dual extrusion
+      this.baseMesh = baseMesh;
+      this.qrcodeMesh = new THREE.Mesh(qrcodeGeometry, materialBlock);
+      // combined mesh
       this.mesh = new THREE.Mesh(combinedGeometry, materialBase);
     },
     startAnimation() {
@@ -373,13 +426,31 @@ export default {
         this.isGenerating = false;
       }, 100);
     },
-    exportASCII() {
-      const result = this.exporter.parse(this.mesh);
-      this.saveString(result, 'qrcode.stl');
-    },
-    exportBinary() {
-      const result = this.exporter.parse(this.mesh, { binary: true });
-      this.saveArrayBuffer(result, 'qrcode.stl');
+    exportSTL() {
+      const timestamp = new Date().getTime();
+      const exportAsBinary = (this.stlType === 'binary');
+
+      if (this.dualExtrusion) {
+        const filenameBase = `base-${timestamp}.stl`;
+        const filenameQrcode = `qrcode-${timestamp}.stl`;
+        const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
+        const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
+        if (exportAsBinary) {
+          this.saveArrayBuffer(baseSTL, filenameBase);
+          this.saveArrayBuffer(qrcodeSTL, filenameQrcode);
+        } else {
+          this.saveString(baseSTL, filenameBase);
+          this.saveString(qrcodeSTL, filenameQrcode);
+        }
+      } else {
+        const filename = `combined-${timestamp}.stl`;
+        const result = this.exporter.parse(this.mesh, { binary: exportAsBinary });
+        if (exportAsBinary) {
+          this.saveArrayBuffer(result, filename);
+        } else {
+          this.saveString(result, filename);
+        }
+      }
     },
     save(blob, filename) {
       const link = document.createElement('a');
@@ -517,5 +588,9 @@ export default {
 
 #notifications {
   margin-top: 10px;
+}
+
+.field-label {
+  text-align: left;
 }
 </style>
