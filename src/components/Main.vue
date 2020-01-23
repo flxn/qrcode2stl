@@ -120,7 +120,7 @@ If your software has issues with the generated file, you can try to change this 
                 <label class="label" title="If set to 'yes' the base and the qr code will be saved as two separate parts
 for printers with dual extrusion printing.
 Your browser may ask for permissions to download multiple files.">
-                  Export 2 parts?
+                  Export separate parts?
                   <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
                 </label>
               </div>
@@ -129,8 +129,8 @@ Your browser may ask for permissions to download multiple files.">
                   <div class="control">
                     <div class="select">
                       <select v-model="dualExtrusion">
-                        <option value="false">no</option>
-                        <option value="true">yes</option>
+                        <option v-bind:value="false">no</option>
+                        <option v-bind:value="true">yes</option>
                       </select>
                     </div>
                   </div>
@@ -243,12 +243,14 @@ export default {
       options3d: {
         base: {
           width: 100,
-          height: 100,
           depth: 3,
+          hasBorder: false,
+          borderWidth: 2,
+          borderDepth: 1,
         },
         code: {
           depth: 1,
-          margin: 3,
+          margin: 5,
           qrcodeBlockStyle: 'square',
           blockSizeMultiplier: 100,
         },
@@ -259,6 +261,7 @@ export default {
       mesh: null,
       baseMesh: null,
       qrcodeMesh: null,
+      borderMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
       camera: null,
@@ -330,7 +333,7 @@ export default {
     setup3dObject() {
       const modelBase = new THREE.BoxGeometry(
         this.options3d.base.width,
-        this.options3d.base.height,
+        this.options3d.base.width,
         this.options3d.base.depth,
       );
       const materialBase = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
@@ -342,15 +345,25 @@ export default {
 
       const qrcodeGeometry = new THREE.Geometry();
       const combinedGeometry = new THREE.Geometry();
+      const borderGeometry = new THREE.Geometry();
+
       baseMesh.updateMatrix();
       combinedGeometry.merge(baseMesh.geometry, baseMesh.matrix);
 
       const canvasWidth = this.workCanvas.width;
       const canvasHeight = this.workCanvas.height;
-      const availableWidth = this.options3d.base.width - 2 * this.options3d.code.margin;
+      let availableWidth = this.options3d.base.width - 2 * this.options3d.code.margin;
+      if (this.options3d.base.hasBorder) {
+        availableWidth -= 2 * this.options3d.base.borderWidth;
+      }
       this.blockWidth = (availableWidth / canvasWidth) * (this.options3d.code.blockSizeMultiplier / 100);
-      const availableHeight = this.options3d.base.height - 2 * this.options3d.code.margin;
+
+      let availableHeight = this.options3d.base.width - 2 * this.options3d.code.margin;
+      if (this.options3d.base.hasBorder) {
+        availableHeight -= 2 * this.options3d.base.borderWidth;
+      }
       this.blockHeight = (availableHeight / canvasHeight) * (this.options3d.code.blockSizeMultiplier / 100);
+
       const ctx = this.workCanvas.getContext('2d');
       for (let y = 0; y < canvasHeight; y += 1) {
         for (let x = 0; x < canvasWidth; x += 1) {
@@ -397,9 +410,71 @@ export default {
           }
         }
       }
+
+      if (this.options3d.base.hasBorder) {
+        const widthOffset = this.options3d.base.borderWidth / 2;
+        const topSide = -this.options3d.base.width / 2 + widthOffset;
+        const rightSide = this.options3d.base.width / 2 - widthOffset;
+        const bottomSide = this.options3d.base.width / 2 - widthOffset;
+        const leftSide = -this.options3d.base.width / 2 + widthOffset;
+
+        const borderZ = this.options3d.base.depth + this.options3d.base.borderDepth / 2;
+
+        const topBorder = new THREE.BoxGeometry(
+          this.options3d.base.borderWidth,
+          this.options3d.base.width,
+          this.options3d.base.borderDepth,
+        );
+        const topBorderMesh = new THREE.Mesh(topBorder, materialBlock);
+        topBorderMesh.position.set(topSide, 0, borderZ);
+        this.scene.add(topBorderMesh);
+        topBorderMesh.updateMatrix();
+        borderGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
+        combinedGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
+
+        const rightBorder = new THREE.BoxGeometry(
+          this.options3d.base.borderWidth,
+          this.options3d.base.width,
+          this.options3d.base.borderDepth,
+        );
+        const rightBorderMesh = new THREE.Mesh(rightBorder, materialBlock);
+        rightBorderMesh.position.set(0, rightSide, borderZ);
+        rightBorderMesh.rotation.set(0, 0, Math.PI / 2);
+        this.scene.add(rightBorderMesh);
+        rightBorderMesh.updateMatrix();
+        borderGeometry.merge(rightBorderMesh.geometry, rightBorderMesh.matrix);
+        combinedGeometry.merge(rightBorderMesh.geometry, rightBorderMesh.matrix);
+
+        const bottomBorder = new THREE.BoxGeometry(
+          this.options3d.base.borderWidth,
+          this.options3d.base.width,
+          this.options3d.base.borderDepth,
+        );
+        const bottomBorderMesh = new THREE.Mesh(bottomBorder, materialBlock);
+        bottomBorderMesh.position.set(bottomSide, 0, borderZ);
+        this.scene.add(bottomBorderMesh);
+        bottomBorderMesh.updateMatrix();
+        borderGeometry.merge(bottomBorderMesh.geometry, bottomBorderMesh.matrix);
+        combinedGeometry.merge(bottomBorderMesh.geometry, bottomBorderMesh.matrix);
+
+        const leftBorder = new THREE.BoxGeometry(
+          this.options3d.base.borderWidth,
+          this.options3d.base.width,
+          this.options3d.base.borderDepth,
+        );
+        const leftBorderMesh = new THREE.Mesh(leftBorder, materialBlock);
+        leftBorderMesh.position.set(0, leftSide, borderZ);
+        leftBorderMesh.rotation.set(0, 0, Math.PI / 2);
+        this.scene.add(leftBorderMesh);
+        leftBorderMesh.updateMatrix();
+        borderGeometry.merge(leftBorderMesh.geometry, leftBorderMesh.matrix);
+        combinedGeometry.merge(leftBorderMesh.geometry, leftBorderMesh.matrix);
+      }
+
       // separate meshes for dual extrusion
       this.baseMesh = baseMesh;
       this.qrcodeMesh = new THREE.Mesh(qrcodeGeometry, materialBlock);
+      this.borderMesh = new THREE.Mesh(borderGeometry, materialBlock);
       // combined mesh
       this.mesh = new THREE.Mesh(combinedGeometry, materialBase);
     },
@@ -440,6 +515,7 @@ export default {
       if (this.dualExtrusion) {
         const filenameBase = `base-${timestamp}.stl`;
         const filenameQrcode = `qrcode-${timestamp}.stl`;
+        const filenameBorder = `border-${timestamp}.stl`;
         const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
         const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
         if (exportAsBinary) {
@@ -448,6 +524,15 @@ export default {
         } else {
           this.saveString(baseSTL, filenameBase);
           this.saveString(qrcodeSTL, filenameQrcode);
+        }
+
+        if (this.options3d.base.hasBorder) {
+          const borderSTL = this.exporter.parse(this.borderMesh, { binary: exportAsBinary });
+          if (exportAsBinary) {
+            this.saveArrayBuffer(borderSTL, filenameBorder);
+          } else {
+            this.saveString(borderSTL, filenameBorder);
+          }
         }
       } else {
         const filename = `combined-${timestamp}.stl`;

@@ -24,12 +24,12 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Height</label>
+              <label class="label">Depth</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.height" />
+                  <input class="input is-small" type="number" v-model.number="options.base.depth" />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>
@@ -39,12 +39,41 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Depth</label>
+              <label class="label">Border</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <label class="checkbox">
+                    <input type="checkbox" v-model="options.base.hasBorder" />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasBorder">
+            <div class="field-label is-small">
+              <label class="label">Border Width</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.depth" />
+                  <input class="input is-small" type="number" v-model.number="options.base.borderWidth" />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasBorder">
+            <div class="field-label is-small">
+              <label class="label">Border Depth</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input class="input is-small" type="number" v-model.number="options.base.borderDepth" />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>
