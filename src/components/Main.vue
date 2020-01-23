@@ -159,8 +159,12 @@ Your browser may ask for permissions to download multiple files.">
             Depending on your setup, this could make printing harder.
           </div>
         </div>
+        <br/>
+        <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> Scroll down for a guide on how to print your QR code.</a>
       </div>
     </div>
+
+    <PrintGuide />
   </div>
 </template>
 
@@ -183,6 +187,8 @@ import SMSForm from './forms/SMS.vue';
 // 3D settings panel
 import Panel3dOptions from './Panel3dOptions.vue';
 
+import PrintGuide from './PrintGuide.vue';
+
 export default {
   name: 'Main',
   props: {
@@ -195,6 +201,7 @@ export default {
     SMSForm,
     Panel3dOptions,
     TabsQR,
+    PrintGuide,
   },
   data() {
     return {
