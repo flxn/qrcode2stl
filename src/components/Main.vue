@@ -175,6 +175,8 @@ import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 
+import QRCode3D from '../qrcode3d';
+
 // QR Code settings tabs
 import TabsQR from './TabsQR.vue';
 
@@ -186,7 +188,7 @@ import SMSForm from './forms/SMS.vue';
 
 // 3D settings panel
 import Panel3dOptions from './Panel3dOptions.vue';
-
+// Print Guide
 import PrintGuide from './PrintGuide.vue';
 
 export default {
@@ -284,20 +286,6 @@ export default {
       this.scene.background = new THREE.Color(0xa0a0a0);
       this.scene.rotation.z = -Math.PI / 2;
 
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
-      hemiLight.position.set(0, 200, 0);
-      this.scene.add(hemiLight);
-
-      const directionalLight = new THREE.DirectionalLight(0xffffff);
-      directionalLight.position.set(0, 200, 100);
-      directionalLight.castShadow = true;
-      directionalLight.shadow.camera.top = 180;
-      directionalLight.shadow.camera.bottom = -100;
-      directionalLight.shadow.camera.left = -120;
-      directionalLight.shadow.camera.right = 120;
-      directionalLight.rotation.x = Math.PI / 2;
-      this.scene.add(directionalLight);
-
       const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
       grid.material.opacity = 0.2;
       grid.material.transparent = true;
@@ -331,152 +319,15 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
-      const modelBase = new THREE.BoxGeometry(
-        this.options3d.base.width,
-        this.options3d.base.width,
-        this.options3d.base.depth,
-      );
-      const materialBase = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
-      const materialBlock = new THREE.MeshBasicMaterial({ color: 0x111111 });
+      const qrcodeModel = new QRCode3D(this.workCanvas, this.options3d);
+      this.baseMesh = qrcodeModel.baseMesh;
+      this.qrcodeMesh = qrcodeModel.qrcodeMesh;
+      this.borderMesh = qrcodeModel.borderMesh;
+      this.mesh = qrcodeModel.combinedMesh;
 
-      const baseMesh = new THREE.Mesh(modelBase, materialBase);
-      baseMesh.position.set(0, 0, this.options3d.base.depth / 2);
-      this.scene.add(baseMesh);
-
-      const qrcodeGeometry = new THREE.Geometry();
-      const combinedGeometry = new THREE.Geometry();
-      const borderGeometry = new THREE.Geometry();
-
-      baseMesh.updateMatrix();
-      combinedGeometry.merge(baseMesh.geometry, baseMesh.matrix);
-
-      const canvasWidth = this.workCanvas.width;
-      const canvasHeight = this.workCanvas.height;
-      let availableWidth = this.options3d.base.width - 2 * this.options3d.code.margin;
-      if (this.options3d.base.hasBorder) {
-        availableWidth -= 2 * this.options3d.base.borderWidth;
-      }
-      this.blockWidth = (availableWidth / canvasWidth) * (this.options3d.code.blockSizeMultiplier / 100);
-
-      let availableHeight = this.options3d.base.width - 2 * this.options3d.code.margin;
-      if (this.options3d.base.hasBorder) {
-        availableHeight -= 2 * this.options3d.base.borderWidth;
-      }
-      this.blockHeight = (availableHeight / canvasHeight) * (this.options3d.code.blockSizeMultiplier / 100);
-
-      const ctx = this.workCanvas.getContext('2d');
-      for (let y = 0; y < canvasHeight; y += 1) {
-        for (let x = 0; x < canvasWidth; x += 1) {
-          const pixel = ctx.getImageData(x, y, 1, 1).data;
-          const isBlack = pixel[0] === 0;
-          if (isBlack) {
-            let qrBlock;
-            // Determine basic block element
-            if (this.options3d.code.qrcodeBlockStyle === 'round') {
-              qrBlock = new THREE.CylinderGeometry(
-                this.blockWidth / 2,
-                this.blockWidth / 2,
-                this.options3d.code.depth,
-                16,
-              );
-            } else {
-              qrBlock = new THREE.BoxGeometry(
-                this.blockWidth,
-                this.blockHeight,
-                this.options3d.code.depth,
-              );
-            }
-
-            const qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
-
-            let blockX = (x / canvasWidth) * availableWidth;
-            blockX -= availableWidth / 2;
-            blockX += this.blockWidth / 2;
-
-            let blockY = (y / canvasHeight) * availableHeight;
-            blockY -= availableHeight / 2;
-            blockY += this.blockHeight / 2;
-
-            const blockZ = this.options3d.base.depth + this.options3d.code.depth / 2;
-
-            qrBlockMesh.position.set(blockX, blockY, blockZ);
-            if (this.options3d.code.qrcodeBlockStyle === 'round') {
-              qrBlockMesh.rotation.set(Math.PI / 2, Math.PI / 2, 0);
-            }
-            this.scene.add(qrBlockMesh);
-            qrBlockMesh.updateMatrix();
-            qrcodeGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
-            combinedGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
-          }
-        }
-      }
-
-      if (this.options3d.base.hasBorder) {
-        const widthOffset = this.options3d.base.borderWidth / 2;
-        const topSide = -this.options3d.base.width / 2 + widthOffset;
-        const rightSide = this.options3d.base.width / 2 - widthOffset;
-        const bottomSide = this.options3d.base.width / 2 - widthOffset;
-        const leftSide = -this.options3d.base.width / 2 + widthOffset;
-
-        const borderZ = this.options3d.base.depth + this.options3d.base.borderDepth / 2;
-
-        const topBorder = new THREE.BoxGeometry(
-          this.options3d.base.borderWidth,
-          this.options3d.base.width,
-          this.options3d.base.borderDepth,
-        );
-        const topBorderMesh = new THREE.Mesh(topBorder, materialBlock);
-        topBorderMesh.position.set(topSide, 0, borderZ);
-        this.scene.add(topBorderMesh);
-        topBorderMesh.updateMatrix();
-        borderGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
-        combinedGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
-
-        const rightBorder = new THREE.BoxGeometry(
-          this.options3d.base.borderWidth,
-          this.options3d.base.width,
-          this.options3d.base.borderDepth,
-        );
-        const rightBorderMesh = new THREE.Mesh(rightBorder, materialBlock);
-        rightBorderMesh.position.set(0, rightSide, borderZ);
-        rightBorderMesh.rotation.set(0, 0, Math.PI / 2);
-        this.scene.add(rightBorderMesh);
-        rightBorderMesh.updateMatrix();
-        borderGeometry.merge(rightBorderMesh.geometry, rightBorderMesh.matrix);
-        combinedGeometry.merge(rightBorderMesh.geometry, rightBorderMesh.matrix);
-
-        const bottomBorder = new THREE.BoxGeometry(
-          this.options3d.base.borderWidth,
-          this.options3d.base.width,
-          this.options3d.base.borderDepth,
-        );
-        const bottomBorderMesh = new THREE.Mesh(bottomBorder, materialBlock);
-        bottomBorderMesh.position.set(bottomSide, 0, borderZ);
-        this.scene.add(bottomBorderMesh);
-        bottomBorderMesh.updateMatrix();
-        borderGeometry.merge(bottomBorderMesh.geometry, bottomBorderMesh.matrix);
-        combinedGeometry.merge(bottomBorderMesh.geometry, bottomBorderMesh.matrix);
-
-        const leftBorder = new THREE.BoxGeometry(
-          this.options3d.base.borderWidth,
-          this.options3d.base.width,
-          this.options3d.base.borderDepth,
-        );
-        const leftBorderMesh = new THREE.Mesh(leftBorder, materialBlock);
-        leftBorderMesh.position.set(0, leftSide, borderZ);
-        leftBorderMesh.rotation.set(0, 0, Math.PI / 2);
-        this.scene.add(leftBorderMesh);
-        leftBorderMesh.updateMatrix();
-        borderGeometry.merge(leftBorderMesh.geometry, leftBorderMesh.matrix);
-        combinedGeometry.merge(leftBorderMesh.geometry, leftBorderMesh.matrix);
-      }
-
-      // separate meshes for dual extrusion
-      this.baseMesh = baseMesh;
-      this.qrcodeMesh = new THREE.Mesh(qrcodeGeometry, materialBlock);
-      this.borderMesh = new THREE.Mesh(borderGeometry, materialBlock);
-      // combined mesh
-      this.mesh = new THREE.Mesh(combinedGeometry, materialBase);
+      this.scene.add(this.baseMesh);
+      this.scene.add(this.qrcodeMesh);
+      this.scene.add(this.borderMesh);
     },
     startAnimation() {
       const animate = () => {
