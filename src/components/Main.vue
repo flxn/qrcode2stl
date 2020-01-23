@@ -660,12 +660,6 @@ export default {
   display: none;
 }
 
-.model-options-title {
-  margin: 0 0 10px 5px;
-  padding-bottom: 7px;
-  border-bottom: 2px solid whitesmoke;
-}
-
 .export-button {
   margin: 0 10px;
 }

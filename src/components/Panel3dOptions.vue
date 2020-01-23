@@ -187,4 +187,10 @@ export default {
   margin-top: 3px;
   margin-left: 5px;
 }
+
+.model-options-title {
+  margin: 0 0 10px 5px;
+  padding-bottom: 7px;
+  border-bottom: 2px solid whitesmoke;
+}
 </style>
