@@ -339,10 +339,22 @@ export default {
       };
       animate();
     },
+    getSettingsString() {
+      let settingsString = '';
+      Object.keys(this.options3d).forEach((topLevelKey) => {
+        Object.keys(this.options3d[topLevelKey]).forEach((subLevelKey) => {
+          settingsString += `${topLevelKey}_${subLevelKey}:${this.options3d[topLevelKey][subLevelKey]} `;
+        });
+      });
+      return settingsString;
+    },
     trackGenerateEvent() {
-      const settingsString = JSON.stringify(this.options3d, null, 4);
       // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'Generate', settingsString]);
+      window._paq.push(['trackEvent', 'qrcode2stl', 'Generate', this.getSettingsString()]);
+    },
+    trackExportEvent() {
+      // eslint-disable-next-line no-underscore-dangle
+      window._paq.push(['trackEvent', 'qrcode2stl', 'Export', this.getSettingsString()]);
     },
     async generate3dModel() {
       this.trackGenerateEvent();
@@ -367,6 +379,7 @@ export default {
       }, 100);
     },
     exportSTL() {
+      this.trackExportEvent();
       const timestamp = new Date().getTime();
       const exportAsBinary = (this.stlType === 'binary');
 
