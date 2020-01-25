@@ -339,7 +339,14 @@ export default {
       };
       animate();
     },
+    trackGenerateEvent() {
+      const settingsString = JSON.stringify(this.options3d, null, 4);
+      // eslint-disable-next-line no-underscore-dangle
+      window._paq.push(['trackEvent', 'Generate', settingsString]);
+    },
     async generate3dModel() {
+      this.trackGenerateEvent();
+
       this.isGenerating = true;
       const txt = this.getQRText();
       if (txt === '') {
