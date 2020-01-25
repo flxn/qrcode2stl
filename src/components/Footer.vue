@@ -20,13 +20,19 @@
         If you need help or have some great idea, you can write me a mail:
         <a href="mailto:mail@flxn.de"><i class="fa fa-envelope"></i> mail@flxn.de</a>
       </p>
+      <ShareButtons />
     </div>
   </footer>
 </template>
 
 <script>
+import ShareButtons from './ShareButtons.vue';
+
 export default {
   name: 'Footer',
+  components: {
+    ShareButtons,
+  },
 };
 </script>
 
