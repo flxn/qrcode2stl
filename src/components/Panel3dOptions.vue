@@ -37,6 +37,8 @@
               </div>
             </div>
           </div>
+
+          <!-- Border Settings -->
           <div class="field is-horizontal">
             <div class="field-label is-small">
               <label class="label">Border</label>
@@ -166,6 +168,30 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
               </div>
             </div>
           </div>
+
+          <!-- Icon Settings -->
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">Icon</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control has-icons-left">
+                  <div class="select is-small">
+                    <select v-model="options.code.iconName">
+                      <option>none</option>
+                      <option v-for="icon in icons" :key="icon"><img :src="'/icons/' + icon + '.svg'"/> {{icon}}</option>
+                    </select>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-icons"></i>
+                    </span>
+                  </div>
+                  <object type="image/svg+xml" id="icon-preview" width="32" height="32" :data="'/icons/' + options.code.iconName + '.svg'" v-if="options.code.iconName !== 'none'"/>
+                  <div class="is-size-7" v-if="options.code.iconName !== 'none'">Icons by Fontawesome <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -178,6 +204,25 @@ export default {
   props: {
     options: Object,
     unit: String,
+  },
+  data() {
+    return {
+      icons: [
+        'wifi',
+        'user',
+        'key',
+        'globe',
+        'speech-bubble',
+        'marker',
+        'map-marked',
+        'envelope',
+        'at-symbol',
+        'facebook',
+        'linkedin',
+        'twitter',
+        'reddit',
+      ],
+    };
   },
 };
 </script>
@@ -192,5 +237,9 @@ export default {
   margin: 0 0 10px 5px;
   padding-bottom: 7px;
   border-bottom: 2px solid whitesmoke;
+}
+
+#icon-preview {
+  margin-left: 15px;
 }
 </style>
