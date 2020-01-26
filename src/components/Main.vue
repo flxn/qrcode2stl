@@ -122,7 +122,7 @@ If your software has issues with the generated file, you can try to change this 
                 <label class="label" title="If set to 'yes' the base and the qr code will be saved as two separate parts
 for printers with dual extrusion printing.
 Your browser may ask for permissions to download multiple files.">
-                  Export separate parts?
+                  Separate parts?
                   <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
                 </label>
               </div>
@@ -256,6 +256,8 @@ export default {
           margin: 5,
           qrcodeBlockStyle: 'square',
           blockSizeMultiplier: 100,
+          iconName: 'none',
+          iconSizeRatio: 20,
         },
       },
       workCanvas: null,
@@ -265,6 +267,7 @@ export default {
       baseMesh: null,
       qrcodeMesh: null,
       borderMesh: null,
+      iconMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
       camera: null,
@@ -325,11 +328,13 @@ export default {
       this.baseMesh = qrcodeModel.baseMesh;
       this.qrcodeMesh = qrcodeModel.qrcodeMesh;
       this.borderMesh = qrcodeModel.borderMesh;
+      this.iconMesh = qrcodeModel.iconMesh;
       this.mesh = qrcodeModel.combinedMesh;
 
       this.scene.add(this.baseMesh);
       this.scene.add(this.qrcodeMesh);
       this.scene.add(this.borderMesh);
+      this.scene.add(this.iconMesh);
     },
     startAnimation() {
       const animate = () => {
