@@ -207,7 +207,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
                           </div>
                           <div class="column is-4" v-for="icon in icons" :key="icon">
                             <div class="icon-item dropdown-item is-vcentered" @click="iconSelected(icon)">
-                              <img width="18" height="18" :src="'/icons/' + icon + '.svg'" loading="lazy" />
+                              <img width="18" height="18" :src="'icons/' + icon + '.svg'" loading="lazy" />
                             </div>
                           </div>
                         </div>
@@ -219,7 +219,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
                     id="icon-preview"
                     width="32"
                     height="32"
-                    :data="'/icons/' + options.code.iconName + '.svg'"
+                    :data="'icons/' + options.code.iconName + '.svg'"
                     v-if="options.code.iconName !== 'none'"
                   />
                   <div class="is-size-7" v-if="options.code.iconName !== 'none'">
