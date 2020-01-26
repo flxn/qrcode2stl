@@ -225,6 +225,11 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
                   <div class="is-size-7" v-if="options.code.iconName !== 'none'">
                     Icons by Fontawesome
                     <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
+                    <br/>
+                    <p class="has-text-danger">
+                      This is a beta feature and may cause problems.<br/>
+                      For now Error Correction will be set to high if you use icons.
+                    </p>
                   </div>
                 </div>
               </div>

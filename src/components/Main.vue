@@ -365,6 +365,9 @@ export default {
     },
     async generate3dModel() {
       this.trackGenerateEvent();
+      if (this.options3d.code.iconName !== 'none') {
+        this.errorCorrectionLevel = 'H';
+      }
       this.showNoTextError = false;
       this.isGenerating = true;
       const txt = this.getQRText();
