@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-// import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 
 class QRCode3D {
   constructor(canvas, options) {
@@ -61,15 +60,15 @@ class QRCode3D {
       const loader = new SVGLoader();
       const svgMarkup = document.querySelector('#icon-preview').contentDocument.querySelector('svg').outerHTML;
       const svgData = loader.parse(svgMarkup);
-
       // Loop through all of the parsed paths
       svgData.paths.forEach((path) => {
-        const shapes = path.toShapes(true);
+        const shapes = path.toShapes(true, true);
 
         // Each path has array of shapes
         shapes.forEach((shape) => {
           // Finally we can take each shape and extrude it
           const pathGeometry = new THREE.ExtrudeGeometry(shape, {
+            steps: 1,
             depth: this.options.code.depth,
             bevelEnabled: false,
           });
@@ -78,7 +77,6 @@ class QRCode3D {
           pathMesh.position.set(0, 0, 0);
           pathMesh.rotation.set(0, 0, -Math.PI / 2);
           pathMesh.updateMatrix();
-
           iconGeometry.merge(pathMesh.geometry, pathMesh.matrix);
         });
       });
@@ -88,7 +86,9 @@ class QRCode3D {
       // scale icon to correct size
       iconBoundingBox = new THREE.Box3().setFromObject(iconMesh);
       iconSize = iconBoundingBox.getSize();
-      const scaleRatio = iconSize.y / (blockWidth * 4);
+      const scaleRatioY = iconSize.y / (blockWidth * 4);
+      const scaleRatioX = iconSize.x / (blockWidth * 4);
+      const scaleRatio = scaleRatioX > scaleRatioY ? scaleRatioX : scaleRatioY;
       iconMesh.scale.x /= scaleRatio;
       iconMesh.scale.y /= scaleRatio;
       iconMesh.rotation.x = Math.PI;
@@ -99,9 +99,8 @@ class QRCode3D {
       iconMesh.position.x = -iconSize.x / 2;
       iconMesh.position.y = -iconSize.y / 2 + blockWidth / 2;
       iconMesh.position.z = this.options.base.depth + this.options.code.depth;
-      iconMesh.scale.x *= 0.9;
-      iconMesh.scale.y *= 0.9;
-      console.log(iconMesh.position);
+      // iconMesh.scale.x *= 0.9;
+      // iconMesh.scale.y *= 0.9;
       this.iconMesh = iconMesh;
     }
 
@@ -139,13 +138,14 @@ class QRCode3D {
           blockY -= availableWidth / 2;
           blockY += blockWidth / 2;
 
-          // don't draw block if it collides with icon
+          // don't draw block if it collides with icon bounding box
           if (this.iconMesh) {
+            const maxSize = iconSize.x > iconSize.y ? iconSize.x : iconSize.y;
             const safetyMargin = blockWidth / 2;
-            if ((blockX > -iconSize.x / 2 - safetyMargin
-              && blockX < iconSize.x / 2 + safetyMargin)
-              && (blockY > -iconSize.y / 2 - safetyMargin
-              && blockY < +iconSize.y / 2 + safetyMargin)) {
+            if ((blockX > -maxSize / 2 - safetyMargin
+              && blockX < maxSize / 2 + safetyMargin)
+              && (blockY > -maxSize / 2 - safetyMargin
+              && blockY < +maxSize / 2 + safetyMargin)) {
               // eslint-disable-next-line no-continue
               continue;
             }

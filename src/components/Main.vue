@@ -209,7 +209,7 @@ export default {
     return {
       activeTabIndex: 0,
       errorCorrectionLevel: 'M',
-      text: 'sdafsdf',
+      text: '',
       wifi: {
         ssid: '',
         password: '',
@@ -255,7 +255,7 @@ export default {
           margin: 5,
           qrcodeBlockStyle: 'square',
           blockSizeMultiplier: 100,
-          iconName: 'wifi',
+          iconName: 'none',
         },
       },
       workCanvas: null,

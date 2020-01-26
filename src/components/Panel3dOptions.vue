@@ -60,7 +60,11 @@
             <div class="field-body">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.borderWidth" />
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.borderWidth"
+                  />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>
@@ -75,7 +79,11 @@
             <div class="field-body">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.borderDepth" />
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.borderDepth"
+                  />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>
@@ -176,18 +184,48 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
             </div>
             <div class="field-body">
               <div class="field">
-                <div class="control has-icons-left">
-                  <div class="select is-small">
-                    <select v-model="options.code.iconName">
-                      <option>none</option>
-                      <option v-for="icon in icons" :key="icon"><img :src="'/icons/' + icon + '.svg'"/> {{icon}}</option>
-                    </select>
-                    <span class="icon is-small is-left">
-                      <i class="fa fa-icons"></i>
-                    </span>
+                <div class="control">
+                  <div class="dropdown is-hoverable">
+                    <div class="dropdown-trigger">
+                      <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu2">
+                        <span class="icon is-small">
+                          <i class="fa fa-icons" aria-hidden="true"></i>
+                        </span>
+                        <span>{{options.code.iconName}}</span>
+                        <span class="icon is-small">
+                          <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu2" role="menu">
+                      <div class="dropdown-content" id="dropdown-content2">
+                        <div class="columns is-multiline">
+                          <div class="column is-4">
+                            <div class="no-icon icon-item dropdown-item is-vcentered" @click="iconSelected('none')">
+                              <span class="title is-size-7">no icon</span>
+                            </div>
+                          </div>
+                          <div class="column is-4" v-for="icon in icons" :key="icon">
+                            <div class="icon-item dropdown-item is-vcentered" @click="iconSelected(icon)">
+                              <img width="18" height="18" :src="'/icons/' + icon + '.svg'" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <object type="image/svg+xml" id="icon-preview" width="32" height="32" :data="'/icons/' + options.code.iconName + '.svg'" v-if="options.code.iconName !== 'none'"/>
-                  <div class="is-size-7" v-if="options.code.iconName !== 'none'">Icons by Fontawesome <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a></div>
+                  <object
+                    type="image/svg+xml"
+                    id="icon-preview"
+                    width="32"
+                    height="32"
+                    :data="'/icons/' + options.code.iconName + '.svg'"
+                    v-if="options.code.iconName !== 'none'"
+                  />
+                  <div class="is-size-7" v-if="options.code.iconName !== 'none'">
+                    Icons by Fontawesome
+                    <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -210,19 +248,41 @@ export default {
       icons: [
         'wifi',
         'user',
+        'user-plus',
         'key',
         'globe',
-        'speech-bubble',
+        'bubble',
         'marker',
-        'map-marked',
+        'map',
         'envelope',
-        'at-symbol',
         'facebook',
         'linkedin',
         'twitter',
-        'reddit',
+        'paypal',
+        'share',
+        'share-alt',
+        'calendar',
+        'phone',
+        'music',
+        'play',
+        'exclamation',
+        'info',
+        'home',
+        'heart',
+        'check',
+        'lightbulb',
+        'star',
+        'thumbs-up',
+        'thumbs-down',
+        'bolt',
+        'moon',
       ],
     };
+  },
+  methods: {
+    iconSelected(icon) {
+      this.options.code.iconName = icon;
+    },
   },
 };
 </script>
@@ -241,5 +301,28 @@ export default {
 
 #icon-preview {
   margin-left: 15px;
+}
+
+.icon-item {
+  border-radius: 10px;
+}
+
+.icon-item>img {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-item:hover {
+  background: whitesmoke;
+  cursor: pointer;
+}
+
+.icon-item.no-icon {
+  padding: 5px;
+}
+
+#dropdown-content2 {
+  width: 240px;
+  padding: 20px;
 }
 </style>
