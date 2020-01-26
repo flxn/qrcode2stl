@@ -7,7 +7,6 @@
         <hr />
         <nav class="panel">
           <p class="panel-heading">QR Code Options</p>
-
           <!-- QR Code settings tabs -->
           <TabsQR :active-tab-index="activeTabIndex" @tabChanged="setActiveTab" />
 
@@ -69,6 +68,10 @@
         <!-- 3D Options -->
         <Panel3dOptions :options="options3d" :unit="unit" />
 
+        <div class="notification is-danger is-light" v-if="showNoTextError" style="margin-top: 20px 0;">
+          You have not entered any text.
+        </div>
+
         <button
           class="button is-success is-large"
           v-bind:class="{'is-loading': isGenerating}"
@@ -80,7 +83,6 @@
           <span>Generate 3D Model</span>
         </button>
 
-        <p>{{outputText}}</p>
         <canvas id="qr-canvas"></canvas>
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
@@ -241,7 +243,6 @@ export default {
         recipient: '',
         message: '',
       },
-      outputText: '',
       options3d: {
         base: {
           width: 100,
@@ -274,6 +275,7 @@ export default {
       blockWidth: null,
       blockHeight: null,
       isGenerating: false,
+      showNoTextError: false,
     };
   },
 
@@ -358,11 +360,12 @@ export default {
     },
     async generate3dModel() {
       this.trackGenerateEvent();
-
+      this.showNoTextError = false;
       this.isGenerating = true;
       const txt = this.getQRText();
       if (txt === '') {
         this.isGenerating = false;
+        this.showNoTextError = true;
         return;
       }
       await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
