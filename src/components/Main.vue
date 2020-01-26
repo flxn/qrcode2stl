@@ -68,8 +68,8 @@
         <!-- 3D Options -->
         <Panel3dOptions :options="options3d" :unit="unit" />
 
-        <div class="notification is-danger is-light" v-if="showNoTextError" style="margin-top: 20px 0;">
-          You have not entered any text.
+        <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
+          {{generateError}}
         </div>
 
         <button
@@ -278,7 +278,7 @@ export default {
       blockWidth: null,
       blockHeight: null,
       isGenerating: false,
-      showNoTextError: false,
+      generateError: null,
     };
   },
 
@@ -368,19 +368,27 @@ export default {
       if (this.options3d.code.iconName !== 'none') {
         this.errorCorrectionLevel = 'H';
       }
-      this.showNoTextError = false;
+      this.generateError = null;
       this.isGenerating = true;
       const txt = this.getQRText();
       if (txt === '') {
         this.isGenerating = false;
-        this.showNoTextError = true;
+        this.generateError = 'You have not entered any text.';
         return;
       }
-      await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
-        margin: 0,
-        scale: 1,
-        errorCorrectionLevel: this.errorCorrectionLevel,
-      });
+
+      try {
+        await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
+          margin: 0,
+          scale: 1,
+          errorCorrectionLevel: this.errorCorrectionLevel,
+        });
+      } catch (e) {
+        this.generateError = `Error during generation: ${e.message}`;
+        this.isGenerating = false;
+        return;
+      }
+
       setTimeout(() => {
         this.init3d();
         this.setup3dObject();
