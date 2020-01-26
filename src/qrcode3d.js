@@ -86,8 +86,11 @@ class QRCode3D {
       // scale icon to correct size
       iconBoundingBox = new THREE.Box3().setFromObject(iconMesh);
       iconSize = iconBoundingBox.getSize();
-      const scaleRatioY = iconSize.y / (blockWidth * 4);
-      const scaleRatioX = iconSize.x / (blockWidth * 4);
+
+      const iconSizeRatio = this.options.code.iconSizeRatio / 100;
+      const scaleRatioY = iconSize.y / (availableWidth * iconSizeRatio);
+      const scaleRatioX = iconSize.x / (availableWidth * iconSizeRatio);
+
       const scaleRatio = scaleRatioX > scaleRatioY ? scaleRatioX : scaleRatioY;
       iconMesh.scale.x /= scaleRatio;
       iconMesh.scale.y /= scaleRatio;
@@ -99,8 +102,6 @@ class QRCode3D {
       iconMesh.position.x = -iconSize.x / 2;
       iconMesh.position.y = -iconSize.y / 2 + blockWidth / 2;
       iconMesh.position.z = this.options.base.depth + this.options.code.depth;
-      // iconMesh.scale.x *= 0.9;
-      // iconMesh.scale.y *= 0.9;
       this.iconMesh = iconMesh;
     }
 
@@ -140,12 +141,11 @@ class QRCode3D {
 
           // don't draw block if it collides with icon bounding box
           if (this.iconMesh) {
-            const maxSize = iconSize.x > iconSize.y ? iconSize.x : iconSize.y;
-            const safetyMargin = blockWidth / 2;
-            if ((blockX > -maxSize / 2 - safetyMargin
-              && blockX < maxSize / 2 + safetyMargin)
-              && (blockY > -maxSize / 2 - safetyMargin
-              && blockY < +maxSize / 2 + safetyMargin)) {
+            const safetyMargin = Math.min(blockWidth * 2, 5);
+            if ((blockX > -iconSize.x / 2 - safetyMargin
+              && blockX < iconSize.x / 2 + safetyMargin)
+              && (blockY > -iconSize.y / 2 - safetyMargin
+              && blockY < +iconSize.y / 2 + safetyMargin)) {
               // eslint-disable-next-line no-continue
               continue;
             }

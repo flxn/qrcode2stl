@@ -207,7 +207,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
                           </div>
                           <div class="column is-4" v-for="icon in icons" :key="icon">
                             <div class="icon-item dropdown-item is-vcentered" @click="iconSelected(icon)">
-                              <img width="18" height="18" :src="'/icons/' + icon + '.svg'" />
+                              <img width="18" height="18" :src="'/icons/' + icon + '.svg'" loading="lazy" />
                             </div>
                           </div>
                         </div>
@@ -230,6 +230,35 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
               </div>
             </div>
           </div>
+          <div class="field is-horizontal" v-if="options.code.iconName !== 'none'">
+            <div class="field-label is-small">
+              <label class="label">Icon Size</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.code.iconSizeRatio"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">%</a>
+                </p>
+                <span
+                  class="help-icon icon has-text-info"
+                  title="The size of the icon relative to the total width of the QR Code.
+The icon abuses the inbuilt error correction of the qr code. If it is too big the code may not be readable.
+If you want to have a big icon but your phone can't read the QR code you can try to increase the Error Correction Level."
+                >
+                  <i class="fas fa-info-circle"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+
         </div>
       </div>
     </div>
@@ -250,7 +279,9 @@ export default {
         'user',
         'user-plus',
         'key',
+        'mouse-pointer',
         'globe',
+        'bookmark',
         'bubble',
         'marker',
         'map',

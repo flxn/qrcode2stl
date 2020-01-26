@@ -256,6 +256,7 @@ export default {
           qrcodeBlockStyle: 'square',
           blockSizeMultiplier: 100,
           iconName: 'none',
+          iconSizeRatio: 20,
         },
       },
       workCanvas: null,
