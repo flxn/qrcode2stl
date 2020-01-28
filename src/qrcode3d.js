@@ -103,6 +103,8 @@ class QRCode3D {
       iconMesh.position.y = -iconSize.y / 2 + blockWidth / 2;
       iconMesh.position.z = this.options.base.depth + this.options.code.depth;
       this.iconMesh = iconMesh;
+      iconMesh.updateMatrix();
+      combinedGeometry.merge(iconMesh.geometry, iconMesh.matrix);
     }
 
     const ctx = this.canvas.getContext('2d');

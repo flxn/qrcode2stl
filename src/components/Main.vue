@@ -406,6 +406,7 @@ export default {
         const filenameBase = `base-${timestamp}.stl`;
         const filenameQrcode = `qrcode-${timestamp}.stl`;
         const filenameBorder = `border-${timestamp}.stl`;
+        const filenameIcon = `icon-${timestamp}.stl`;
         const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
         const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
         if (exportAsBinary) {
@@ -416,12 +417,21 @@ export default {
           this.saveString(qrcodeSTL, filenameQrcode);
         }
 
-        if (this.options3d.base.hasBorder) {
+        if (this.borderMesh) {
           const borderSTL = this.exporter.parse(this.borderMesh, { binary: exportAsBinary });
           if (exportAsBinary) {
             this.saveArrayBuffer(borderSTL, filenameBorder);
           } else {
             this.saveString(borderSTL, filenameBorder);
+          }
+        }
+
+        if (this.iconMesh) {
+          const iconSTL = this.exporter.parse(this.iconMesh, { binary: exportAsBinary });
+          if (exportAsBinary) {
+            this.saveArrayBuffer(iconSTL, filenameIcon);
+          } else {
+            this.saveString(iconSTL, filenameIcon);
           }
         }
       } else {
