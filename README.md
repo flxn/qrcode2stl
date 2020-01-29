@@ -31,3 +31,11 @@ npm run lint
 
 Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+## Contribute a translation
+To add a new translation:
+- Create a new file with the corresponding country code under *src/translations/*
+  (Example: for french this would be *src/translations/fr.js*)
+- Copy the content of the *src/translations/en.js* file into your newly created translation file
+- Translate the english strings into your language
+- In *src/translations/loader.js* import your new translation and add it to the exported object
