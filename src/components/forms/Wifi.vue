@@ -10,7 +10,7 @@
             <input
               class="input"
               type="text"
-              placeholder="The name of the Wifi network"
+              :placeholder="$t('ssidPlaceholder')"
               v-model="wifi.ssid"
             />
           </div>
@@ -19,7 +19,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Password</label>
+        <label class="label">{{$t('password')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -27,7 +27,7 @@
             <input
               class="input"
               type="text"
-              placeholder="The password of the Wifi network"
+              :placeholder="$t('passwordPlaceholder')"
               v-model="wifi.password"
             />
           </div>
@@ -36,7 +36,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Security</label>
+        <label class="label">{{$t('security')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -53,14 +53,14 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Security</label>
+        <label class="label">{{$t('hidden')}}?</label>
       </div>
       <div class="field-body">
         <div class="field">
           <div class="control">
             <label class="checkbox">
               <input type="checkbox" v-model="wifi.hidden" />
-              Hidden
+              {{$t('hiddenText')}}
             </label>
           </div>
         </div>

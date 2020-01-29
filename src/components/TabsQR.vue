@@ -30,7 +30,7 @@
           <span class="icon is-small">
             <i class="far fa-address-card" aria-hidden="true"></i>
           </span>
-          <span>Contact (vCard)</span>
+          <span>{{$t('contact')}} (vCard)</span>
         </a>
       </li>
       <li v-bind:class="{ 'is-active': activeTabIndex === 4 }" @click="$emit('tabChanged', 4) ">

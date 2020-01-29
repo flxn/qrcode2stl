@@ -2,11 +2,11 @@
   <div id="main" class="container is-fluid">
     <div class="columns is-multiline">
       <div class="column is-5-widescreen is-5-fullhd is-12">
-        <h1 class="title">QR Code Generator</h1>
-        <h2 class="subtitle">Export your QR code as STL for 3D printing</h2>
+        <h1 class="title">{{ $t("title") }}</h1>
+        <h2 class="subtitle">{{ $t("subtitle") }}</h2>
         <hr />
         <nav class="panel">
-          <p class="panel-heading">QR Code Options</p>
+          <p class="panel-heading">{{ $t("qrCodeOptions") }}</p>
           <!-- QR Code settings tabs -->
           <TabsQR :active-tab-index="activeTabIndex" @tabChanged="setActiveTab" />
 
@@ -14,7 +14,7 @@
           <div class="option-pane" v-if="activeTabIndex === 0">
             <textarea
               class="textarea"
-              placeholder="The text for your QR code e.g. Hello World or https://flxn.de"
+              :placeholder="$t('qrCodeTextPlaceholder')"
               v-model="text"
               style="width: 100%"
             ></textarea>
@@ -44,7 +44,7 @@
           <div class="option-pane">
             <div class="field is-horizontal">
               <div class="field-label is-small">
-                <label class="label">Error Correction</label>
+                <label class="label">{{$t('errorCorrection')}}</label>
               </div>
               <div class="field-body">
                 <div class="field">
@@ -57,7 +57,7 @@
                         <option value="H">H (High, 30% redundant)</option>
                       </select>
                     </div>
-                    <p class="help">The higher the error correction level, the denser the QR code.</p>
+                    <p class="help">{{$t('errorCorrectionHelp')}}</p>
                   </div>
                 </div>
               </div>
@@ -80,7 +80,7 @@
           <span class="icon">
             <i class="fa fa-cube"></i>
           </span>
-          <span>Generate 3D Model</span>
+          <span>{{$t('generateButton')}}</span>
         </button>
 
         <canvas id="qr-canvas"></canvas>
@@ -88,16 +88,14 @@
       <div class="column is-7-widescreen is-7-fullhd is-12">
         <div class="columns">
           <div class="column">
-            <p class="title">Preview</p>
-            <p class="subtitle">Use your mouse to rotate.</p>
+            <p class="title">{{$t('preview')}}</p>
+            <p class="subtitle">{{ $t("controlsHint") }}</p>
           </div>
           <div class="column is-2" v-if="mesh">
             <div class="field">
               <div class="field-label is-normal">
-                <label class="label"
-                    title="Just leave this as 'binary' to keep file size low.
-If your software has issues with the generated file, you can try to change this option.">
-                  STL file
+                <label class="label" :title="$t('exportTypeHelp')">
+                  STL {{ $t('file') }}
                   <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
                 </label>
 
@@ -119,10 +117,8 @@ If your software has issues with the generated file, you can try to change this 
           <div class="column is-3" v-if="mesh">
             <div class="field">
               <div class="field-label is-normal">
-                <label class="label" title="If set to 'yes' the base and the qr code will be saved as two separate parts
-for printers with dual extrusion printing.
-Your browser may ask for permissions to download multiple files.">
-                  Separate parts?
+                <label class="label" :title="$t('exportSeparatePartsHelp')">
+                  {{$t('separateParts')}}?
                   <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
                 </label>
               </div>
@@ -131,8 +127,8 @@ Your browser may ask for permissions to download multiple files.">
                   <div class="control">
                     <div class="select">
                       <select v-model="dualExtrusion">
-                        <option v-bind:value="false">no</option>
-                        <option v-bind:value="true">yes</option>
+                        <option v-bind:value="false">{{$t('no')}}</option>
+                        <option v-bind:value="true">{{$t('yes')}}</option>
                       </select>
                     </div>
                   </div>
@@ -145,7 +141,7 @@ Your browser may ask for permissions to download multiple files.">
               <span class="icon">
                 <i class="fa fa-download"></i>
               </span>
-              <span>Save As STL</span>
+              <span>{{$t('saveAsButton')}}</span>
             </button>
           </div>
         </div>
@@ -156,13 +152,12 @@ Your browser may ask for permissions to download multiple files.">
             class="notification is-warning is-light"
             v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"
           >
-            <strong>Warning for 3D printability:</strong>
-            At least one edge of the smallest element in the 3D model is very small: {{Number(blockWidth).toFixed(1)}}mm x {{Number(blockHeight).toFixed(1)}}mm.
-            Depending on your setup, this could make printing harder.
+            <strong>{{$t('printabilityWarning')}}:</strong>
+            {{$t('printabilityWarningBody', { dimensions: `${Number(blockWidth).toFixed(1)}mm x ${Number(blockHeight).toFixed(1)}mm` })}}
           </div>
         </div>
         <br/>
-        <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> Scroll down for a guide on how to print your QR code.</a>
+        <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
       </div>
     </div>
 

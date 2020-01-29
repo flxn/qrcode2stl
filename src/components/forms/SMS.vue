@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="field has-text-centered">Not all fields have to be filled in.</div>
+    <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Phone</label>
+        <label class="label">{{$t('phone')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -11,7 +11,7 @@
             <input
               class="input"
               type="text"
-              placeholder="The phone number of the recipient"
+              :placeholder="$t('phonePlaceholder')"
               v-model="sms.recipient"
             />
           </div>
@@ -20,14 +20,14 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Message</label>
+        <label class="label">{{$t('smsMessage')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
           <div class="control">
             <textarea
               class="textarea"
-              placeholder="The sms content"
+              :placeholder="$t('smsMessagePlaceholder')"
               v-model="sms.message"
               style="width: 100%"
             ></textarea>

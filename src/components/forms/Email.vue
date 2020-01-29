@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="field has-text-centered">Not all fields have to be filled in.</div>
+    <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Recipient</label>
+        <label class="label">{{$t('recipient')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -11,7 +11,7 @@
             <input
               class="input"
               type="text"
-              placeholder="The address that sould receive the mail"
+              :placeholder="$t('recipientPlaceholder')"
               v-model="email.recipient"
             />
           </div>
@@ -20,7 +20,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Subject</label>
+        <label class="label">{{$t('subject')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -28,7 +28,7 @@
             <input
               class="input"
               type="text"
-              placeholder="The e-mail subject line"
+              :placeholder="$t('subjectPlaceholder')"
               v-model="email.subject"
             />
           </div>
@@ -37,14 +37,14 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Body</label>
+        <label class="label">{{$t('body')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
           <div class="control">
             <textarea
               class="textarea"
-              placeholder="The e-mail content"
+              :placeholder="$t('bodyPlaceholder')"
               v-model="email.body"
               style="width: 100%"
             ></textarea>

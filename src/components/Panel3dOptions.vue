@@ -1,15 +1,15 @@
 <template>
   <nav class="panel">
-    <p class="panel-heading">3D Model Options</p>
+    <p class="panel-heading">{{$t('modelOptions')}}</p>
     <div class="panel-block">
       <div class="columns" style="width: 100%">
         <div class="column">
           <div class="model-options-title">
-            <div class="title is-size-5">Base</div>
+            <div class="title is-size-5">{{$t('base')}}</div>
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Width</label>
+              <label class="label">{{$t('width')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -24,7 +24,7 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Depth</label>
+              <label class="label">{{$t('depth')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -41,7 +41,7 @@
           <!-- Border Settings -->
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Border</label>
+              <label class="label">{{$t('border')}}</label>
             </div>
             <div class="field-body">
               <div class="field">
@@ -55,7 +55,7 @@
           </div>
           <div class="field is-horizontal" v-if="options.base.hasBorder">
             <div class="field-label is-small">
-              <label class="label">Border Width</label>
+              <label class="label">{{$t('border')}} {{$t('width')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -74,7 +74,7 @@
           </div>
           <div class="field is-horizontal" v-if="options.base.hasBorder">
             <div class="field-label is-small">
-              <label class="label">Border Depth</label>
+              <label class="label">{{$t('border')}} {{$t('depth')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -98,7 +98,7 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Depth</label>
+              <label class="label">{{$t('depth')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -113,7 +113,7 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Margin</label>
+              <label class="label">{{$t('margin')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -128,15 +128,15 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Block Style</label>
+              <label class="label">{{$t('block')}} {{$t('style')}}</label>
             </div>
             <div class="field-body">
               <div class="field">
                 <div class="control has-icons-left">
                   <div class="select is-small">
                     <select v-model="options.code.qrcodeBlockStyle">
-                      <option>square</option>
-                      <option>round</option>
+                      <option>{{$t('square')}}</option>
+                      <option>{{$t('round')}}</option>
                     </select>
                     <span class="icon is-small is-left">
                       <i class="fa fa-shapes"></i>
@@ -148,7 +148,7 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Block Size</label>
+              <label class="label">{{$t('block')}} {{$t('size')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -164,13 +164,7 @@
                 </p>
                 <span
                   class="help-icon icon has-text-info"
-                  title="This settings modifies the size of the individual QR code blocks.
-Play around with this value to achieve unique visual looks but keep in mind that this could impact readability of the QR code.
-Check the preview with your phone before printing to see if you have gone too far.
-
-Stay at 100% if you are not sure.
-If you increase this value above 100% (e.g. 120%) the blocks will form connected islands that make the QR code easier to print."
-                >
+                  :title="$t('blockSizeHelp')">
                   <i class="fas fa-info-circle"></i>
                 </span>
               </div>
@@ -180,7 +174,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
           <!-- Icon Settings -->
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">Icon</label>
+              <label class="label">{{$t('icon')}}</label>
             </div>
             <div class="field-body">
               <div class="field">
@@ -202,7 +196,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
                         <div class="columns is-multiline">
                           <div class="column is-4">
                             <div class="no-icon icon-item dropdown-item is-vcentered" @click="iconSelected('none')">
-                              <span class="title is-size-7">no icon</span>
+                              <span class="title is-size-7">{{$t('noIcon')}}</span>
                             </div>
                           </div>
                           <div class="column is-4" v-for="icon in icons" :key="icon">
@@ -237,7 +231,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
           </div>
           <div class="field is-horizontal" v-if="options.code.iconName !== 'none'">
             <div class="field-label is-small">
-              <label class="label">Icon Size</label>
+              <label class="label">{{$t('icon')}} {{$t('size')}}</label>
             </div>
             <div class="field-body">
               <div class="field has-addons">
@@ -253,9 +247,7 @@ If you increase this value above 100% (e.g. 120%) the blocks will form connected
                 </p>
                 <span
                   class="help-icon icon has-text-info"
-                  title="The size of the icon relative to the total width of the QR Code.
-The icon abuses the inbuilt error correction of the qr code. If it is too big the code may not be readable.
-If you want to have a big icon but your phone can't read the QR code you can try to increase the Error Correction Level."
+                  :title="$t('iconSizeHelp')"
                 >
                   <i class="fas fa-info-circle"></i>
                 </span>

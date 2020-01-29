@@ -1,26 +1,26 @@
 <template>
   <div>
-    <div class="field has-text-centered">Not all fields have to be filled in.</div>
+    <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Your Name:</label>
+        <label class="label">{{$t('yourName')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">
           <p class="control">
-            <input class="input" type="text" placeholder="Firstname" v-model="contact.firstName" />
+            <input class="input" type="text" :placeholder="$t('firstname')" v-model="contact.firstName" />
           </p>
         </div>
         <div class="field">
           <p class="control">
-            <input class="input" type="text" placeholder="Lastname" v-model="contact.lastName" />
+            <input class="input" type="text" :placeholder="$t('lastname')" v-model="contact.lastName" />
           </p>
         </div>
       </div>
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Organization:</label>
+        <label class="label">{{$t('organization')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -32,7 +32,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Role:</label>
+        <label class="label">{{$t('role')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -49,12 +49,12 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Numbers:</label>
+        <label class="label">{{$t('numbers')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">
           <p class="control">
-            <input class="input" type="text" placeholder="Cell" v-model="contact.cell" />
+            <input class="input" type="text" :placeholder="$t('cellphone')" v-model="contact.cell" />
           </p>
         </div>
       </div>
@@ -66,7 +66,7 @@
       <div class="field-body">
         <div class="field">
           <p class="control">
-            <input class="input" type="text" placeholder="Phone" v-model="contact.phone" />
+            <input class="input" type="text" :placeholder="$t('phone')" v-model="contact.phone" />
           </p>
         </div>
         <div class="field">
@@ -90,7 +90,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Street:</label>
+        <label class="label">{{$t('street')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -102,7 +102,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">City:</label>
+        <label class="label">{{$t('city')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -119,7 +119,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">State:</label>
+        <label class="label">{{$t('state')}}:</label>
       </div>
       <div class="field-body">
         <div class="field">

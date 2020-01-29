@@ -21,6 +21,9 @@
     <div class="navbar-menu" :class="{ 'is-active': navbarOpen }">
       <div class="navbar-end">
         <div class="navbar-item">
+          <LanguageSelector />
+        </div>
+        <div class="navbar-item">
           <ShareButtons />
         </div>
         <div class="navbar-item">
@@ -34,7 +37,7 @@
                   alt="Support Me on Ko-Fi"
                 />
               </span>
-              <span>Support Me</span>
+              <span>{{$t('supportMe')}}</span>
             </a>
           </div>
         </div>
@@ -44,7 +47,7 @@
               <span class="icon">
                 <i class="fab fa-github"></i>
               </span>
-              <span>View on GitHub</span>
+              <span>{{$t('viewOnGithub')}}</span>
             </a>
           </div>
         </div>
@@ -55,11 +58,13 @@
 
 <script>
 import ShareButtons from './ShareButtons.vue';
+import LanguageSelector from './LanguageSelector.vue';
 
 export default {
   name: 'Header',
   components: {
     ShareButtons,
+    LanguageSelector,
   },
   data() {
     return {

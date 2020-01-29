@@ -16,7 +16,8 @@
     "qrcode": "^1.4.4",
     "three": "^0.112.1",
     "vcards-js": "^2.10.0",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-i18n": "^8.15.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
