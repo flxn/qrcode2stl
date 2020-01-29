@@ -14,7 +14,7 @@
           <img :src="'flags/gif/' + locale + '.gif'"/> {{ locale }}
         </a>
         <hr class="dropdown-divider">
-        <a href="#" class="dropdown-item" rel="nofollow noopener" target="_blank">
+        <a href="https://github.com/flxn/qrcode2stl#contribute-a-translation" class="dropdown-item" rel="nofollow noopener" target="_blank">
           {{$t('contributeTranslation')}}
         </a>
       </div>
