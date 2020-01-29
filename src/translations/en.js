@@ -128,10 +128,6 @@ export default {
   <li>Click on "Add a script" then select "Filament Change".</li>
   <li>In the Filament Change settings, set the "Layer" value to your layer number from step 1.</li>
   <li>Re-Slice your model. The icon left of the "Slice" button indicates an active Post Processing script.</li>`,
-  printGuideCuraStep3: `
-  You can now print the model as usual.<br/>
-  The 3d printer will pause on the specified layer and move to the origin of the print bed.<br/>
-  Now you can swap the filament and restart the print job from your printers menu.`,
   // PrusaSlicer
   printGuidePrusaSlicerStep1: `
   Slice the model and locate the layer where the color change should happen.<br/>
@@ -140,7 +136,7 @@ export default {
   <li>Click on the little plus sign right of the layer selection bar.</li>
   <li>PrusaSlicer gives you a nice preview where you can see the different colors to verify that you selected the right layer. The qr code parts should have a different color than the base</li>
   <li>Re-Slice your model.</li>`,
-  printGuidePrusaSlicerStep3: `
+  printGuideStep3: `
   You can now print the model as usual.<br/>
   The 3d printer will pause on the specified layer and move to the origin of the print bed.
   Now you can swap the filament and restart the print job from your printers menu.`,

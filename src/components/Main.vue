@@ -6,7 +6,7 @@
         <h2 class="subtitle">{{ $t("subtitle") }}</h2>
         <hr />
         <nav class="panel">
-          <p class="panel-heading">{{ $t("qrCodeOptions") }}</p>
+          <p class="panel-heading">{{ $t("qrCodeOptionsTitle") }}</p>
           <!-- QR Code settings tabs -->
           <TabsQR :active-tab-index="activeTabIndex" @tabChanged="setActiveTab" />
 

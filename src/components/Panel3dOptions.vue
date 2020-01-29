@@ -135,8 +135,8 @@
                 <div class="control has-icons-left">
                   <div class="select is-small">
                     <select v-model="options.code.qrcodeBlockStyle">
-                      <option>{{$t('square')}}</option>
-                      <option>{{$t('round')}}</option>
+                      <option value="square">{{$t('square')}}</option>
+                      <option value="round">{{$t('round')}}</option>
                     </select>
                     <span class="icon is-small is-left">
                       <i class="fa fa-shapes"></i>

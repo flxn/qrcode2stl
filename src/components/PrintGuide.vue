@@ -51,7 +51,7 @@
           <ol type="1" v-html="$t('printGuideCuraStep2')"></ol>
         </div>
       </div>
-      <p v-html="$t('printGuideCuraStep3')"></p>
+      <p v-html="$t('printGuideStep3')"></p>
 
       <!-- PrusaSlicer Guide -->
       <hr/>
@@ -71,7 +71,7 @@
           <ol type="1" v-html="$t('printGuidePrusaSlicerStep2')"></ol>
         </div>
       </div>
-      <p v-html="$t('printGuidePrusaSlicerStep3')"></p>
+      <p v-html="$t('printGuideStep3')"></p>
     </div>
   </section>
 </template>
