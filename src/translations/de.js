@@ -96,6 +96,9 @@ export default {
   textOnEdge: 'Text an der Basiskante hinzufügen',
   placement: 'Platzierung',
   theText: 'Der Text',
+  cityMode: 'QR-City',
+  cityModeText: 'Unpraktisch aber lustig',
+
   //
   // Export Settings
   //

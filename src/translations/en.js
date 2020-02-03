@@ -95,6 +95,9 @@ export default {
   textOnEdge: 'Add text on the base edge',
   placement: 'Placement',
   theText: 'The text',
+  cityMode: 'QR-City',
+  cityModeText: 'It\'s impractical but fun',
+
   //
   // Export Settings
   //

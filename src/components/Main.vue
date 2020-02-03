@@ -259,6 +259,7 @@ export default {
           blockSizeMultiplier: 100,
           iconName: 'none',
           iconSizeRatio: 20,
+          cityMode: false,
         },
       },
       workCanvas: null,
@@ -292,6 +293,17 @@ export default {
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0xa0a0a0);
       this.scene.rotation.z = -Math.PI / 2;
+
+
+      // LIGHTS
+      const ambientLight = new THREE.AmbientLight(0x333333);
+      const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+      directionalLight.position.x = -1;
+      directionalLight.position.y = 0;
+      directionalLight.position.z = 1;
+      this.scene.add(ambientLight);
+      this.scene.add(directionalLight);
+
 
       const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
       grid.material.opacity = 0.2;

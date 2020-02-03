@@ -6,7 +6,7 @@ class QRCode3D {
   constructor(canvas, options) {
     const defaultOptions = {
       baseColor: 0xeeeeee,
-      qrcodeColor: 0x111111,
+      qrcodeColor: 0x333333,
     };
 
     this.options = Object.assign({}, defaultOptions, options);
@@ -29,8 +29,17 @@ class QRCode3D {
       this.options.base.depth,
     );
 
-    const materialBase = new THREE.MeshBasicMaterial({ color: this.options.baseColor });
-    const materialBlock = new THREE.MeshBasicMaterial({ color: this.options.qrcodeColor });
+
+    const materialBase = new THREE.MeshPhongMaterial({
+      color: this.options.baseColor,
+      specular: 0xffffff,
+      shininess: 30,
+    });
+    const materialBlock = new THREE.MeshPhongMaterial({
+      color: this.options.qrcodeColor,
+      specular: 0x0d0d0d,
+      shininess: 90,
+    });
 
     let baseMesh = new THREE.Mesh(modelBase, materialBase);
     baseMesh.position.set(0, 0, this.options.base.depth / 2);
@@ -113,19 +122,23 @@ class QRCode3D {
         const isBlack = pixel[0] === 0;
         if (isBlack) {
           let qrBlock;
+          let blockDepth = this.options.code.depth;
+          if (this.options.code.cityMode) {
+            blockDepth = 1 + Math.random() * 4;
+          }
           // Determine basic block element
           if (this.options.code.qrcodeBlockStyle === 'round') {
             qrBlock = new THREE.CylinderGeometry(
               blockWidth / 2,
               blockWidth / 2,
-              this.options.code.depth,
+              blockDepth,
               16,
             );
           } else {
             qrBlock = new THREE.BoxGeometry(
               blockWidth,
               blockWidth,
-              this.options.code.depth,
+              blockDepth,
             );
           }
 
@@ -152,7 +165,7 @@ class QRCode3D {
             }
           }
 
-          const blockZ = this.options.base.depth + this.options.code.depth / 2;
+          const blockZ = this.options.base.depth + blockDepth / 2;
 
           qrBlockMesh.position.set(blockX, blockY, blockZ);
           if (this.options.code.qrcodeBlockStyle === 'round') {

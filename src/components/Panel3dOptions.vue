@@ -366,6 +366,22 @@
             </div>
           </div>
 
+          <!-- Skyraper Mode -->
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('cityMode')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <label class="checkbox">
+                    <input type="checkbox" v-model="options.code.cityMode" />
+                    <span class="is-size-7"><i class="fa fa-city"></i> {{$t("cityModeText")}}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
