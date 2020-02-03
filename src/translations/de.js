@@ -20,6 +20,11 @@ export default {
   file: 'Datei',
   no: 'Nein',
   yes: 'Ja',
+  top: 'oben',
+  bottom: 'unten',
+  left: 'links',
+  right: 'rechts',
+  content: 'Inhalt',
 
   //
   // QR Code Options Panel
@@ -69,7 +74,8 @@ export default {
   width: 'Breite',
   depth: 'Tiefe',
   border: 'Rahmen',
-  margin: 'Abstand zum Rand',
+  borderAroundBase: 'Rahmen um die Basis hinzufügen',
+  margin: 'Abstand',
   block: 'Block',
   style: 'Stil',
   square: 'quadratisch',
@@ -86,7 +92,10 @@ export default {
   iconSizeHelp: `
   Die Größe des Icons relativ zur Breite des QR Codes.
   Um das Icon anzuzeigen wird die Fehlerkorrektur des QR Codes missbraucht. Wenn es zu groß ist, kann der Code evtl. nicht mehr richtig ausgelesen werden.`,
-
+  text: 'Text',
+  textOnEdge: 'Text an der Basiskante hinzufügen',
+  placement: 'Platzierung',
+  theText: 'Der Text',
   //
   // Export Settings
   //

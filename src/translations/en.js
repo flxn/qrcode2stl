@@ -18,6 +18,11 @@ export default {
   file: 'file',
   no: 'no',
   yes: 'yes',
+  top: 'top',
+  bottom: 'bottom',
+  left: 'left',
+  right: 'right',
+  content: 'content',
 
   //
   // QR Code Options Panel
@@ -67,6 +72,7 @@ export default {
   width: 'Width',
   depth: 'Depth',
   border: 'Border',
+  borderAroundBase: 'Add border around the base',
   margin: 'Margin',
   block: 'Block',
   style: 'Style',
@@ -85,7 +91,10 @@ export default {
   The size of the icon relative to the total width of the QR Code.
   The icon abuses the inbuilt error correction of the qr code. If it is too big the code may not be readable.
   If you want to have a big icon but your phone can't read the QR code you can try to increase the Error Correction Level.`,
-
+  text: 'Text',
+  textOnEdge: 'Add text on the base edge',
+  placement: 'Placement',
+  theText: 'The text',
   //
   // Export Settings
   //

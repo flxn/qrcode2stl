@@ -48,6 +48,7 @@
                 <div class="control">
                   <label class="checkbox">
                     <input type="checkbox" v-model="options.base.hasBorder" />
+                    <span class="is-size-7">{{$t("borderAroundBase")}}</span>
                   </label>
                 </div>
               </div>
@@ -91,6 +92,98 @@
               </div>
             </div>
           </div>
+
+          <!-- Text Settings -->
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('text')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <label class="checkbox">
+                    <input type="checkbox" v-model="options.base.hasText" />
+                    <span class="is-size-7">{{$t('textOnEdge')}}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasText">
+            <div class="field-label is-small">
+              <label class="label">{{$t('text')}} {{$t('placement')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control has-icons-left">
+                  <div class="select is-small">
+                    <select v-model="options.base.textPlacement">
+                      <option value="top">{{$t('top')}}</option>
+                      <option value="bottom">{{$t('bottom')}}</option>
+                    </select>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-arrows-alt-v"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasText">
+            <div class="field-label is-small">
+              <label class="label">{{$t('text')}} {{$t('content')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    v-model="options.base.textMessage"
+                    :placeholder="$t('theText')"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasText">
+            <div class="field-label is-small">
+              <label class="label">{{$t('text')}} {{$t('size')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.textSize"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasText">
+            <div class="field-label is-small">
+              <label class="label">{{$t('text')}} {{$t('margin')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.textMargin"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
         <div class="column">
           <div class="model-options-title">

@@ -245,6 +245,11 @@ export default {
           hasBorder: false,
           borderWidth: 2,
           borderDepth: 1,
+          hasText: false,
+          textPlacement: '',
+          textMargin: 2,
+          textSize: 8,
+          textMessage: '',
         },
         code: {
           depth: 1,
@@ -263,6 +268,7 @@ export default {
       qrcodeMesh: null,
       borderMesh: null,
       iconMesh: null,
+      textMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
       camera: null,
@@ -324,12 +330,14 @@ export default {
       this.qrcodeMesh = qrcodeModel.qrcodeMesh;
       this.borderMesh = qrcodeModel.borderMesh;
       this.iconMesh = qrcodeModel.iconMesh;
+      this.textMesh = qrcodeModel.textMesh;
       this.mesh = qrcodeModel.combinedMesh;
 
       this.scene.add(this.baseMesh);
       this.scene.add(this.qrcodeMesh);
       this.scene.add(this.borderMesh);
       this.scene.add(this.iconMesh);
+      this.scene.add(this.textMesh);
     },
     startAnimation() {
       const animate = () => {
