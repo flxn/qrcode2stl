@@ -172,11 +172,10 @@ class QRCode3D {
     if (this.options.base.hasText) {
       // create text
       const fontHelvetikerBold = new THREE.Font(fontDefinitionHelvetikerBold);
-      const textZ = this.options.base.depth + this.options.code.depth / 2;
       const tempTextGeometry = new THREE.TextGeometry(this.options.base.textMessage, {
         font: fontHelvetikerBold,
         size: this.options.base.textSize,
-        height: this.options.code.depth,
+        height: this.options.base.textDepth,
       });
 
       const textMesh = new THREE.Mesh(tempTextGeometry, materialBlock);
@@ -188,7 +187,7 @@ class QRCode3D {
       const bottomSide = this.options.base.width / 2 + this.options.base.textSize / 2 + this.options.base.textMargin;
       const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
 
-      textMesh.position.set(placement, -textSize.x / 2, textZ);
+      textMesh.position.set(placement, -textSize.x / 2, this.options.base.depth);
       textMesh.rotation.set(0, 0, Math.PI / 2);
       textMesh.updateMatrix();
       textGeometry.merge(textMesh.geometry, textMesh.matrix);

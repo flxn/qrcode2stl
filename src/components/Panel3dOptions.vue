@@ -183,7 +183,25 @@
               </div>
             </div>
           </div>
-
+          <div class="field is-horizontal" v-if="options.base.hasText">
+            <div class="field-label is-small">
+              <label class="label">{{$t('text')}} {{$t('depth')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.textDepth"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="column">
           <div class="model-options-title">

@@ -242,14 +242,15 @@ export default {
         base: {
           width: 100,
           depth: 3,
-          hasBorder: false,
+          hasBorder: true,
           borderWidth: 2,
           borderDepth: 1,
           hasText: false,
-          textPlacement: '',
+          textPlacement: 'bottom',
           textMargin: 2,
           textSize: 8,
           textMessage: '',
+          textDepth: 1,
         },
         code: {
           depth: 1,
@@ -410,6 +411,7 @@ export default {
         const filenameQrcode = `qrcode-${timestamp}.stl`;
         const filenameBorder = `border-${timestamp}.stl`;
         const filenameIcon = `icon-${timestamp}.stl`;
+        const filenameText = `text-${timestamp}.stl`;
         const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
         const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
         if (exportAsBinary) {
@@ -435,6 +437,15 @@ export default {
             this.saveArrayBuffer(iconSTL, filenameIcon);
           } else {
             this.saveString(iconSTL, filenameIcon);
+          }
+        }
+
+        if (this.textMesh) {
+          const textSTL = this.exporter.parse(this.textMesh, { binary: exportAsBinary });
+          if (exportAsBinary) {
+            this.saveArrayBuffer(textSTL, filenameText);
+          } else {
+            this.saveString(textSTL, filenameText);
           }
         }
       } else {
