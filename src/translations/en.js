@@ -92,11 +92,11 @@ export default {
   The icon abuses the inbuilt error correction of the qr code. If it is too big the code may not be readable.
   If you want to have a big icon but your phone can't read the QR code you can try to increase the Error Correction Level.`,
   text: 'Text',
-  textOnEdge: 'Add text on the base edge',
+  textOnEdge: 'Add a custom title text to your QR code.',
   placement: 'Placement',
   theText: 'The text',
   cityMode: 'QR-City',
-  cityModeText: 'It\'s impractical but fun',
+  cityModeText: 'Randomly alters the height of the blocks.',
 
   //
   // Export Settings

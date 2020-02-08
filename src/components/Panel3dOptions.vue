@@ -48,7 +48,7 @@
                 <div class="control">
                   <label class="checkbox">
                     <input type="checkbox" v-model="options.base.hasBorder" />
-                    <span class="is-size-7">{{$t("borderAroundBase")}}</span>
+                    <span class="is-size-7"><i class="fa fa-border-all"></i> {{$t("borderAroundBase")}}</span>
                   </label>
                 </div>
               </div>
@@ -103,7 +103,7 @@
                 <div class="control">
                   <label class="checkbox">
                     <input type="checkbox" v-model="options.base.hasText" />
-                    <span class="is-size-7">{{$t('textOnEdge')}}</span>
+                    <span class="is-size-7"><i class="fa fa-font"></i> {{$t('textOnEdge')}}</span>
                   </label>
                 </div>
               </div>
@@ -332,8 +332,8 @@
                     <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
                     <br/>
                     <p class="has-text-danger">
-                      This is a beta feature and may cause problems.<br/>
-                      For now Error Correction will be set to high if you use icons.
+                      This is a beta feature.<br/>
+                      Error Correction will be set to high if you use icons.
                     </p>
                   </div>
                 </div>

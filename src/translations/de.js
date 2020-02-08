@@ -93,11 +93,11 @@ export default {
   Die Größe des Icons relativ zur Breite des QR Codes.
   Um das Icon anzuzeigen wird die Fehlerkorrektur des QR Codes missbraucht. Wenn es zu groß ist, kann der Code evtl. nicht mehr richtig ausgelesen werden.`,
   text: 'Text',
-  textOnEdge: 'Text an der Basiskante hinzufügen',
+  textOnEdge: 'Füge dem QR Code deinen eigenen Text hinzu.',
   placement: 'Platzierung',
   theText: 'Der Text',
   cityMode: 'QR-City',
-  cityModeText: 'Unpraktisch aber lustig',
+  cityModeText: 'Verändert die Höhe der Blöcke zufällig.',
 
   //
   // Export Settings
