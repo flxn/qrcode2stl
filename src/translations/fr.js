@@ -3,7 +3,7 @@ export default {
   // General
   //
   title: 'Générateur de QR Code',
-  subtitle: 'Exportez votre code QR en STL pour l'impression 3D',
+  subtitle: 'Exportez votre code QR en STL pour l\'impression 3D',
   preview: 'Aperçu',
   controlsHint: 'Utilisez votre souris pour faire pivoter',
   changeLanguage: 'Changer la Langue',
@@ -11,7 +11,7 @@ export default {
   generateButton: 'Générer un modèle 3D',
   scrollDownForGuide: 'Faites défiler vers le bas pour voir comment imprimer votre code QR.',
   printabilityWarning: 'Avertissement pour imprimabilité 3D',
-  printabilityWarningBody: 'Au moins un bord du plus petit élément du modèle 3D est très petit: {dimensions}. Selon votre configuration, cela pourrait rendre l'impression plus difficile.',
+  printabilityWarningBody: 'Au moins un bord du plus petit élément du modèle 3D est très petit: {dimensions}. Selon votre configuration, cela pourrait rendre l\'impression plus difficile.',
   supportMe: 'Me soutenir',
   viewOnGithub: 'Voir sur GitHub',
   shareButtonTitle: 'Partager cette page',
@@ -30,7 +30,7 @@ export default {
   qrCodeOptionsTitle: 'Options du QR Code',
   qrCodeTextPlaceholder: 'Le text pour votre QR code e.g. Hello World ou https://flxn.de',
   errorCorrection: 'Correction des erreurs',
-  errorCorrectionHelp: 'Plus le niveau de correction d'erreur est élevé, plus le QR Code est dense.',
+  errorCorrectionHelp: 'Plus le niveau de correction d\'erreur est élevé, plus le QR Code est dense.',
   optionalFieldsHint: 'Tous les champs ne doivent pas être remplis.',
   // Wifi
   ssidPlaceholder: 'Le nom du réseau Wifi',
@@ -54,11 +54,11 @@ export default {
   state: 'Etat',
   // E-Mail
   recipient: 'Destinataire',
-  recipientPlaceholder: 'L'adresse qui doit recevoir le mail',
+  recipientPlaceholder: 'L\'adresse qui doit recevoir le mail',
   subject: 'Sujet',
-  subjectPlaceholder: 'Sujet de l'e-mail',
+  subjectPlaceholder: 'Sujet de l\'e-mail',
   body: 'Contenu',
-  bodyPlaceholder: 'Contenu de l'e-mail',
+  bodyPlaceholder: 'Contenu de l\'e-mail',
   // SMS
   phonePlaceholder: 'Numero de portable du destinataire',
   smsMessage: 'Message',
@@ -110,16 +110,16 @@ export default {
   // Print Guide
   // with HTML Tags included!
   //
-  printGuideTitle: 'Guide d'impression 3D',
+  printGuideTitle: 'Guide d\'impression 3D',
   printGuideSubtitle: 'Comment imprimer un QR code bicolore avec un seul extrudeuse sur votre imprimante 3D?',
-  printGuideWIPInfo: 'Ce guide est en cours d'écriture.',
+  printGuideWIPInfo: 'Ce guide est en cours d\'écriture.',
   printGuideIntro: `
   Vous pouvez imprimer des objets multicolores même avec un seul extrudeur en échangeant le filament sur des couches spécifiques.<br/>
   Nous pouvons utiliser cette méthode pour imprimer la base de votre QR Code et la partie réelle du QR Code sur le dessus en deux couleurs différentes.<br/>
   Cette technique est ce qui rend les QR Code imprimables en 3D dans un premier temps.<br/>
   Le processus est différent selon le logiciel de découpage que vous utilisez.<br/>
   Dans ce guide, je me concentrerai uniquement sur Cura et PrusaSlicer et je ne prends aucune responsabilité si vous endommagez votre imprimante dans le processus.<br/>`,
-  printGuideSupportWarningTitle: 'Gardez à l'esprit: toutes les imprimantes/firmwares ne prennent pas forcément en charge les fonctionnalités nécessaires!',
+  printGuideSupportWarningTitle: 'Gardez à l\'esprit: toutes les imprimantes/firmwares ne prennent pas forcément en charge les fonctionnalités nécessaires!',
   printGuideSupportWarningMessage: `
   Il s'agit d'un guide général, car je ne peux pas fournir de récapitulatif sur chaque combinaison imprimante/firmware.<br/>
   Je recommande de faire d'abord un petit test d'impression. Si vous rencontrez des problèmes pour que cela fonctionne, veuillez rechercher en ligne si votre modèle d'imprimante spécifique prend en charge la commande G-CODE <strong>M600</strong> pour changer de filament.<br/>`,
