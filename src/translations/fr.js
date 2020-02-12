@@ -1,5 +1,10 @@
 export default {
   //
+  //  Local name of the language
+  //
+  languageLocalName: 'Français',
+
+  //
   // General
   //
   title: 'Générateur de QR Code',

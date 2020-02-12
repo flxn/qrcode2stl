@@ -11,11 +11,11 @@
     <div class="dropdown-menu" id="dropdown-menu" role="menu">
       <div class="dropdown-content">
         <a href="#" class="dropdown-item" v-for="locale in locales" :key="locale" @click="changeLanguage(locale)">
-          <img :src="'flags/gif/' + locale + '.gif'"/> {{ locale }}
+          <img :src="'flags/gif/' + locale + '.gif'"/> {{ $i18n.messages[locale]['languageLocalName'] }}
         </a>
         <hr class="dropdown-divider">
         <a href="https://github.com/flxn/qrcode2stl#contribute-a-translation" class="dropdown-item" rel="nofollow noopener" target="_blank">
-          {{$t('contributeTranslation')}}
+          <i class="fab fa-github"></i> {{$t('contributeTranslation')}}
         </a>
       </div>
     </div>

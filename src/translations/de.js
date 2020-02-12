@@ -1,5 +1,10 @@
 export default {
   //
+  //  Local name of the language
+  //
+  languageLocalName: 'Deutsch',
+
+  //
   // General
   //
   title: 'QR Code Generator',
