@@ -8,13 +8,13 @@ export default {
   // General
   //
   title: 'Générateur de QR Code',
-  subtitle: 'Exportez votre code QR en STL pour l\'impression 3D',
+  subtitle: 'Exportez votre QR code en STL pour l\'impression 3D',
   preview: 'Aperçu',
   controlsHint: 'Utilisez votre souris pour faire pivoter',
   changeLanguage: 'Changer la Langue',
   contributeTranslation: 'Contribuer une traduction',
   generateButton: 'Générer un modèle 3D',
-  scrollDownForGuide: 'Faites défiler vers le bas pour voir comment imprimer votre code QR.',
+  scrollDownForGuide: 'Faites défiler vers le bas pour voir comment imprimer votre QR Code.',
   printabilityWarning: 'Avertissement pour imprimabilité 3D',
   printabilityWarningBody: 'Au moins un bord du plus petit élément du modèle 3D est très petit: {dimensions}. Selon votre configuration, cela pourrait rendre l\'impression plus difficile.',
   supportMe: 'Me soutenir',
@@ -43,7 +43,7 @@ export default {
   passwordPlaceholder: 'Mot de passe du réseau Wifi',
   security: 'Securité',
   hidden: 'Caché',
-  hiddenText: 'Le SSID est caché',
+  hiddenText: 'SSID caché',
   // Contact
   contact: 'Contact',
   yourName: 'Votre Nom',
@@ -97,7 +97,7 @@ export default {
   L'icône abuse de la correction d'erreur intégrée du QR Code. S'il est trop gros, le code peut ne pas être lisible.
   Si vous voulez avoir une grande icône mais que votre téléphone ne peut pas lire le code QR, vous pouvez essayer d'augmenter le niveau de correction d'erreur.`,
   text: 'Text',
-  textOnEdge: 'Ajoutez un texte de titre personnalisé à votre QR Code.',
+  textOnEdge: 'Ajoutez un texte personnalisé à votre QR Code.',
   placement: 'Placement',
   theText: 'Le text',
   cityMode: 'QR-Ville',
