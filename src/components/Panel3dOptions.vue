@@ -9,6 +9,26 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
+              <label class="label">{{$t('shape')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control has-icons-left">
+                  <div class="select is-small">
+                    <select v-model="options.base.shape">
+                      <option value="rectangle">{{$t('rectangle')}}</option>
+                      <option value="roundedRectangle">{{$t('roundedRectangle')}}</option>
+                    </select>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-shapes"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
               <label class="label">{{$t('width')}}</label>
             </div>
             <div class="field-body">
@@ -30,6 +50,25 @@
               <div class="field has-addons">
                 <div class="control">
                   <input class="input is-small" type="number" v-model.number="options.base.depth" />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.shape === 'roundedRectangle'">
+            <div class="field-label is-small">
+              <label class="label">{{$t('cornerRadius')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.cornerRadius"
+                  />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>

@@ -240,8 +240,10 @@ export default {
       },
       options3d: {
         base: {
+          shape: 'rectangle',
           width: 100,
           depth: 3,
+          cornerRadius: 5,
           hasBorder: true,
           borderWidth: 2,
           borderDepth: 1,
