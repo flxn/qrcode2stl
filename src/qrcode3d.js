@@ -272,7 +272,7 @@ class QRCode3D {
           -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
           this.options.base.width - this.options.base.borderWidth * 2,
           this.options.base.width - this.options.base.borderWidth * 2,
-          this.options.base.cornerRadius,
+          Math.max(0, this.options.base.cornerRadius - this.options.base.borderWidth),
         );
         borderShape.holes.push(borderHolePath);
         const borderExtrude = new THREE.ExtrudeGeometry(borderShape, {
