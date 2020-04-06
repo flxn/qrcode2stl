@@ -9,7 +9,7 @@ class QRCode3D {
       qrcodeColor: 0x333333,
     };
 
-    this.options = Object.assign({}, defaultOptions, options);
+    this.options = { ...defaultOptions, ...options };
     this.canvas = canvas;
 
     this.baseMesh = null;

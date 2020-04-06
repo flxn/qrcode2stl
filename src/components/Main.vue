@@ -512,7 +512,7 @@ export default {
         case 2: // E-Mail
           ret = `mailto:${this.email.recipient
             .split(',')
-            .map(x => x.trim())
+            .map((x) => x.trim())
             .join(',')}?subject=${encodeURI(
             this.email.subject,
           )}&body=${encodeURI(this.email.body)}`;
