@@ -46,18 +46,23 @@ class QRCode3D {
     this.generate3dModel();
   }
 
-  static getRoundedRectShape(x, y, width, height, radius) {
-    const rrShape = new THREE.Shape();
-    rrShape.moveTo(x, y + radius);
-    rrShape.lineTo(x, y + height - radius);
-    rrShape.quadraticCurveTo(x, y + height, x + radius, y + height);
-    rrShape.lineTo(x + width - radius, y + height);
-    rrShape.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-    rrShape.lineTo(x + width, y + radius);
-    rrShape.quadraticCurveTo(x + width, y, x + width - radius, y);
-    rrShape.lineTo(x + radius, y);
-    rrShape.quadraticCurveTo(x, y, x, y + radius);
-    return rrShape;
+  static getRoundedRectShape(x, y, width, height, radius, path = false) {
+    let ctx;
+    if (path) {
+      ctx = new THREE.Path();
+    } else {
+      ctx = new THREE.Shape();
+    }
+    ctx.moveTo(x, y + radius);
+    ctx.lineTo(x, y + height - radius);
+    ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+    ctx.lineTo(x + width - radius, y + height);
+    ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+    ctx.lineTo(x + width, y + radius);
+    ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+    ctx.lineTo(x + radius, y);
+    ctx.quadraticCurveTo(x, y, x, y + radius);
+    return ctx;
   }
 
   getBaseMesh(textBaseOffset = 0) {
@@ -66,7 +71,7 @@ class QRCode3D {
 
     if (this.options.base.shape === 'roundedRectangle') {
       const shape = QRCode3D.getRoundedRectShape(
-        -this.options.base.width / 2,
+        -(this.options.base.width + textBaseOffset) / 2,
         -this.options.base.width / 2,
         this.options.base.width + textBaseOffset,
         this.options.base.width,
@@ -97,6 +102,7 @@ class QRCode3D {
       baseMesh.position.x = textPlacementOffset;
     }
 
+    baseMesh.updateMatrix();
     return baseMesh;
   }
 
@@ -267,38 +273,36 @@ class QRCode3D {
       cornerRadius = this.options.base.cornerRadius;
     }
 
-    /*
-    if (this.options.base.hasText) {
-      if (this.options.base.textPlacement === 'top') {
-        topSide -= textBaseOffset;
-      } else {
-        bottomSide += textBaseOffset;
-      }
+    let topOffset = 0;
+    if (this.options.base.textPlacement === 'top') {
+      topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
     }
-    */
 
     const borderShape = QRCode3D.getRoundedRectShape(
+      -(this.options.base.width + topOffset) / 2,
       -this.options.base.width / 2,
-      -this.options.base.width / 2,
-      this.options.base.width,
       this.options.base.width + textBaseOffset,
+      this.options.base.width,
       cornerRadius,
     );
 
     const borderHoleShape = QRCode3D.getRoundedRectShape(
+      -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
       -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-      -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-      this.options.base.width - this.options.base.borderWidth * 2,
+      this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
       this.options.base.width - this.options.base.borderWidth * 2,
       Math.max(0, cornerRadius - this.options.base.borderWidth),
+      true,
     );
 
     borderShape.holes.push(borderHoleShape);
+
     const borderExtrude = new THREE.ExtrudeGeometry(borderShape, {
       steps: 1,
       depth: this.options.base.borderDepth,
       bevelEnabled: false,
     });
+
     const borderMesh = new THREE.Mesh(borderExtrude, this.materialBlock);
     borderMesh.position.z = this.options.base.depth;
     borderMesh.updateMatrix();
@@ -327,10 +331,6 @@ class QRCode3D {
     }
 
     this.baseMesh = this.getBaseMesh(textBaseOffset);
-    if (this.options.base.hasText) {
-      const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
-      this.baseMesh.position.set(textPlacementOffset, 0, this.options.base.depth / 2);
-    }
     combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
 
     if (this.options.code.iconName !== 'none') {
