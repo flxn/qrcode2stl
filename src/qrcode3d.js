@@ -12,6 +12,30 @@ class QRCode3D {
     this.options = { ...defaultOptions, ...options };
     this.canvas = canvas;
 
+    // default material for the base
+    this.materialBase = new THREE.MeshPhongMaterial({
+      color: this.options.baseColor,
+      specular: 0xffffff,
+      shininess: 30,
+    });
+    // default material for qr code, border, etc.
+    this.materialBlock = new THREE.MeshPhongMaterial({
+      color: this.options.qrcodeColor,
+      specular: 0x0d0d0d,
+      shininess: 90,
+    });
+
+    // total available width without margin and borders for the qr code part
+    this.availableWidth = this.options.base.width - 2 * this.options.code.margin;
+    if (this.options.base.hasBorder) {
+      // subtract border width
+      this.availableWidth -= 2 * this.options.base.borderWidth;
+    }
+
+    // the width of the actual qr code blocks
+    this.blockWidth = (this.availableWidth / this.canvas.width) * (this.options.code.blockSizeMultiplier / 100);
+
+
     this.baseMesh = null;
     this.qrcodeMesh = null;
     this.borderMesh = null;
@@ -22,39 +46,29 @@ class QRCode3D {
     this.generate3dModel();
   }
 
-  static makeRoundedRect(ctx, x, y, width, height, radius) {
-    ctx.moveTo(x, y + radius);
-    ctx.lineTo(x, y + height - radius);
-    ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-    ctx.lineTo(x + width - radius, y + height);
-    ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-    ctx.lineTo(x + width, y + radius);
-    ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-    ctx.lineTo(x + radius, y);
-    ctx.quadraticCurveTo(x, y, x, y + radius);
+  static getRoundedRectShape(x, y, width, height, radius) {
+    const rrShape = new THREE.Shape();
+    rrShape.moveTo(x, y + radius);
+    rrShape.lineTo(x, y + height - radius);
+    rrShape.quadraticCurveTo(x, y + height, x + radius, y + height);
+    rrShape.lineTo(x + width - radius, y + height);
+    rrShape.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+    rrShape.lineTo(x + width, y + radius);
+    rrShape.quadraticCurveTo(x + width, y, x + width - radius, y);
+    rrShape.lineTo(x + radius, y);
+    rrShape.quadraticCurveTo(x, y, x, y + radius);
+    return rrShape;
   }
 
-  generate3dModel() {
+  getBaseMesh(textBaseOffset = 0) {
     let modelBase;
     let baseMesh;
-    const materialBase = new THREE.MeshPhongMaterial({
-      color: this.options.baseColor,
-      specular: 0xffffff,
-      shininess: 30,
-    });
-    const materialBlock = new THREE.MeshPhongMaterial({
-      color: this.options.qrcodeColor,
-      specular: 0x0d0d0d,
-      shininess: 90,
-    });
 
     if (this.options.base.shape === 'roundedRectangle') {
-      const shape = new THREE.Shape();
-      QRCode3D.makeRoundedRect(
-        shape,
+      const shape = QRCode3D.getRoundedRectShape(
         -this.options.base.width / 2,
         -this.options.base.width / 2,
-        this.options.base.width,
+        this.options.base.width + textBaseOffset,
         this.options.base.width,
         this.options.base.cornerRadius,
       );
@@ -65,93 +79,96 @@ class QRCode3D {
         bevelEnabled: false,
       });
 
-      baseMesh = new THREE.Mesh(modelBase, materialBase);
+      baseMesh = new THREE.Mesh(modelBase, this.materialBase);
       baseMesh.position.set(0, 0, 0);
     } else {
       modelBase = new THREE.BoxGeometry(
-        this.options.base.width,
+        this.options.base.width + textBaseOffset,
         this.options.base.width,
         this.options.base.depth,
       );
 
-      baseMesh = new THREE.Mesh(modelBase, materialBase);
+      baseMesh = new THREE.Mesh(modelBase, this.materialBase);
       baseMesh.position.set(0, 0, this.options.base.depth / 2);
     }
 
-    const qrcodeGeometry = new THREE.Geometry();
-    const combinedGeometry = new THREE.Geometry();
-    const borderGeometry = new THREE.Geometry();
+    if (textBaseOffset > 0) {
+      const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
+      baseMesh.position.x = textPlacementOffset;
+    }
+
+    return baseMesh;
+  }
+
+  static getIconSize(iconMesh) {
+    const iconBoundingBox = new THREE.Box3().setFromObject(iconMesh);
+    return iconBoundingBox.getSize();
+  }
+
+  /**
+   * @return {THREE.Mesh} the 3D mesh of the icon
+   */
+  getIconMesh() {
     const iconGeometry = new THREE.Geometry();
-    const textGeometry = new THREE.Geometry();
+    const loader = new SVGLoader();
+    const svgMarkup = document.querySelector('#icon-preview').contentDocument.querySelector('svg').outerHTML;
+    const svgData = loader.parse(svgMarkup);
+    // Loop through all of the parsed paths
+    svgData.paths.forEach((path) => {
+      const shapes = path.toShapes(true, true);
 
-    const canvasWidth = this.canvas.width;
-    const canvasHeight = this.canvas.height;
-
-    // total available width without margin and borders for the qr code part
-    let availableWidth = this.options.base.width - 2 * this.options.code.margin;
-    if (this.options.base.hasBorder) {
-      availableWidth -= 2 * this.options.base.borderWidth;
-    }
-    // the width of the actual qr code blocks
-    const blockWidth = (availableWidth / canvasWidth) * (this.options.code.blockSizeMultiplier / 100);
-
-    // SVG icon
-    let iconBoundingBox;
-    let iconSize;
-    if (this.options.code.iconName !== 'none') {
-      const loader = new SVGLoader();
-      const svgMarkup = document.querySelector('#icon-preview').contentDocument.querySelector('svg').outerHTML;
-      const svgData = loader.parse(svgMarkup);
-      // Loop through all of the parsed paths
-      svgData.paths.forEach((path) => {
-        const shapes = path.toShapes(true, true);
-
-        // Each path has array of shapes
-        shapes.forEach((shape) => {
-          // Finally we can take each shape and extrude it
-          const pathGeometry = new THREE.ExtrudeGeometry(shape, {
-            steps: 1,
-            depth: this.options.code.depth,
-            bevelEnabled: false,
-          });
-
-          const pathMesh = new THREE.Mesh(pathGeometry, materialBlock);
-          pathMesh.position.set(0, 0, 0);
-          pathMesh.rotation.set(0, 0, -Math.PI / 2);
-          pathMesh.updateMatrix();
-          iconGeometry.merge(pathMesh.geometry, pathMesh.matrix);
+      // Each path has array of shapes
+      shapes.forEach((shape) => {
+        // Finally we can take each shape and extrude it
+        const pathGeometry = new THREE.ExtrudeGeometry(shape, {
+          steps: 1,
+          depth: this.options.code.depth,
+          bevelEnabled: false,
         });
+
+        const pathMesh = new THREE.Mesh(pathGeometry, this.materialBlock);
+        pathMesh.position.set(0, 0, 0);
+        pathMesh.rotation.set(0, 0, -Math.PI / 2);
+        pathMesh.updateMatrix();
+        iconGeometry.merge(pathMesh.geometry, pathMesh.matrix);
       });
+    });
 
-      const iconMesh = new THREE.Mesh(iconGeometry, materialBlock);
+    const iconMesh = new THREE.Mesh(iconGeometry, this.materialBlock);
 
-      // scale icon to correct size
-      iconBoundingBox = new THREE.Box3().setFromObject(iconMesh);
-      iconSize = iconBoundingBox.getSize();
+    // scale icon to correct size
+    let iconSize = QRCode3D.getIconSize(iconMesh);
 
-      const iconSizeRatio = this.options.code.iconSizeRatio / 100;
-      const scaleRatioY = iconSize.y / (availableWidth * iconSizeRatio);
-      const scaleRatioX = iconSize.x / (availableWidth * iconSizeRatio);
+    const iconSizeRatio = this.options.code.iconSizeRatio / 100;
+    const scaleRatioY = iconSize.y / (this.availableWidth * iconSizeRatio);
+    const scaleRatioX = iconSize.x / (this.availableWidth * iconSizeRatio);
 
-      const scaleRatio = scaleRatioX > scaleRatioY ? scaleRatioX : scaleRatioY;
-      iconMesh.scale.x /= scaleRatio;
-      iconMesh.scale.y /= scaleRatio;
-      iconMesh.rotation.x = Math.PI;
-      // move icon to center
-      iconBoundingBox = new THREE.Box3().setFromObject(iconMesh);
-      iconSize = iconBoundingBox.getSize();
+    const scaleRatio = scaleRatioX > scaleRatioY ? scaleRatioX : scaleRatioY;
+    iconMesh.scale.x /= scaleRatio;
+    iconMesh.scale.y /= scaleRatio;
+    iconMesh.rotation.x = Math.PI;
 
-      iconMesh.position.x = -iconSize.x / 2;
-      iconMesh.position.y = -iconSize.y / 2 + blockWidth / 2;
-      iconMesh.position.z = this.options.base.depth + this.options.code.depth;
-      this.iconMesh = iconMesh;
-      iconMesh.updateMatrix();
-      combinedGeometry.merge(iconMesh.geometry, iconMesh.matrix);
-    }
+    // move icon to center
+    iconSize = QRCode3D.getIconSize(iconMesh);
 
+    iconMesh.position.x = -iconSize.x / 2;
+    iconMesh.position.y = -iconSize.y / 2 + this.blockWidth / 2;
+    iconMesh.position.z = this.options.base.depth + this.options.code.depth;
+    this.iconMesh = iconMesh;
+    iconMesh.updateMatrix();
+
+    return iconMesh;
+  }
+
+  /**
+   * @return {THREE.Mesh} the mesh of the actual QR-Code segment
+   */
+  getQRCodeMesh(iconSize = null) {
     const ctx = this.canvas.getContext('2d');
-    for (let y = 0; y < canvasHeight; y += 1) {
-      for (let x = 0; x < canvasWidth; x += 1) {
+    const qrcodeGeometry = new THREE.Geometry();
+
+    for (let y = 0; y < this.canvas.height; y += 1) {
+      for (let x = 0; x < this.canvas.width; x += 1) {
         const pixel = ctx.getImageData(x, y, 1, 1).data;
         const isBlack = pixel[0] === 0;
         if (isBlack) {
@@ -163,33 +180,33 @@ class QRCode3D {
           // Determine basic block element
           if (this.options.code.qrcodeBlockStyle === 'round') {
             qrBlock = new THREE.CylinderGeometry(
-              blockWidth / 2,
-              blockWidth / 2,
+              this.blockWidth / 2,
+              this.blockWidth / 2,
               blockDepth,
               16,
             );
           } else {
             qrBlock = new THREE.BoxGeometry(
-              blockWidth,
-              blockWidth,
+              this.blockWidth,
+              this.blockWidth,
               blockDepth,
             );
           }
 
-          const qrBlockMesh = new THREE.Mesh(qrBlock, materialBlock);
+          const qrBlockMesh = new THREE.Mesh(qrBlock, this.materialBlock);
 
           // qr code block positions
-          let blockX = (x / canvasWidth) * availableWidth;
-          blockX -= availableWidth / 2;
-          blockX += blockWidth / 2;
+          let blockX = (x / this.canvas.width) * this.availableWidth;
+          blockX -= this.availableWidth / 2;
+          blockX += this.blockWidth / 2;
 
-          let blockY = (y / canvasHeight) * availableWidth;
-          blockY -= availableWidth / 2;
-          blockY += blockWidth / 2;
+          let blockY = (y / this.canvas.height) * this.availableWidth;
+          blockY -= this.availableWidth / 2;
+          blockY += this.blockWidth / 2;
 
           // don't draw block if it collides with icon bounding box
-          if (this.iconMesh) {
-            const safetyMargin = Math.min(blockWidth * 2, 5);
+          if (iconSize) {
+            const safetyMargin = Math.min(this.blockWidth * 2, 5);
             if ((blockX > -iconSize.x / 2 - safetyMargin
               && blockX < iconSize.x / 2 + safetyMargin)
               && (blockY > -iconSize.y / 2 - safetyMargin
@@ -210,181 +227,121 @@ class QRCode3D {
           // add qr code blocks to qrcode and combined model
           qrBlockMesh.updateMatrix();
           qrcodeGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
-          combinedGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
         }
       }
+    }
+
+    return new THREE.Mesh(qrcodeGeometry, this.materialBlock);
+  }
+
+  getTextMesh() {
+    const textGeometry = new THREE.Geometry();
+    // create text
+    const fontHelvetikerBold = new THREE.Font(fontDefinitionHelvetikerBold);
+    const tempTextGeometry = new THREE.TextGeometry(this.options.base.textMessage, {
+      font: fontHelvetikerBold,
+      size: this.options.base.textSize,
+      height: this.options.base.textDepth,
+    });
+
+    const textMesh = new THREE.Mesh(tempTextGeometry, this.materialBlock);
+    const textBoundingBox = new THREE.Box3().setFromObject(textMesh);
+    const textSize = textBoundingBox.getSize();
+
+    // place text at correct position
+    const topSide = -this.options.base.width / 2 + this.options.base.textSize / 2 - this.options.base.textMargin;
+    const bottomSide = this.options.base.width / 2 + this.options.base.textSize / 2 + this.options.base.textMargin;
+    const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
+
+    textMesh.position.set(placement, -textSize.x / 2, this.options.base.depth);
+    textMesh.rotation.set(0, 0, Math.PI / 2);
+    textMesh.updateMatrix();
+    textGeometry.merge(textMesh.geometry, textMesh.matrix);
+
+    return new THREE.Mesh(textGeometry, this.materialBlock);
+  }
+
+  getBorderMesh(textBaseOffset = 0) {
+    let cornerRadius = 0;
+    if (this.options.base.shape === 'roundedRectangle') {
+      cornerRadius = this.options.base.cornerRadius;
+    }
+
+    /*
+    if (this.options.base.hasText) {
+      if (this.options.base.textPlacement === 'top') {
+        topSide -= textBaseOffset;
+      } else {
+        bottomSide += textBaseOffset;
+      }
+    }
+    */
+
+    const borderShape = QRCode3D.getRoundedRectShape(
+      -this.options.base.width / 2,
+      -this.options.base.width / 2,
+      this.options.base.width,
+      this.options.base.width + textBaseOffset,
+      cornerRadius,
+    );
+
+    const borderHoleShape = QRCode3D.getRoundedRectShape(
+      -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+      -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+      this.options.base.width - this.options.base.borderWidth * 2,
+      this.options.base.width - this.options.base.borderWidth * 2,
+      Math.max(0, cornerRadius - this.options.base.borderWidth),
+    );
+
+    borderShape.holes.push(borderHoleShape);
+    const borderExtrude = new THREE.ExtrudeGeometry(borderShape, {
+      steps: 1,
+      depth: this.options.base.borderDepth,
+      bevelEnabled: false,
+    });
+    const borderMesh = new THREE.Mesh(borderExtrude, this.materialBlock);
+    borderMesh.position.z = this.options.base.depth;
+    borderMesh.updateMatrix();
+
+    return borderMesh;
+  }
+
+  generate3dModel() {
+    const combinedGeometry = new THREE.Geometry();
+
+    if (this.options.code.iconName !== 'none') {
+      this.iconMesh = this.getIconMesh();
+      combinedGeometry.merge(this.iconMesh.geometry, this.iconMesh.matrix);
     }
 
     let textBaseOffset = 0;
     if (this.options.base.hasText) {
-      // create text
-      const fontHelvetikerBold = new THREE.Font(fontDefinitionHelvetikerBold);
-      const tempTextGeometry = new THREE.TextGeometry(this.options.base.textMessage, {
-        font: fontHelvetikerBold,
-        size: this.options.base.textSize,
-        height: this.options.base.textDepth,
-      });
-
-      const textMesh = new THREE.Mesh(tempTextGeometry, materialBlock);
-      const textBoundingBox = new THREE.Box3().setFromObject(textMesh);
-      const textSize = textBoundingBox.getSize();
-
-      // place text at correct position
-      const topSide = -this.options.base.width / 2 + this.options.base.textSize / 2 - this.options.base.textMargin;
-      const bottomSide = this.options.base.width / 2 + this.options.base.textSize / 2 + this.options.base.textMargin;
-      const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
-
-      textMesh.position.set(placement, -textSize.x / 2, this.options.base.depth);
-      textMesh.rotation.set(0, 0, Math.PI / 2);
-      textMesh.updateMatrix();
-      textGeometry.merge(textMesh.geometry, textMesh.matrix);
-      combinedGeometry.merge(textMesh.geometry, textMesh.matrix);
-
+      this.textMesh = this.getTextMesh();
+      combinedGeometry.merge(this.textMesh.geometry, this.textMesh.matrix);
       textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-      // update base size
-      const updatedBase = new THREE.BoxGeometry(
-        this.options.base.width + textBaseOffset,
-        this.options.base.width,
-        this.options.base.depth,
-      );
-
-      const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
-
-      baseMesh = new THREE.Mesh(updatedBase, materialBase);
-      baseMesh.position.set(textPlacementOffset, 0, this.options.base.depth / 2);
     }
 
     if (this.options.base.hasBorder) {
-      if (this.options.base.shape === 'roundedRectangle') {
-        const borderShape = new THREE.Shape();
-        QRCode3D.makeRoundedRect(
-          borderShape,
-          -this.options.base.width / 2,
-          -this.options.base.width / 2,
-          this.options.base.width,
-          this.options.base.width,
-          this.options.base.cornerRadius,
-        );
-        const borderHolePath = new THREE.Path();
-        QRCode3D.makeRoundedRect(
-          borderHolePath,
-          -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-          -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-          this.options.base.width - this.options.base.borderWidth * 2,
-          this.options.base.width - this.options.base.borderWidth * 2,
-          Math.max(0, this.options.base.cornerRadius - this.options.base.borderWidth),
-        );
-        borderShape.holes.push(borderHolePath);
-        const borderExtrude = new THREE.ExtrudeGeometry(borderShape, {
-          steps: 1,
-          depth: this.options.base.borderDepth,
-          bevelEnabled: false,
-        });
-        const topBorderMesh = new THREE.Mesh(borderExtrude, materialBlock);
-        topBorderMesh.position.z = this.options.base.depth;
-        topBorderMesh.updateMatrix();
-        borderGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
-        combinedGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
-      } else {
-        const widthOffset = this.options.base.borderWidth / 2;
-        let topSide = -this.options.base.width / 2 + widthOffset;
-        const rightSide = this.options.base.width / 2 - widthOffset;
-        let bottomSide = this.options.base.width / 2 - widthOffset;
-        const leftSide = -this.options.base.width / 2 + widthOffset;
-
-        const borderZ = this.options.base.depth + this.options.base.borderDepth / 2;
-
-        let sideBorderLength = this.options.base.width;
-
-        if (this.options.base.hasText) {
-          if (this.options.base.textPlacement === 'top') {
-            topSide -= textBaseOffset;
-          } else {
-            bottomSide += textBaseOffset;
-          }
-          sideBorderLength += textBaseOffset;
-        }
-
-        // Top Border
-        const topBorder = new THREE.BoxGeometry(
-          this.options.base.borderWidth,
-          this.options.base.width,
-          this.options.base.borderDepth,
-        );
-        const topBorderMesh = new THREE.Mesh(topBorder, materialBlock);
-        topBorderMesh.position.set(topSide, 0, borderZ);
-        topBorderMesh.updateMatrix();
-        borderGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
-        combinedGeometry.merge(topBorderMesh.geometry, topBorderMesh.matrix);
-
-        // Right Border
-        const rightBorder = new THREE.BoxGeometry(
-          this.options.base.borderWidth,
-          sideBorderLength,
-          this.options.base.borderDepth,
-        );
-        const rightBorderMesh = new THREE.Mesh(rightBorder, materialBlock);
-        if (this.options.base.hasText) {
-          if (this.options.base.textPlacement === 'top') {
-            rightBorderMesh.position.set(-textBaseOffset / 2, rightSide, borderZ);
-          } else {
-            rightBorderMesh.position.set(textBaseOffset / 2, rightSide, borderZ);
-          }
-        } else {
-          rightBorderMesh.position.set(0, rightSide, borderZ);
-        }
-        rightBorderMesh.rotation.set(0, 0, Math.PI / 2);
-        rightBorderMesh.updateMatrix();
-        borderGeometry.merge(rightBorderMesh.geometry, rightBorderMesh.matrix);
-        combinedGeometry.merge(rightBorderMesh.geometry, rightBorderMesh.matrix);
-
-        // Bottom Border
-        const bottomBorder = new THREE.BoxGeometry(
-          this.options.base.borderWidth,
-          this.options.base.width,
-          this.options.base.borderDepth,
-        );
-        const bottomBorderMesh = new THREE.Mesh(bottomBorder, materialBlock);
-        bottomBorderMesh.position.set(bottomSide, 0, borderZ);
-        bottomBorderMesh.updateMatrix();
-        borderGeometry.merge(bottomBorderMesh.geometry, bottomBorderMesh.matrix);
-        combinedGeometry.merge(bottomBorderMesh.geometry, bottomBorderMesh.matrix);
-
-        // Left Border
-        const leftBorder = new THREE.BoxGeometry(
-          this.options.base.borderWidth,
-          sideBorderLength,
-          this.options.base.borderDepth,
-        );
-        const leftBorderMesh = new THREE.Mesh(leftBorder, materialBlock);
-        if (this.options.base.hasText) {
-          if (this.options.base.textPlacement === 'top') {
-            leftBorderMesh.position.set(-textBaseOffset / 2, leftSide, borderZ);
-          } else {
-            leftBorderMesh.position.set(textBaseOffset / 2, leftSide, borderZ);
-          }
-        } else {
-          leftBorderMesh.position.set(0, leftSide, borderZ);
-        }
-        leftBorderMesh.rotation.set(0, 0, Math.PI / 2);
-        leftBorderMesh.updateMatrix();
-        borderGeometry.merge(leftBorderMesh.geometry, leftBorderMesh.matrix);
-        combinedGeometry.merge(leftBorderMesh.geometry, leftBorderMesh.matrix);
-      }
+      this.borderMesh = this.getBorderMesh(textBaseOffset);
+      combinedGeometry.merge(this.borderMesh.geometry, this.borderMesh.matrix);
     }
 
-    // add base to combined model
-    baseMesh.updateMatrix();
-    combinedGeometry.merge(baseMesh.geometry, baseMesh.matrix);
+    this.baseMesh = this.getBaseMesh(textBaseOffset);
+    if (this.options.base.hasText) {
+      const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
+      this.baseMesh.position.set(textPlacementOffset, 0, this.options.base.depth / 2);
+    }
+    combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
 
-    // separate meshes for dual extrusion
-    this.baseMesh = baseMesh;
-    this.qrcodeMesh = new THREE.Mesh(qrcodeGeometry, materialBlock);
-    this.borderMesh = new THREE.Mesh(borderGeometry, materialBlock);
-    this.textMesh = new THREE.Mesh(textGeometry, materialBlock);
-
+    if (this.options.code.iconName !== 'none') {
+      const iconSize = QRCode3D.getIconSize(this.iconMesh);
+      this.qrcodeMesh = this.getQRCodeMesh(iconSize);
+    } else {
+      this.qrcodeMesh = this.getQRCodeMesh();
+    }
+    combinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
     // combined mesh
-    this.combinedMesh = new THREE.Mesh(combinedGeometry, materialBase);
+    this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
   }
 }
 
