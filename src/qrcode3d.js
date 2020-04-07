@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
 
+/**
+ * Class used for generating the 3D model from an html5 canvas that contains the qr code image
+ * TODO: Refactor actual qrcode to model translation: integrate canvas into this class or maybe roll own qr code algorithm
+ */
 class QRCode3D {
   constructor(canvas, options) {
     const defaultOptions = {
@@ -35,7 +39,7 @@ class QRCode3D {
     // the width of the actual qr code blocks
     this.blockWidth = (this.availableWidth / this.canvas.width) * (this.options.code.blockSizeMultiplier / 100);
 
-
+    // reset meshes
     this.baseMesh = null;
     this.qrcodeMesh = null;
     this.borderMesh = null;
@@ -43,11 +47,18 @@ class QRCode3D {
     this.textMesh = null;
     this.combinedMesh = null;
 
+    // build the 3D model
     this.generate3dModel();
   }
 
+  /**
+   * Returns a rounded rectangle shape with the given parameters
+   * Taken from: https://threejs.org/examples/webgl_geometry_shapes.html
+   */
   static getRoundedRectShape(x, y, width, height, radius, path = false) {
     let ctx;
+    // can return Shape (default) or Path, used for punching the hole in the border mesh
+    // TODO: find out the differences because always using a Shape works too
     if (path) {
       ctx = new THREE.Path();
     } else {
@@ -65,39 +76,36 @@ class QRCode3D {
     return ctx;
   }
 
+  /**
+   * @param {Number} textBaseOffset additional offset when using text
+   * @return {THREE.Mesh} the mesh of the base
+   */
   getBaseMesh(textBaseOffset = 0) {
-    let modelBase;
-    let baseMesh;
-
+    // TODO: rethink handling of rounded rectangle: Different shape category vs only corner radius adjustment
+    let cornerRadius = 0;
     if (this.options.base.shape === 'roundedRectangle') {
-      const shape = QRCode3D.getRoundedRectShape(
-        -(this.options.base.width + textBaseOffset) / 2,
-        -this.options.base.width / 2,
-        this.options.base.width + textBaseOffset,
-        this.options.base.width,
-        this.options.base.cornerRadius,
-      );
-
-      modelBase = new THREE.ExtrudeGeometry(shape, {
-        steps: 1,
-        depth: this.options.base.depth,
-        bevelEnabled: false,
-      });
-
-      baseMesh = new THREE.Mesh(modelBase, this.materialBase);
-      baseMesh.position.set(0, 0, 0);
-    } else {
-      modelBase = new THREE.BoxGeometry(
-        this.options.base.width + textBaseOffset,
-        this.options.base.width,
-        this.options.base.depth,
-      );
-
-      baseMesh = new THREE.Mesh(modelBase, this.materialBase);
-      baseMesh.position.set(0, 0, this.options.base.depth / 2);
+      cornerRadius = this.options.base.cornerRadius;
     }
 
+    const shape = QRCode3D.getRoundedRectShape(
+      -(this.options.base.width + textBaseOffset) / 2,
+      -this.options.base.width / 2,
+      this.options.base.width + textBaseOffset,
+      this.options.base.width,
+      cornerRadius,
+    );
+
+    const modelBase = new THREE.ExtrudeGeometry(shape, {
+      steps: 1,
+      depth: this.options.base.depth,
+      bevelEnabled: false,
+    });
+
+    const baseMesh = new THREE.Mesh(modelBase, this.materialBase);
+    baseMesh.position.set(0, 0, 0);
+
     if (textBaseOffset > 0) {
+      // shift base in x direction to align with text
       const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
       baseMesh.position.x = textPlacementOffset;
     }
@@ -106,9 +114,13 @@ class QRCode3D {
     return baseMesh;
   }
 
-  static getIconSize(iconMesh) {
-    const iconBoundingBox = new THREE.Box3().setFromObject(iconMesh);
-    return iconBoundingBox.getSize();
+  /**
+   * @param {THREE.Mesh} mesh a mesh
+   * @return {THREE.Vector3} size of the given mesh's bounding box
+   */
+  static getBoundingBoxSize(mesh) {
+    const boundingBox = new THREE.Box3().setFromObject(mesh);
+    return boundingBox.getSize();
   }
 
   /**
@@ -143,7 +155,7 @@ class QRCode3D {
     const iconMesh = new THREE.Mesh(iconGeometry, this.materialBlock);
 
     // scale icon to correct size
-    let iconSize = QRCode3D.getIconSize(iconMesh);
+    let iconSize = QRCode3D.getBoundingBoxSize(iconMesh);
 
     const iconSizeRatio = this.options.code.iconSizeRatio / 100;
     const scaleRatioY = iconSize.y / (this.availableWidth * iconSizeRatio);
@@ -155,7 +167,7 @@ class QRCode3D {
     iconMesh.rotation.x = Math.PI;
 
     // move icon to center
-    iconSize = QRCode3D.getIconSize(iconMesh);
+    iconSize = QRCode3D.getBoundingBoxSize(iconMesh);
 
     iconMesh.position.x = -iconSize.x / 2;
     iconMesh.position.y = -iconSize.y / 2 + this.blockWidth / 2;
@@ -172,12 +184,13 @@ class QRCode3D {
   getQRCodeMesh(iconSize = null) {
     const ctx = this.canvas.getContext('2d');
     const qrcodeGeometry = new THREE.Geometry();
-
+    // iterate through pixels in canvas
     for (let y = 0; y < this.canvas.height; y += 1) {
       for (let x = 0; x < this.canvas.width; x += 1) {
         const pixel = ctx.getImageData(x, y, 1, 1).data;
         const isBlack = pixel[0] === 0;
         if (isBlack) {
+          // if pixel is black create a block
           let qrBlock;
           let blockDepth = this.options.code.depth;
           if (this.options.code.cityMode) {
@@ -240,6 +253,9 @@ class QRCode3D {
     return new THREE.Mesh(qrcodeGeometry, this.materialBlock);
   }
 
+  /**
+   * @return {THREE.Mesh} the mesh of the text
+   */
   getTextMesh() {
     const textGeometry = new THREE.Geometry();
     // create text
@@ -267,6 +283,10 @@ class QRCode3D {
     return new THREE.Mesh(textGeometry, this.materialBlock);
   }
 
+  /**
+   * @param {Number} textBaseOffset additional offset when using text
+   * @return {THREE.Mesh} the mesh of the border
+   */
   getBorderMesh(textBaseOffset = 0) {
     let cornerRadius = 0;
     if (this.options.base.shape === 'roundedRectangle') {
@@ -278,6 +298,7 @@ class QRCode3D {
       topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
     }
 
+    // shape covering the whole area
     const borderShape = QRCode3D.getRoundedRectShape(
       -(this.options.base.width + topOffset) / 2,
       -this.options.base.width / 2,
@@ -286,6 +307,7 @@ class QRCode3D {
       cornerRadius,
     );
 
+    // shape that covers everything exact where the border should be
     const borderHoleShape = QRCode3D.getRoundedRectShape(
       -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
       -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
@@ -295,6 +317,7 @@ class QRCode3D {
       true,
     );
 
+    // punch a hole through the large shape to create shape of border
     borderShape.holes.push(borderHoleShape);
 
     const borderExtrude = new THREE.ExtrudeGeometry(borderShape, {
@@ -310,6 +333,9 @@ class QRCode3D {
     return borderMesh;
   }
 
+  /**
+   * Generates all required meshes of the 3D model and combines them
+   */
   generate3dModel() {
     const combinedGeometry = new THREE.Geometry();
 
@@ -334,13 +360,13 @@ class QRCode3D {
     combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
 
     if (this.options.code.iconName !== 'none') {
-      const iconSize = QRCode3D.getIconSize(this.iconMesh);
+      const iconSize = QRCode3D.getBoundingBoxSize(this.iconMesh);
       this.qrcodeMesh = this.getQRCodeMesh(iconSize);
     } else {
       this.qrcodeMesh = this.getQRCodeMesh();
     }
     combinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
-    // combined mesh
+
     this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
   }
 }
