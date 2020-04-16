@@ -1,5 +1,8 @@
 <template>
   <div id="main" class="container is-fluid">
+    <div class="notification is-warning">
+      <i class="fa fa-exclamation-triangle"></i> I am investigating an issue where <strong>slicing with Cura does not work correctly when using a border</strong>. As a temporary workaround you can repair the stl file with Netfabb: <a href="https://service.netfabb.com/" target="_blank" rel="noopener noreferrer">https://service.netfabb.com/</a>.
+    </div>
     <div class="columns is-multiline">
       <div class="column is-5-widescreen is-5-fullhd is-12">
         <h1 class="title">{{ $t("title") }}</h1>
