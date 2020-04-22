@@ -1,7 +1,11 @@
 <template>
   <div id="main" class="container is-fluid">
     <div class="notification is-warning">
-      <i class="fa fa-exclamation-triangle"></i> I am investigating an issue where <strong>slicing with Cura does not work correctly when using a border</strong>. As a temporary workaround you can repair the stl file with Netfabb: <a href="https://service.netfabb.com/" target="_blank" rel="noopener noreferrer">https://service.netfabb.com/</a>.
+      <i class="fa fa-exclamation-triangle"></i>
+      I am investigating an issue where <strong>slicing with Cura does not work correctly when using a border</strong>. PrusaSlicer/Slic3r repairs the file automatically and does not seem to be affected.<br/>
+      As a temporary workaround you can repair the stl file with Netfabb: <a href="https://service.netfabb.com/" target="_blank" rel="noopener noreferrer">https://service.netfabb.com/</a>.<br/>
+      Another easy way for Windows 10 users is to repair the file with <a href="https://www.microsoft.com/en-us/p/3d-builder/9wzdncrfj3t6?activetab=pivot:overviewtab" target="_blank" rel="noopener noreferrer">3D Builder</a>:
+      Just open the file and click on the popup in the bottom right corner to repair it. You can then save the file again and it should be printable now.
     </div>
     <div class="columns is-multiline">
       <div class="column is-5-widescreen is-5-fullhd is-12">
