@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <div class="field is-horizontal">
+    <div class="field is-horizontal" v-if="wifi.security !== 'nopass'">
       <div class="field-label is-normal">
         <label class="label">{{$t('password')}}</label>
       </div>
@@ -43,8 +43,9 @@
           <div class="control">
             <div class="select">
               <select v-model="wifi.security">
-                <option>WPA</option>
-                <option>WEP</option>
+                <option value="WPA">WPA</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">No password</option>
               </select>
             </div>
           </div>

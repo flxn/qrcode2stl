@@ -510,6 +510,12 @@ export default {
           ret = this.text;
           break;
         case 1: // Wifi
+          if (this.wifi.password === '') {
+            this.wifi.security = 'nopass';
+          }
+          if (this.wifi.security === 'nopass') {
+            this.wifi.password = '';
+          }
           ret = `WIFI:S:${this.wifiQREscape(
             this.wifi.ssid,
           )};T:${this.wifiQREscape(this.wifi.security)};P:${this.wifiQREscape(
