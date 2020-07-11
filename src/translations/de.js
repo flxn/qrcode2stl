@@ -30,6 +30,7 @@ export default {
   left: 'links',
   right: 'rechts',
   content: 'Inhalt',
+  thankYou: 'Vielen Dank für die Unterstützung. Du rockst!',
 
   //
   // QR Code Options Panel

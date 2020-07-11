@@ -30,6 +30,7 @@ export default {
   content: 'content',
   min: 'min',
   max: 'max',
+  thankYou: 'Thank you very much for the support. You rock!',
 
 
   //

@@ -20,6 +20,11 @@
     </div>
     <div class="navbar-menu" :class="{ 'is-active': navbarOpen }">
       <div class="navbar-end">
+        <div class="navbar-item" v-if="showThankYou">
+          <div class="notification is-danger">
+            <i class="fa fa-heart"></i> <span>{{$t('thankYou')}}</span>
+          </div>
+        </div>
         <div class="navbar-item">
           <LanguageSelector />
         </div>
@@ -28,14 +33,9 @@
         </div>
         <div class="navbar-item">
           <div class="buttons">
-            <a class="button" href="https://ko-fi.com/flxn256" target="_blank">
+            <a class="button" href="https://paypal.me/fstein42" target="_blank" @click="showThanks">
               <span class="icon">
-                <img
-                  src="../assets/cup-border.png"
-                  width="24"
-                  loading="lazy"
-                  alt="Support Me on Ko-Fi"
-                />
+                <i class="fab fa-paypal"></i>
               </span>
               <span>{{$t('supportMe')}}</span>
             </a>
@@ -69,12 +69,16 @@ export default {
   data() {
     return {
       navbarOpen: false,
+      showThankYou: false,
     };
   },
   methods: {
     toggleNavigation() {
       this.navbarOpen = !this.navbarOpen;
       console.log(this.navbarOpen);
+    },
+    showThanks() {
+      this.showThankYou = true;
     },
   },
 };
