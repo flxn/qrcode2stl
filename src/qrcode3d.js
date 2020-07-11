@@ -194,7 +194,7 @@ class QRCode3D {
           let qrBlock;
           let blockDepth = this.options.code.depth;
           if (this.options.code.cityMode) {
-            blockDepth = 1 + Math.random() * 4;
+            blockDepth = Math.min(this.options.code.depth, this.options.code.depthMax) + Math.random() * Math.abs(this.options.code.depthMax - this.options.code.depth);
           }
           // Determine basic block element
           if (this.options.code.qrcodeBlockStyle === 'round') {

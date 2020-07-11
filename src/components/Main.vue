@@ -269,6 +269,7 @@ export default {
           iconName: 'none',
           iconSizeRatio: 20,
           cityMode: false,
+          depthMax: 5,
         },
       },
       workCanvas: null,

@@ -28,6 +28,9 @@ export default {
   left: 'left',
   right: 'right',
   content: 'content',
+  min: 'min',
+  max: 'max',
+
 
   //
   // QR Code Options Panel
