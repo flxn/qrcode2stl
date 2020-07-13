@@ -304,7 +304,6 @@ export default {
       this.scene.background = new THREE.Color(0xa0a0a0);
       this.scene.rotation.z = -Math.PI / 2;
 
-
       // LIGHTS
       const ambientLight = new THREE.AmbientLight(0x333333);
       const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
@@ -313,7 +312,6 @@ export default {
       directionalLight.position.z = 1;
       this.scene.add(ambientLight);
       this.scene.add(directionalLight);
-
 
       const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
       grid.material.opacity = 0.2;
@@ -356,11 +354,21 @@ export default {
       this.textMesh = qrcodeModel.textMesh;
       this.mesh = qrcodeModel.combinedMesh;
 
-      this.scene.add(this.baseMesh);
-      this.scene.add(this.qrcodeMesh);
-      this.scene.add(this.borderMesh);
-      this.scene.add(this.iconMesh);
-      this.scene.add(this.textMesh);
+      if (this.baseMesh) {
+        this.scene.add(this.baseMesh);
+      }
+      if (this.qrcodeMesh) {
+        this.scene.add(this.qrcodeMesh);
+      }
+      if (this.borderMesh) {
+        this.scene.add(this.borderMesh);
+      }
+      if (this.iconMesh) {
+        this.scene.add(this.iconMesh);
+      }
+      if (this.textMesh) {
+        this.scene.add(this.textMesh);
+      }
     },
     startAnimation() {
       const animate = () => {

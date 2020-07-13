@@ -11,22 +11,22 @@ Feel free to write an issue if you find a bug or have an idea for a new feature:
 ## Project setup
 Install dependencies:
 ```
-npm install
+yarn
 ```
 
 Compiles and hot-reload for development:
 ```
-npm run serve
+yarn run serve
 ```
 
 Compiles and minifies for production:
 ```
-npm run build
+yarn run build
 ```
 
 Lints and fixes files:
 ```
-npm run lint
+yarn run lint
 ```
 
 Customize configuration

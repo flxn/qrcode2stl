@@ -62,7 +62,6 @@
   </ul>
 </template>
 
-
 <script>
 const url = 'https://flxn.de/qrcode2stl/';
 const title = 'Generate 3d printable QR codes';
