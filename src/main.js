@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
+import VueMarkdown from 'vue-markdown';
 import translations from './translations/loader';
 
 import App from './App.vue';
@@ -15,6 +16,11 @@ const i18n = new VueI18n({
   fallbackLocale: 'en',
   messages: translations,
 });
+
+Vue.use(VueMarkdown);
+
+// eslint-disable-next-line import/prefer-default-export
+export const bus = new Vue();
 
 new Vue({
   i18n,

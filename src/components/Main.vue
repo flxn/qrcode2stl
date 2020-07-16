@@ -169,6 +169,7 @@
     </div>
 
     <PrintGuide />
+    <ChangelogModal v-if="changelogModalVisible"/>
   </div>
 </template>
 
@@ -178,18 +179,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
-
+import packageJson from '../../package.json';
 import QRCode3D from '../qrcode3d';
-
+import ChangelogModal from './ChangelogModal.vue';
+import { bus } from '../main';
 // QR Code settings tabs
 import TabsQR from './TabsQR.vue';
-
 // QR Code settings forms
 import WifiForm from './forms/Wifi.vue';
 import EmailForm from './forms/Email.vue';
 import ContactForm from './forms/Contact.vue';
 import SMSForm from './forms/SMS.vue';
-
 // 3D settings panel
 import Panel3dOptions from './Panel3dOptions.vue';
 // Print Guide
@@ -208,6 +208,7 @@ export default {
     Panel3dOptions,
     TabsQR,
     PrintGuide,
+    ChangelogModal,
   },
   data() {
     return {
@@ -292,6 +293,7 @@ export default {
       blockHeight: null,
       isGenerating: false,
       generateError: null,
+      changelogModalVisible: false,
     };
   },
 
@@ -589,6 +591,11 @@ export default {
     // await this.handleTextChanged();
     // this.setup3dObject();
     this.startAnimation();
+    console.log(packageJson);
+  },
+  created() {
+    bus.$on('openChangelogModal', () => { this.changelogModalVisible = true; });
+    bus.$on('closeChangelogModal', () => { this.changelogModalVisible = false; });
   },
 };
 </script>

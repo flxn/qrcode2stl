@@ -1,6 +1,5 @@
 <template>
   <ul class="share-buttons">
-    <div class="title is-size-7">{{$t('shareButtonTitle')}}</div>
     <li>
       <a
         :href="facebookLink"

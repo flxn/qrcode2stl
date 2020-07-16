@@ -51,6 +51,16 @@
             </a>
           </div>
         </div>
+        <div class="navbar-item">
+          <div class="buttons">
+            <a :class="{'button': true, 'is-info': newVersion}" @click="openChangelogModal">
+              <span class="icon">
+                <i class="fa fa-box"></i>
+              </span>
+              <span>v{{appVersion}}</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -59,6 +69,8 @@
 <script>
 import ShareButtons from './ShareButtons.vue';
 import LanguageSelector from './LanguageSelector.vue';
+import packageJson from '../../package.json';
+import { bus } from '../main';
 
 export default {
   name: 'Header',
@@ -70,6 +82,8 @@ export default {
     return {
       navbarOpen: false,
       showThankYou: false,
+      appVersion: packageJson.version,
+      newVersion: false,
     };
   },
   methods: {
@@ -80,6 +94,17 @@ export default {
     showThanks() {
       this.showThankYou = true;
     },
+    openChangelogModal() {
+      bus.$emit('openChangelogModal');
+      window.localStorage.setItem('lastViewedVersion', this.appVersion);
+      this.newVersion = false;
+    },
+  },
+  created() {
+    const lastViewedVersion = window.localStorage.getItem('lastViewedVersion') || '';
+    if (lastViewedVersion !== this.appVersion) {
+      this.newVersion = true;
+    }
   },
 };
 </script>

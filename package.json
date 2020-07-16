@@ -1,6 +1,6 @@
 {
   "name": "qrcode2stl",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -17,7 +17,8 @@
     "three": "^0.118.3",
     "vcards-js": "^2.10.0",
     "vue": "^2.6.11",
-    "vue-i18n": "^8.18.2"
+    "vue-i18n": "^8.18.2",
+    "vue-markdown": "^2.2.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.4.6",
@@ -27,6 +28,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^7.4.0",
     "eslint-plugin-vue": "^6.2.2",
+    "raw-loader": "^4.0.1",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
