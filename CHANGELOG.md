@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2020-07-24
+### Fixed
+- The long standing bug when slicing with Cura seems to be fixed now 🥳
+
 ## [0.9.0] - 2020-07-16
 ### Added
 - Versioning! I bumped the version to 0.9.0 and from now on I will try to follow a consistent versioning scheme for the project.

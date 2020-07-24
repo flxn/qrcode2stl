@@ -1,6 +1,6 @@
 {
   "name": "qrcode2stl",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
