@@ -9148,6 +9148,11 @@ thread-loader@^2.1.3:
     loader-utils "^1.1.0"
     neo-async "^2.6.0"
 
+three-csg-ts@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/three-csg-ts/-/three-csg-ts-1.0.4.tgz#0e41d283430e6c8f268dac65f3e8170b96a3595c"
+  integrity sha512-XdCG2CXt+N+K45KAbZZN/PqEC2aRPItVpACeG24lGGlXxsQmKeih7CjT0Y6Q/a0IGnF7pgI0DAcuARz6vv9gNg==
+
 three@^0.118.3:
   version "0.118.3"
   resolved "https://registry.yarnpkg.com/three/-/three-0.118.3.tgz#c0bf8c10a68155478f12f4ccac2ff979526a4a0a"

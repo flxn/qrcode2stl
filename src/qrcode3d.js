@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CSG } from 'three-csg-ts';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
 
@@ -307,6 +308,13 @@ class QRCode3D {
       cornerRadius,
     );
 
+    const fullShapeMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(borderShape, {
+      steps: 1,
+      depth: this.options.base.borderDepth,
+      bevelEnabled: false,
+    }), this.materialBlock);
+    fullShapeMesh.updateMatrix();
+
     // shape that covers everything exact where the border should be
     const borderHoleShape = QRCode3D.getRoundedRectShape(
       -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
@@ -314,19 +322,21 @@ class QRCode3D {
       this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
       this.options.base.width - this.options.base.borderWidth * 2,
       Math.max(0, cornerRadius - this.options.base.borderWidth),
-      true,
     );
 
-    // punch a hole through the large shape to create shape of border
-    borderShape.holes.push(borderHoleShape);
-
-    const borderExtrude = new THREE.ExtrudeGeometry(borderShape, {
+    const holeMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(borderHoleShape, {
       steps: 1,
       depth: this.options.base.borderDepth,
       bevelEnabled: false,
-    });
+    }), this.materialBlock);
+    holeMesh.updateMatrix();
 
-    const borderMesh = new THREE.Mesh(borderExtrude, this.materialBlock);
+    const bspFull = CSG.fromMesh(fullShapeMesh);
+    const bspHole = CSG.fromMesh(holeMesh);
+    const bspBorder = bspFull.subtract(bspHole);
+
+    const borderMesh = CSG.toMesh(bspBorder, fullShapeMesh.matrix);
+    borderMesh.material = this.materialBlock;
     borderMesh.position.z = this.options.base.depth;
     borderMesh.updateMatrix();
 
