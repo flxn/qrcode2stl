@@ -460,7 +460,7 @@
 
 <script>
 export default {
-  name: 'Panel3dOptions',
+  name: 'QRCode3DOptionsPanel',
   props: {
     options: Object,
     unit: String,

@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: 'TabsQR',
+  name: 'QRCodeOptionsTabs',
   props: {
     activeTabIndex: Number,
   },
