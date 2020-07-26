@@ -73,11 +73,20 @@ export default {
   smsMessagePlaceholder: 'The SMS message',
 
   //
+  // Spotify Options Panel
+  //
+  spotifyOptions: 'Spotify Code Options',
+  spotifyUri: 'Spotify URI',
+  spotifyUriHelp: 'You can get the Spotify URI for a track/album/playlist/user from Spotify by clicking "Share" and then "URI".',
+  spotifyCodeHeightInfo: 'Spotify Codes have a fixed aspect ratio of 4:1',
+
+  //
   // 3D Model Options Panel
   //
   modelOptions: '3D Model Options',
   base: 'Base',
   width: 'Width',
+  height: 'Height',
   depth: 'Depth',
   cornerRadius: 'Corner Radius',
   border: 'Border',

@@ -11,10 +11,17 @@
             </span>
             <span>QR Code</span>
           </button>
+          <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="mode = 'Spotify'">
+            <span class="icon is-medium">
+              <i class="fab fa-spotify"></i>
+            </span>
+            <span>Spotify Code</span>
+          </button>
         </div>
         <hr />
         <!-- Menus for modes -->
-        <QRCodeMenu v-if="mode === 'QR'"/>
+        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" @exportReady="showExport = true"/>
+        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" @exportReady="showExport = true"/>
 
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
@@ -23,7 +30,7 @@
             <p class="title">{{$t('preview')}}</p>
             <p class="subtitle">{{ $t("controlsHint") }}</p>
           </div>
-          <div class="column is-2" v-if="mesh">
+          <div class="column is-2" v-if="showExport">
             <div class="field">
               <div class="field-label is-normal">
                 <label class="label" :title="$t('exportTypeHelp')">
@@ -46,7 +53,7 @@
               </div>
             </div>
           </div>
-          <div class="column is-3" v-if="mesh">
+          <div class="column is-3" v-if="showExport">
             <div class="field">
               <div class="field-label is-normal">
                 <label class="label" :title="$t('exportSeparatePartsHelp')">
@@ -58,7 +65,7 @@
                 <div class="field">
                   <div class="control">
                     <div class="select">
-                      <select v-model="dualExtrusion">
+                      <select v-model="multipleParts">
                         <option v-bind:value="false">{{$t('no')}}</option>
                         <option v-bind:value="true">{{$t('yes')}}</option>
                       </select>
@@ -68,7 +75,7 @@
               </div>
             </div>
           </div>
-          <div class="column is-3" style="padding-top: 2rem" v-if="mesh">
+          <div class="column is-3" style="padding-top: 2rem" v-if="showExport">
             <button class="button export-button is-primary is-medium" @click="exportSTL">
               <span class="icon">
                 <i class="fa fa-download"></i>
@@ -102,6 +109,7 @@
 import ChangelogModal from './ChangelogModal.vue';
 import { bus } from '../main';
 import QRCodeMenu from './QRCodeMenu.vue';
+import SpotifyMenu from './SpotifyMenu.vue';
 import PrintGuide from './PrintGuide.vue';
 
 export default {
@@ -111,101 +119,31 @@ export default {
   },
   components: {
     QRCodeMenu,
+    SpotifyMenu,
     PrintGuide,
     ChangelogModal,
   },
   data() {
     return {
       mode: 'QR',
-      optionsQR: {
-        activeTabIndex: 0,
-        errorCorrectionLevel: 'M',
-        text: '',
-        wifi: {
-          ssid: '',
-          password: '',
-          security: 'WPA',
-          hidden: false,
-        },
-        email: {
-          recipient: '',
-          subject: '',
-          body: '',
-        },
-        contact: {
-          firstName: '',
-          lastName: '',
-          organization: '',
-          role: '',
-          cell: '',
-          phone: '',
-          fax: '',
-          email: '',
-          street: '',
-          postcode: '',
-          city: '',
-          state: '',
-          country: '',
-          website: '',
-        },
-        sms: {
-          recipient: '',
-          message: '',
-        },
-      },
-      options3d: {
-        base: {
-          shape: 'rectangle',
-          width: 100,
-          depth: 3,
-          cornerRadius: 5,
-          hasBorder: true,
-          borderWidth: 2,
-          borderDepth: 1,
-          hasText: false,
-          textPlacement: 'bottom',
-          textMargin: 2,
-          textSize: 8,
-          textMessage: '',
-          textDepth: 1,
-        },
-        code: {
-          depth: 1,
-          margin: 5,
-          qrcodeBlockStyle: 'square',
-          blockSizeMultiplier: 100,
-          iconName: 'none',
-          iconSizeRatio: 20,
-          cityMode: false,
-          depthMax: 5,
-        },
-      },
-      workCanvas: null,
-      exporter: null,
-      unit: 'mm',
-      mesh: null,
-      baseMesh: null,
-      qrcodeMesh: null,
-      borderMesh: null,
-      iconMesh: null,
-      textMesh: null,
+      showExport: true,
       stlType: 'binary',
-      dualExtrusion: false,
-      camera: null,
-      scene: null,
-      renderer: null,
-      animationFrameId: null,
-      animationTimer: null,
-      blockWidth: null,
-      blockHeight: null,
-      isGenerating: false,
-      generateError: null,
+      multipleParts: false,
       changelogModalVisible: false,
     };
   },
   created() {
     bus.$on('openChangelogModal', () => { this.changelogModalVisible = true; });
     bus.$on('closeChangelogModal', () => { this.changelogModalVisible = false; });
+  },
+  methods: {
+    exportSTL() {
+      if (this.mode === 'QR') {
+        this.$refs.qrcode.exportSTL(this.stlType, this.multipleParts);
+      } else if (this.mode === 'Spotify') {
+        this.$refs.spotifycode.exportSTL(this.stlType, this.multipleParts);
+      }
+    },
   },
 };
 </script>

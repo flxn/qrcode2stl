@@ -1,9 +1,69 @@
 <template>
-  <div id="qrcodeMenu">
-    <!-- QR Code Options -->
-    <QRCodeOptionsPanel :options="optionsQR" />
+  <div id="spotifyMenu">
+    <p class="help content" title="Plz don't sue me Spotify">I am not affiliated with and this tool is not endorsed by Spotify AB. Please follow the <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes.pdf" target="_blank" rel="nofollow noopener noreferrer">Terms and Conditions</a> for Spotify Codes.</p>
+    <!-- Spotify Options -->
+    <nav class="panel">
+      <p class="panel-heading">{{ $t("spotifyOptions") }}</p>
+
+      <!-- Text -->
+      <div class="option-pane">
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">{{$t('spotifyUri')}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="spotify:track:4uLU6hMCjMI75M1A2tKUQC"
+                  v-model="optionsSpotify.spotifyUri"
+                  @change="downloadSpotifyCode"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content">
+          <p class="help">
+            <span class="help-icon icon has-text-info">
+              <i class="fas fa-info-circle"></i>
+            </span>
+            {{$t('spotifyUriHelp')}}
+          </p>
+        </div>
+        <div class="content" v-if="spotifyCodeUrl">
+          <figure class="image">
+            <object
+              type="image/svg+xml"
+              id="spotify-code-preview"
+              width="640"
+              height="160"
+              :data="spotifyCodeUrl"
+              v-if="validSpotifyCode"
+              @load="validSpotifyCode = true"
+              @error="validSpotifyCode = false"
+            />
+            <p class="has-text-weight-bold has-text-success" v-if="validSpotifyCode">
+              <span class="icon">
+                <i class="fa fa-check"></i>
+              </span>
+              Valid Spotify URI
+            </p>
+            <p class="has-text-weight-bold has-text-danger" v-if="!validSpotifyCode">
+              <span class="icon">
+                <i class="fa fa-exclamation-triangle"></i>
+              </span>
+              Invalid Spotify URI
+            </p>
+          </figure>
+        </div>
+
+      </div>
+    </nav>
     <!-- 3D Options -->
-    <QRCode3DOptionsPanel :options="options3d" :unit="unit" />
+    <Spotify3DOptionsPanel :options="options3d" :unit="unit" />
 
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
@@ -13,6 +73,7 @@
       class="button is-success is-large"
       v-bind:class="{'is-loading': isGenerating}"
       @click="generate3dModel"
+      v-if="validSpotifyCode"
     >
       <span class="icon">
         <i class="fa fa-cube"></i>
@@ -28,64 +89,28 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
-import qrcode from 'qrcode';
-import vcardjs from 'vcards-js';
-import QRCode3D from '../qrcode3d';
-import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
+import SpotifyCode3D from '../spotifyCode3D';
 // 3D settings panel
-import QRCode3DOptionsPanel from './QRCode3DOptionsPanel.vue';
+import Spotify3DOptionsPanel from './Spotify3DOptionsPanel.vue';
 
 export default {
-  name: 'QRCodeMenu',
+  name: 'SpotifyMenu',
   props: {
     msg: String,
   },
   components: {
-    QRCodeOptionsPanel,
-    QRCode3DOptionsPanel,
+    Spotify3DOptionsPanel,
   },
   data() {
     return {
-      optionsQR: {
-        activeTabIndex: 0,
-        errorCorrectionLevel: 'M',
-        text: '',
-        wifi: {
-          ssid: '',
-          password: '',
-          security: 'WPA',
-          hidden: false,
-        },
-        email: {
-          recipient: '',
-          subject: '',
-          body: '',
-        },
-        contact: {
-          firstName: '',
-          lastName: '',
-          organization: '',
-          role: '',
-          cell: '',
-          phone: '',
-          fax: '',
-          email: '',
-          street: '',
-          postcode: '',
-          city: '',
-          state: '',
-          country: '',
-          website: '',
-        },
-        sms: {
-          recipient: '',
-          message: '',
-        },
+      optionsSpotify: {
+        spotifyUri: '',
       },
       options3d: {
         base: {
           shape: 'rectangle',
           width: 100,
+          height: 25,
           depth: 3,
           cornerRadius: 5,
           hasBorder: true,
@@ -101,22 +126,19 @@ export default {
         code: {
           depth: 1,
           margin: 5,
-          qrcodeBlockStyle: 'square',
-          blockSizeMultiplier: 100,
-          iconName: 'none',
-          iconSizeRatio: 20,
           cityMode: false,
           depthMax: 5,
         },
       },
+      spotifyCodeUrl: '',
+      validSpotifyCode: false,
       workCanvas: null,
       exporter: null,
       unit: 'mm',
       mesh: null,
       baseMesh: null,
-      qrcodeMesh: null,
+      spotifyCodeMesh: null,
       borderMesh: null,
-      iconMesh: null,
       textMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
@@ -125,11 +147,8 @@ export default {
       renderer: null,
       animationFrameId: null,
       animationTimer: null,
-      blockWidth: null,
-      blockHeight: null,
       isGenerating: false,
       generateError: null,
-      changelogModalVisible: false,
     };
   },
 
@@ -184,9 +203,9 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
-      const qrcodeModel = new QRCode3D(this.workCanvas, this.options3d);
+      const qrcodeModel = new SpotifyCode3D(this.options3d);
       this.baseMesh = qrcodeModel.baseMesh;
-      this.qrcodeMesh = qrcodeModel.qrcodeMesh;
+      this.spotifyCodeMesh = qrcodeModel.spotifyCodeMesh;
       this.borderMesh = qrcodeModel.borderMesh;
       this.iconMesh = qrcodeModel.iconMesh;
       this.textMesh = qrcodeModel.textMesh;
@@ -195,8 +214,8 @@ export default {
       if (this.baseMesh) {
         this.scene.add(this.baseMesh);
       }
-      if (this.qrcodeMesh) {
-        this.scene.add(this.qrcodeMesh);
+      if (this.spotifyCodeMesh) {
+        this.scene.add(this.spotifyCodeMesh);
       }
       if (this.borderMesh) {
         this.scene.add(this.borderMesh);
@@ -237,29 +256,6 @@ export default {
     },
     async generate3dModel() {
       this.trackGenerateEvent();
-      if (this.options3d.code.iconName !== 'none') {
-        this.optionsQR.errorCorrectionLevel = 'H';
-      }
-      this.generateError = null;
-      this.isGenerating = true;
-      const txt = this.getQRText();
-      if (txt === '') {
-        this.isGenerating = false;
-        this.generateError = 'You have not entered any text.';
-        return;
-      }
-
-      try {
-        await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
-          margin: 0,
-          scale: 1,
-          errorCorrectionLevel: this.optionsQR.errorCorrectionLevel,
-        });
-      } catch (e) {
-        this.generateError = `Error during generation: ${e.message}`;
-        this.isGenerating = false;
-        return;
-      }
 
       setTimeout(() => {
         this.init3d();
@@ -279,10 +275,9 @@ export default {
         const filenameBase = `base-${timestamp}.stl`;
         const filenameQrcode = `qrcode-${timestamp}.stl`;
         const filenameBorder = `border-${timestamp}.stl`;
-        const filenameIcon = `icon-${timestamp}.stl`;
         const filenameText = `text-${timestamp}.stl`;
         const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
-        const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
+        const qrcodeSTL = this.exporter.parse(this.spotifyCodeMesh, { binary: exportAsBinary });
         if (exportAsBinary) {
           this.saveArrayBuffer(baseSTL, filenameBase);
           this.saveArrayBuffer(qrcodeSTL, filenameQrcode);
@@ -297,15 +292,6 @@ export default {
             this.saveArrayBuffer(borderSTL, filenameBorder);
           } else {
             this.saveString(borderSTL, filenameBorder);
-          }
-        }
-
-        if (this.iconMesh) {
-          const iconSTL = this.exporter.parse(this.iconMesh, { binary: exportAsBinary });
-          if (exportAsBinary) {
-            this.saveArrayBuffer(iconSTL, filenameIcon);
-          } else {
-            this.saveString(iconSTL, filenameIcon);
           }
         }
 
@@ -344,78 +330,24 @@ export default {
         filename,
       );
     },
-    wifiQREscape(str) {
-      const regex = /([:|\\|;|,|"])/gm;
-      const subst = '\\$1';
-      const result = str.replace(regex, subst);
-      return result;
-    },
-    getQRText() {
-      const vCard = vcardjs();
-      let ret = '';
-      switch (this.optionsQR.activeTabIndex) {
-        case 0: // Text
-          ret = this.optionsQR.text;
-          break;
-        case 1: // Wifi
-          if (this.optionsQR.wifi.password === '') {
-            this.optionsQR.wifi.security = 'nopass';
-          }
-          if (this.optionsQR.wifi.security === 'nopass') {
-            this.optionsQR.wifi.password = '';
-          }
-          ret = `WIFI:S:${this.wifiQREscape(
-            this.optionsQR.wifi.ssid,
-          )};T:${this.wifiQREscape(this.optionsQR.wifi.security)};P:${this.wifiQREscape(
-            this.optionsQR.wifi.password,
-          )};H:${this.optionsQR.wifi.hidden ? 'true' : 'false'};`;
-          break;
-        case 2: // E-Mail
-          ret = `mailto:${this.optionsQR.email.recipient
-            .split(',')
-            .map((x) => x.trim())
-            .join(',')}?subject=${encodeURI(
-            this.optionsQR.email.subject,
-          )}&body=${encodeURI(this.optionsQR.email.body)}`;
-          break;
-        case 3: // Contact
-          vCard.firstName = this.optionsQR.contact.firstName;
-          vCard.lastName = this.optionsQR.contact.lastName;
-          vCard.organization = this.optionsQR.contact.organization;
-          vCard.url = this.optionsQR.contact.website;
-          vCard.role = this.optionsQR.contact.role;
-
-          vCard.homePhone = this.optionsQR.contact.phone;
-          vCard.cellPhone = this.optionsQR.contact.cell;
-          vCard.homeFax = this.optionsQR.contact.fax;
-
-          vCard.email = this.optionsQR.contact.email;
-
-          vCard.homeAddress.street = this.optionsQR.contact.street;
-          vCard.homeAddress.city = this.optionsQR.contact.city;
-          vCard.homeAddress.stateProvince = this.optionsQR.contact.state;
-          vCard.homeAddress.postalCode = this.optionsQR.contact.postcode;
-          vCard.homeAddress.countryRegion = this.optionsQR.contact.country;
-
-          // vCard.socialUrls.facebook = 'https://...';
-          // vCard.socialUrls.linkedIn = 'https://...';
-          // vCard.socialUrls.twitter = 'https://...';
-          // vCard.socialUrls.flickr = 'https://...';
-          // vCard.socialUrls.custom = 'https://...';
-
-          vCard.version = '3.0'; // can also support 2.1 and 4.0, certain versions only support certain fields
-
-          ret = vCard.getFormattedString();
-          break;
-        case 4: // SMS
-          ret = `SMSTO:${this.optionsQR.sms.recipient}:${this.optionsQR.sms.message}`;
-          break;
-        default:
-          break;
+    downloadSpotifyCode() {
+      if (!this.optionsSpotify.spotifyUri.startsWith('spotify:')) {
+        console.error('not a Spotify URI');
+        return;
       }
-
-      console.log('QR Code String:', ret);
-      return ret;
+      const spotifyCodeSvgUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${this.optionsSpotify.spotifyUri}`;
+      this.validSpotifyCode = true;
+      fetch(spotifyCodeSvgUrl)
+        .then((response) => {
+          const utf8Decoder = new TextDecoder('utf-8');
+          const reader = response.body.getReader();
+          reader.read().then((data) => {
+            const svgString = utf8Decoder.decode(data.value);
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+            this.spotifyCodeUrl = URL.createObjectURL(svgBlob);
+          });
+          console.log(response);
+        });
     },
   },
   async mounted() {
@@ -430,35 +362,11 @@ export default {
 </script>
 
 <style scoped>
-#main {
-  margin-top: 20px;
-}
-
-#container3d {
-  width: 100%;
-  height: 600px;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-#qr-canvas {
-  display: none;
-}
-
-.export-button {
-  margin: 0 10px;
-}
-
 #notifications {
   margin-top: 10px;
 }
 
 .field-label {
   text-align: left;
-}
-
-#mode-buttons>button {
-  margin-right: 20px;
 }
 </style>
