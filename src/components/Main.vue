@@ -11,12 +11,16 @@
             </span>
             <span>QR Code</span>
           </button>
-          <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="mode = 'Spotify'">
-            <span class="icon is-medium">
-              <i class="fab fa-spotify"></i>
-            </span>
-            <span>Spotify Code</span>
-          </button>
+          <div class="highlight">
+            <span class="highlight-text">NEW</span>
+            <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="mode = 'Spotify'">
+              <span class="icon is-medium">
+                <i class="fab fa-spotify"></i>
+              </span>
+              <span>Spotify Code</span>
+            </button>
+          </div>
+
         </div>
         <hr />
         <!-- Menus for modes -->
@@ -92,11 +96,19 @@
     </div>
 
     <PrintGuide />
+    <div class="content container">
+      <h2 class="title">Changelog</h2>
+      <hr>
+      <vue-markdown :source="changelog" class="content"></vue-markdown>
+    </div>
     <ChangelogModal v-if="changelogModalVisible"/>
   </div>
 </template>
 
 <script>
+import VueMarkdown from 'vue-markdown';
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import changelog from 'raw-loader!../../CHANGELOG.md';
 import ChangelogModal from './ChangelogModal.vue';
 import { bus } from '../main';
 import QRCodeMenu from './QRCodeMenu.vue';
@@ -113,6 +125,7 @@ export default {
     SpotifyMenu,
     PrintGuide,
     ChangelogModal,
+    VueMarkdown,
   },
   data() {
     return {
@@ -121,6 +134,7 @@ export default {
       stlType: 'binary',
       multipleParts: false,
       changelogModalVisible: false,
+      changelog: changelog.split('\n').slice(3).join('\n'),
     };
   },
   created() {
@@ -142,6 +156,7 @@ export default {
 <style scoped>
 #main {
   margin-top: 20px;
+  padding-bottom: 20px;
 }
 
 #container3d {
@@ -170,5 +185,23 @@ export default {
 
 #mode-buttons>button {
   margin-right: 20px;
+}
+
+.highlight {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.highlight>.highlight-text {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 0px 5px;
+  background-color: hsl(348, 100%, 61%);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 3px;
+  z-index: 10000;
 }
 </style>

@@ -1,6 +1,8 @@
 <template>
   <div id="spotifyMenu">
-    <p class="help content" title="Plz don't sue me Spotify">I am not affiliated with and this tool is not endorsed by Spotify AB. Please follow the <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes.pdf" target="_blank" rel="nofollow noopener noreferrer">Terms and Conditions</a> for Spotify Codes.</p>
+    <p class="help content" title="Plz don't sue me Spotify">
+      I am not affiliated with Spotify and this tool is not endorsed by Spotify AB. Please follow the <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes.pdf" target="_blank" rel="nofollow noopener noreferrer">Terms and Conditions</a> for Spotify Codes.
+    </p>
     <!-- Spotify Options -->
     <nav class="panel">
       <p class="panel-heading">{{ $t("spotifyOptions") }}</p>
@@ -347,7 +349,6 @@ export default {
             const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
             this.spotifyCodeUrl = URL.createObjectURL(svgBlob);
           });
-          console.log(response);
         });
     },
   },

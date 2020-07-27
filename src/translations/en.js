@@ -7,8 +7,8 @@ export default {
   //
   // General
   //
-  title: 'QR Code Generator',
-  subtitle: 'Export your QR code as STL for 3D printing',
+  title: '3D Code Generator',
+  subtitle: 'Export QR codes or Spotify codes as STL for 3D printing',
   preview: 'Preview',
   controlsHint: 'Use your mouse to rotate',
   changeLanguage: 'Change Language',

@@ -7,8 +7,8 @@ export default {
   //
   // General
   //
-  title: 'QR Code Generator',
-  subtitle: 'Generiere 3D-druckbare QR Codes',
+  title: '3D Code Generator',
+  subtitle: 'Generiere 3D-druckbare QR Codes oder Spotify Codes',
   preview: 'Vorschau',
   controlsHint: 'Benutze die Maus um die Sicht zu ändern',
   changeLanguage: 'Sprache Ändern',
@@ -73,11 +73,20 @@ export default {
   smsMessagePlaceholder: 'Die SMS-Nachricht',
 
   //
+  // Spotify Options Panel
+  //
+  spotifyOptions: 'Spotify Code Optionen',
+  spotifyUri: 'Spotify URI',
+  spotifyUriHelp: 'Du bekommst die Spotify URI für ein Lied/Album/Playlist/User indem du auf "Teilen" und dann "URI" klickst.',
+  spotifyCodeHeightInfo: 'Spotify Codes haben ein festes Seitenverhätnis von 4:1',
+
+  //
   // 3D Model Options Panel
   //
   modelOptions: '3D Modell Optionen',
   base: 'Grundplatte',
   width: 'Breite',
+  height: 'Höhe',
   depth: 'Tiefe',
   cornerRadius: 'Eckradius',
   border: 'Rahmen',
