@@ -40,8 +40,6 @@
             <object
               type="image/svg+xml"
               id="spotify-code-preview"
-              width="640"
-              height="160"
               :data="spotifyCodeUrl"
               v-if="validSpotifyCode"
               @load="validSpotifyCode = true"
@@ -378,5 +376,9 @@ export default {
   text-align: left;
   flex-grow: 1.5;
   margin-right: 0;
+}
+
+#spotify-code-preview {
+  max-width: 100%;
 }
 </style>
