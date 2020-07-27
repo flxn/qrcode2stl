@@ -86,15 +86,6 @@
         </div>
         <hr />
         <div id="container3d"></div>
-        <div id="notifications">
-          <div
-            class="notification is-warning is-light"
-            v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"
-          >
-            <strong>{{$t('printabilityWarning')}}:</strong>
-            {{$t('printabilityWarningBody', { dimensions: `${Number(blockWidth).toFixed(1)}mm x ${Number(blockHeight).toFixed(1)}mm` })}}
-          </div>
-        </div>
         <br/>
         <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
       </div>

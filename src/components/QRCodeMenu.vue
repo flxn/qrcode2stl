@@ -8,6 +8,13 @@
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
     </div>
+    <div
+      class="notification is-warning is-light"
+      v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"
+    >
+      <strong>{{$t('printabilityWarning')}}:</strong>
+      {{$t('printabilityWarningBody', { dimensions: `${Number(blockWidth).toFixed(1)}mm x ${Number(blockHeight).toFixed(1)}mm` })}}
+    </div>
 
     <button
       class="button is-success is-large"

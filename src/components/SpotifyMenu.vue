@@ -202,8 +202,9 @@ export default {
       const elem = document.getElementById('container3d');
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
-    setup3dObject() {
+    async setup3dObject() {
       const qrcodeModel = new SpotifyCode3D(this.options3d);
+      await qrcodeModel.generate3dModel();
       this.baseMesh = qrcodeModel.baseMesh;
       this.spotifyCodeMesh = qrcodeModel.spotifyCodeMesh;
       this.borderMesh = qrcodeModel.borderMesh;

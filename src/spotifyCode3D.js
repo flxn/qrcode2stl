@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
+import pathThatSvg from 'path-that-svg';
 
 /**
  * Class used for generating the 3D model of the Spotify Code
@@ -43,8 +44,8 @@ class SpotifyCode3D {
     this.textMesh = null;
     this.combinedMesh = null;
 
-    // build the 3D model
-    this.generate3dModel();
+    // do not build the 3D model in constructor but async from calling function
+    // this.generate3dModel();
   }
 
   /**
@@ -122,28 +123,29 @@ class SpotifyCode3D {
   /**
    * @return {THREE.Mesh} the 3D mesh of the icon
    */
-  getSpotifyCodeMesh() {
+  async getSpotifyCodeMesh() {
     const spotifyCodeGeometry = new THREE.Geometry();
     const loader = new SVGLoader();
     let svgMarkup = document.querySelector('#spotify-code-preview').contentDocument.querySelector('svg').outerHTML;
     svgMarkup = svgMarkup.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
-    const svgData = loader.parse(svgMarkup);
+    const pathedSvg = await pathThatSvg(svgMarkup);
+    console.log(pathedSvg);
+    const svgData = loader.parse(pathedSvg);
     // Loop through all of the parsed paths
     svgData.paths.forEach((path) => {
       const shapes = path.toShapes(true, false);
       // Each path has array of shapes
       shapes.forEach((shape) => {
-        console.log(shape);
         // Finally we can take each shape and extrude it
         const pathGeometry = new THREE.ExtrudeGeometry(shape, {
-          steps: 2,
+          steps: 1,
           depth: this.options.code.depth,
           bevelEnabled: false,
         });
 
         const pathMesh = new THREE.Mesh(pathGeometry, this.materialBlock);
         pathMesh.position.set(0, 0, 0);
-        pathMesh.rotation.set(0, 0, -Math.PI / 2); // -Math.PI / 2);
+        pathMesh.rotation.set(0, 0, -Math.PI / 2);
         pathMesh.updateMatrix();
         spotifyCodeGeometry.merge(pathMesh.geometry, pathMesh.matrix);
       });
@@ -264,7 +266,7 @@ class SpotifyCode3D {
   /**
    * Generates all required meshes of the 3D model and combines them
    */
-  generate3dModel() {
+  async generate3dModel() {
     const combinedGeometry = new THREE.Geometry();
 
     let textBaseOffset = 0;
@@ -282,7 +284,7 @@ class SpotifyCode3D {
     this.baseMesh = this.getBaseMesh(textBaseOffset);
     combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
 
-    this.spotifyCodeMesh = this.getSpotifyCodeMesh();
+    this.spotifyCodeMesh = await this.getSpotifyCodeMesh();
     combinedGeometry.merge(this.spotifyCodeMesh.geometry, this.spotifyCodeMesh.matrix);
 
     this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);

@@ -48,7 +48,6 @@ class QRCode3D {
     this.textMesh = null;
     this.combinedMesh = null;
 
-    // build the 3D model
     this.generate3dModel();
   }
 

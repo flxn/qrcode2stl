@@ -13,6 +13,7 @@
     "compression-webpack-plugin": "^4.0.0",
     "core-js": "^3.6.5",
     "imagemin-webpack-plugin": "^2.4.2",
+    "path-that-svg": "^1.2.4",
     "qrcode": "^1.4.4",
     "three": "^0.118.3",
     "three-csg-ts": "^1.0.4",
