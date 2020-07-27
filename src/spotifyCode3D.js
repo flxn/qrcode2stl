@@ -129,22 +129,25 @@ class SpotifyCode3D {
     let svgMarkup = document.querySelector('#spotify-code-preview').contentDocument.querySelector('svg').outerHTML;
     svgMarkup = svgMarkup.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
     const pathedSvg = await pathThatSvg(svgMarkup);
-    console.log(pathedSvg);
     const svgData = loader.parse(pathedSvg);
     // Loop through all of the parsed paths
-    svgData.paths.forEach((path) => {
+    svgData.paths.forEach((path, pathNo) => {
       const shapes = path.toShapes(true, false);
       // Each path has array of shapes
       shapes.forEach((shape) => {
+        let shapeDepth = this.options.code.depth;
+        if (this.options.code.cityMode && pathNo !== svgData.paths.length - 1) {
+          shapeDepth = Math.min(this.options.code.depth, this.options.code.depthMax) + Math.random() * Math.abs(this.options.code.depthMax - this.options.code.depth);
+        }
         // Finally we can take each shape and extrude it
         const pathGeometry = new THREE.ExtrudeGeometry(shape, {
           steps: 1,
-          depth: this.options.code.depth,
+          depth: shapeDepth,
           bevelEnabled: false,
         });
 
         const pathMesh = new THREE.Mesh(pathGeometry, this.materialBlock);
-        pathMesh.position.set(0, 0, 0);
+        pathMesh.position.set(0, 0, -shapeDepth + this.options.code.depth);
         pathMesh.rotation.set(0, 0, -Math.PI / 2);
         pathMesh.updateMatrix();
         spotifyCodeGeometry.merge(pathMesh.geometry, pathMesh.matrix);
@@ -166,8 +169,8 @@ class SpotifyCode3D {
     // move icon to center
     iconSize = SpotifyCode3D.getBoundingBoxSize(spotifyCodeMesh);
 
-    spotifyCodeMesh.position.x = (-iconSize.x / 2) - (0.05 * this.options.base.width);
-    spotifyCodeMesh.position.y = (-iconSize.y / 2) - (0.05 * this.options.base.width);
+    spotifyCodeMesh.position.x = (-iconSize.x / 2) - (0.05 * (this.options.base.width - this.options.code.margin));
+    spotifyCodeMesh.position.y = (-iconSize.y / 2) - (0.05 * (this.options.base.width - this.options.code.margin));
     spotifyCodeMesh.position.z = this.options.base.depth + this.options.code.depth;
     spotifyCodeMesh.updateMatrix();
 
