@@ -334,11 +334,17 @@ export default {
       );
     },
     downloadSpotifyCode() {
-      if (!this.optionsSpotify.spotifyUri.startsWith('spotify:')) {
-        console.error('not a Spotify URI');
-        return;
+      let uri = this.optionsSpotify.spotifyUri;
+      if (!uri.startsWith('spotify:')) {
+        const regex = /spotify\.com\/([^/]+)\/([^?/]+)/gm;
+        const parts = regex.exec(uri);
+        if (parts.length !== 3) {
+          console.error('Not a valid Spotify URI or Link');
+          return;
+        }
+        uri = `spotify:${parts[1]}:${parts[2]}`;
       }
-      const spotifyCodeSvgUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${this.optionsSpotify.spotifyUri}`;
+      const spotifyCodeSvgUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${uri}`;
       this.validSpotifyCode = true;
       fetch(spotifyCodeSvgUrl)
         .then((response) => {
@@ -370,5 +376,7 @@ export default {
 
 .field-label {
   text-align: left;
+  flex-grow: 1.5;
+  margin-right: 0;
 }
 </style>

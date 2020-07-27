@@ -76,7 +76,7 @@ export default {
   // Spotify Options Panel
   //
   spotifyOptions: 'Spotify Code Options',
-  spotifyUri: 'Spotify URI',
+  spotifyUri: 'Spotify URI/Link',
   spotifyUriHelp: 'You can get the Spotify URI for a track/album/playlist/user from Spotify by clicking "Share" and then "URI".',
   spotifyCodeHeightInfo: 'Spotify Codes have a fixed aspect ratio of 4:1',
 
