@@ -202,6 +202,6 @@ export default {
   color: #fff;
   font-weight: bold;
   border-radius: 3px;
-  z-index: 10000;
+  z-index: 30;
 }
 </style>
