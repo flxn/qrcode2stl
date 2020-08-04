@@ -91,7 +91,7 @@ export default {
       },
       options3d: {
         base: {
-          shape: 'rectangle',
+          shape: 'roundedRectangle',
           width: 100,
           depth: 3,
           cornerRadius: 5,
