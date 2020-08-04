@@ -242,9 +242,26 @@
             </div>
           </div>
         </div>
+
+        <!-- Right Column -->
         <div class="column">
           <div class="model-options-title">
             <div class="title is-size-5">QR Code</div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('invert')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <label class="checkbox">
+                    <input type="checkbox" v-model="options.code.invert" />
+                    <span class="is-size-7"><i class="fa fa-retweet"></i> {{$t("invertText")}}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">

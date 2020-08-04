@@ -117,6 +117,8 @@ export default {
   theText: 'Der Text',
   cityMode: 'QR-City',
   cityModeText: 'Verändert die Höhe der Blöcke zufällig.',
+  invert: 'Invertieren',
+  invertText: 'QR Code Blöcke werden Löcher',
 
   //
   // Export Settings

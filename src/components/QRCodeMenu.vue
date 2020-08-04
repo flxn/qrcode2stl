@@ -114,6 +114,7 @@ export default {
           iconSizeRatio: 20,
           cityMode: false,
           depthMax: 5,
+          invert: false,
         },
       },
       workCanvas: null,

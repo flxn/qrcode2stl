@@ -184,6 +184,8 @@ class QRCode3D {
   getQRCodeMesh(iconSize = null) {
     const ctx = this.canvas.getContext('2d');
     const qrcodeGeometry = new THREE.Geometry();
+    const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialBlock);
+    let bspQRMesh = CSG.fromMesh(baseQRMesh);
     // iterate through pixels in canvas
     for (let y = 0; y < this.canvas.height; y += 1) {
       for (let x = 0; x < this.canvas.width; x += 1) {
@@ -245,12 +247,53 @@ class QRCode3D {
 
           // add qr code blocks to qrcode and combined model
           qrBlockMesh.updateMatrix();
-          qrcodeGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
+          const bspBlockMesh = CSG.fromMesh(qrBlockMesh);
+          bspQRMesh = bspQRMesh.union(bspBlockMesh);
+          // qrcodeGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
         }
       }
     }
 
-    return new THREE.Mesh(qrcodeGeometry, this.materialBlock);
+    const finalBlockMesh = CSG.toMesh(bspQRMesh, baseQRMesh.matrix);
+    finalBlockMesh.material = this.materialBlock;
+
+    if (this.options.code.invert) {
+      let cornerRadius = 0;
+      if (this.options.base.shape === 'roundedRectangle') {
+        cornerRadius = this.options.base.cornerRadius;
+      }
+
+      const innerAreaShape = QRCode3D.getRoundedRectShape(
+        -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+        -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+        this.options.base.width - this.options.base.borderWidth * 2,
+        this.options.base.width - this.options.base.borderWidth * 2,
+        Math.max(0, cornerRadius - this.options.base.borderWidth),
+      );
+
+      const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(innerAreaShape, {
+        steps: 1,
+        depth: this.options.code.depth,
+        bevelEnabled: false,
+      }), this.materialBlock);
+      innerAreaMesh.position.z = 0;
+      innerAreaMesh.updateMatrix();
+
+      finalBlockMesh.position.z = -this.options.base.depth;
+      finalBlockMesh.updateMatrix();
+
+      const bspFullArea = CSG.fromMesh(innerAreaMesh);
+      const bspQRHoles = CSG.fromMesh(finalBlockMesh);
+      const bspInverted = bspFullArea.subtract(bspQRHoles);
+
+      const invertedMesh = CSG.toMesh(bspInverted, innerAreaMesh.matrix);
+      invertedMesh.material = this.materialBlock;
+      invertedMesh.position.z = this.options.base.depth;
+      invertedMesh.updateMatrix();
+      return invertedMesh;
+    }
+
+    return finalBlockMesh;
   }
 
   /**
@@ -314,7 +357,7 @@ class QRCode3D {
     }), this.materialBlock);
     fullShapeMesh.updateMatrix();
 
-    // shape that covers everything exact where the border should be
+    // shape that covers everything except where the border should be
     const borderHoleShape = QRCode3D.getRoundedRectShape(
       -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
       -(this.options.base.width - this.options.base.borderWidth * 2) / 2,

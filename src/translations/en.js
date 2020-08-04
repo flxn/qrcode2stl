@@ -118,6 +118,8 @@ export default {
   theText: 'The text',
   cityMode: 'QR-City',
   cityModeText: 'Randomly alters the height of the blocks.',
+  invert: 'Invert',
+  invertText: 'QR Code blocks become holes',
 
   //
   // Export Settings
