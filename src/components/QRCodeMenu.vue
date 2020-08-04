@@ -108,7 +108,6 @@ export default {
         code: {
           depth: 1,
           margin: 5,
-          qrcodeBlockStyle: 'square',
           blockSizeMultiplier: 100,
           iconName: 'none',
           iconSizeRatio: 20,

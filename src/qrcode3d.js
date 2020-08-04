@@ -193,26 +193,16 @@ class QRCode3D {
         const isBlack = pixel[0] === 0;
         if (isBlack) {
           // if pixel is black create a block
-          let qrBlock;
           let blockDepth = this.options.code.depth;
           if (this.options.code.cityMode) {
             blockDepth = Math.min(this.options.code.depth, this.options.code.depthMax) + Math.random() * Math.abs(this.options.code.depthMax - this.options.code.depth);
           }
-          // Determine basic block element
-          if (this.options.code.qrcodeBlockStyle === 'round') {
-            qrBlock = new THREE.CylinderGeometry(
-              this.blockWidth / 2,
-              this.blockWidth / 2,
-              blockDepth,
-              16,
-            );
-          } else {
-            qrBlock = new THREE.BoxGeometry(
-              this.blockWidth,
-              this.blockWidth,
-              blockDepth,
-            );
-          }
+
+          const qrBlock = new THREE.BoxGeometry(
+            this.blockWidth,
+            this.blockWidth,
+            blockDepth,
+          );
 
           const qrBlockMesh = new THREE.Mesh(qrBlock, this.materialBlock);
 
@@ -238,12 +228,7 @@ class QRCode3D {
           }
 
           const blockZ = this.options.base.depth + blockDepth / 2;
-
           qrBlockMesh.position.set(blockX, blockY, blockZ);
-          if (this.options.code.qrcodeBlockStyle === 'round') {
-            // rotate cylinders 90 degrees in X and Y directions
-            qrBlockMesh.rotation.set(Math.PI / 2, Math.PI / 2, 0);
-          }
 
           // add qr code blocks to qrcode and combined model
           qrBlockMesh.updateMatrix();

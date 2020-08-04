@@ -295,26 +295,6 @@
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">{{$t('block')}} {{$t('style')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control has-icons-left">
-                  <div class="select is-small">
-                    <select v-model="options.code.qrcodeBlockStyle">
-                      <option value="square">{{$t('square')}}</option>
-                      <option value="round">{{$t('round')}}</option>
-                    </select>
-                    <span class="icon is-small is-left">
-                      <i class="fa fa-shapes"></i>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
               <label class="label">{{$t('block')}} {{$t('size')}}</label>
             </div>
             <div class="field-body">
