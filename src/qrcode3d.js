@@ -77,14 +77,18 @@ class QRCode3D {
   }
 
   /**
-   * @param {Number} textBaseOffset additional offset when using text
    * @return {THREE.Mesh} the mesh of the base
    */
-  getBaseMesh(textBaseOffset = 0) {
+  getBaseMesh() {
     // TODO: rethink handling of rounded rectangle: Different shape category vs only corner radius adjustment
     let cornerRadius = 0;
     if (this.options.base.shape === 'roundedRectangle') {
       cornerRadius = this.options.base.cornerRadius;
+    }
+
+    let textBaseOffset = 0;
+    if (this.options.base.hasText) {
+      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
     }
 
     const shape = QRCode3D.getRoundedRectShape(
@@ -248,10 +252,20 @@ class QRCode3D {
         cornerRadius = this.options.base.cornerRadius;
       }
 
+      let textBaseOffset = 0;
+      if (this.options.base.hasText) {
+        textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
+      }
+
+      let topOffset = 0;
+      if (this.options.base.textPlacement === 'top') {
+        topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
+      }
+
       const innerAreaShape = QRCode3D.getRoundedRectShape(
+        -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
         -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-        -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-        this.options.base.width - this.options.base.borderWidth * 2,
+        this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
         this.options.base.width - this.options.base.borderWidth * 2,
         Math.max(0, cornerRadius - this.options.base.borderWidth),
       );
@@ -312,13 +326,17 @@ class QRCode3D {
   }
 
   /**
-   * @param {Number} textBaseOffset additional offset when using text
    * @return {THREE.Mesh} the mesh of the border
    */
-  getBorderMesh(textBaseOffset = 0) {
+  getBorderMesh() {
     let cornerRadius = 0;
     if (this.options.base.shape === 'roundedRectangle') {
       cornerRadius = this.options.base.cornerRadius;
+    }
+
+    let textBaseOffset = 0;
+    if (this.options.base.hasText) {
+      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
     }
 
     let topOffset = 0;
@@ -381,19 +399,12 @@ class QRCode3D {
       combinedGeometry.merge(this.iconMesh.geometry, this.iconMesh.matrix);
     }
 
-    let textBaseOffset = 0;
-    if (this.options.base.hasText) {
-      this.textMesh = this.getTextMesh();
-      combinedGeometry.merge(this.textMesh.geometry, this.textMesh.matrix);
-      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-    }
-
     if (this.options.base.hasBorder) {
-      this.borderMesh = this.getBorderMesh(textBaseOffset);
+      this.borderMesh = this.getBorderMesh();
       combinedGeometry.merge(this.borderMesh.geometry, this.borderMesh.matrix);
     }
 
-    this.baseMesh = this.getBaseMesh(textBaseOffset);
+    this.baseMesh = this.getBaseMesh();
     combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
 
     if (this.options.code.iconName !== 'none') {
@@ -402,8 +413,24 @@ class QRCode3D {
     } else {
       this.qrcodeMesh = this.getQRCodeMesh();
     }
-    combinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
 
+    if (this.options.base.hasText) {
+      const tempTextMesh = this.getTextMesh();
+      if (this.options.code.invert) {
+        // this.textMesh.position.z = -this.options.base.depth;
+        tempTextMesh.updateMatrix();
+        const bspText = CSG.fromMesh(tempTextMesh);
+        const bspQR = CSG.fromMesh(this.qrcodeMesh);
+        const bspCut = bspQR.subtract(bspText);
+        this.qrcodeMesh = CSG.toMesh(bspCut, this.qrcodeMesh.matrix);
+        this.qrcodeMesh.material = this.materialBlock;
+      } else {
+        this.textMesh = tempTextMesh;
+        combinedGeometry.merge(this.textMesh.geometry, this.textMesh.matrix);
+      }
+    }
+
+    combinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
     this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
   }
 }
