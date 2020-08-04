@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2020-08-04
+### Added
+- 🔃 QR Code blocks can now be inverted. If you choose the option the space around the blocks is extruded so the blocks form holes.
+  If you want the top surface to be flush add a border with the same height as the code blocks.
+  You can also invert the QR Code and disable the border for a nice look.
+
+### Changed
+- Changed the default base shape to a rounded rectangle.
+
+### Removed
+- Removed the option to choose a round QR Code block style. It caused problems with the inversion feature and was basically never used.
+
 ## [1.0.0] - 2020-07-27
 ### Added
 - 🎵 Added the possibility to create 3d-printable Spotify Codes.
