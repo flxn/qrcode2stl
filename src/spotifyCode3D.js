@@ -1,9 +1,8 @@
 import * as THREE from 'three';
-import { CSG } from 'three-csg-ts';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import pathThatSvg from 'path-that-svg';
 import BaseTag3D from './base';
-import { getRoundedRectShape, getBoundingBoxSize } from './utils';
+import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
 
 /**
  * Class used for generating the 3D model of the Spotify Code
@@ -71,20 +70,9 @@ class SpotifyCode3D extends BaseTag3D {
     spotifyCodeMesh.updateMatrix();
 
     if (this.options.code.invert) {
-      let cornerRadius = 0;
-      if (this.options.base.shape === 'roundedRectangle') {
-        cornerRadius = this.options.base.cornerRadius;
-      }
-
-      let textBaseOffset = 0;
-      if (this.options.base.hasText) {
-        textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-      }
-
-      let topOffset = 0;
-      if (this.options.base.textPlacement === 'top') {
-        topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
-      }
+      const cornerRadius = this.getCornerRadius();
+      const textBaseOffset = this.getTextBaseOffset();
+      const topOffset = this.getTextTopOffset();
 
       const innerAreaShape = getRoundedRectShape(
         -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
@@ -105,12 +93,7 @@ class SpotifyCode3D extends BaseTag3D {
       spotifyCodeMesh.position.z = this.options.base.depth + this.options.code.depth;
       spotifyCodeMesh.updateMatrix();
 
-      const bspFullArea = CSG.fromMesh(innerAreaMesh);
-      const bspQRHoles = CSG.fromMesh(spotifyCodeMesh);
-      const bspInverted = bspFullArea.subtract(bspQRHoles);
-
-      const invertedMesh = CSG.toMesh(bspInverted, innerAreaMesh.matrix);
-      invertedMesh.material = this.materialDetail;
+      const invertedMesh = subtractMesh(innerAreaMesh, spotifyCodeMesh);
       invertedMesh.position.z = this.options.base.depth;
       invertedMesh.updateMatrix();
       return invertedMesh;
@@ -138,14 +121,7 @@ class SpotifyCode3D extends BaseTag3D {
 
     if (this.options.code.invert) {
       if (this.subtitleMesh) {
-        const tempSubtitleMesh = this.subtitleMesh;
-        // tempSubtitleMesh.position.z = this.options.base.depth;
-        // tempSubtitleMesh.updateMatrix();
-        const bspText = CSG.fromMesh(tempSubtitleMesh);
-        const bspSpotify = CSG.fromMesh(this.spotifyCodeMesh);
-        const bspCut = bspSpotify.subtract(bspText);
-        this.spotifyCodeMesh = CSG.toMesh(bspCut, this.spotifyCodeMesh.matrix);
-        this.spotifyCodeMesh.material = this.materialDetail;
+        this.spotifyCodeMesh = subtractMesh(this.spotifyCodeMesh, this.subtitleMesh);
       }
     }
 

@@ -213,10 +213,7 @@ export default {
       this.subtitleMesh = qrcodeModel.subtitleMesh;
       this.mesh = qrcodeModel.getCombinedMesh();
 
-      qrcodeModel.getPartMeshes().forEach((m) => {
-        console.log(m);
-        this.scene.add(m);
-      });
+      qrcodeModel.getPartMeshes().forEach((m) => this.scene.add(m));
     },
     startAnimation() {
       const animate = () => {

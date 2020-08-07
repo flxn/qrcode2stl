@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import BaseTag3D from './base';
-import { getRoundedRectShape, getBoundingBoxSize } from './utils';
+import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
 
 /**
  * Class used for generating the 3D model from an html5 canvas that contains the qr code image
@@ -139,20 +139,9 @@ class QRCode3D extends BaseTag3D {
     finalBlockMesh.material = this.materialDetail;
 
     if (this.options.code.invert) {
-      let cornerRadius = 0;
-      if (this.options.base.shape === 'roundedRectangle') {
-        cornerRadius = this.options.base.cornerRadius;
-      }
-
-      let textBaseOffset = 0;
-      if (this.options.base.hasText) {
-        textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-      }
-
-      let topOffset = 0;
-      if (this.options.base.textPlacement === 'top') {
-        topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
-      }
+      const cornerRadius = this.getCornerRadius();
+      const textBaseOffset = this.getTextBaseOffset();
+      const topOffset = this.getTextTopOffset();
 
       const innerAreaShape = getRoundedRectShape(
         -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
@@ -173,12 +162,7 @@ class QRCode3D extends BaseTag3D {
       finalBlockMesh.position.z = -this.options.base.depth;
       finalBlockMesh.updateMatrix();
 
-      const bspFullArea = CSG.fromMesh(innerAreaMesh);
-      const bspQRHoles = CSG.fromMesh(finalBlockMesh);
-      const bspInverted = bspFullArea.subtract(bspQRHoles);
-
-      const invertedMesh = CSG.toMesh(bspInverted, innerAreaMesh.matrix);
-      invertedMesh.material = this.materialDetail;
+      const invertedMesh = subtractMesh(innerAreaMesh, finalBlockMesh);
       invertedMesh.position.z = this.options.base.depth;
       invertedMesh.updateMatrix();
       return invertedMesh;
@@ -216,18 +200,10 @@ class QRCode3D extends BaseTag3D {
 
     if (this.options.code.invert) {
       if (this.subtitleMesh) {
-        const bspText = CSG.fromMesh(this.subtitleMesh);
-        const bspQR = CSG.fromMesh(this.qrcodeMesh);
-        const bspCut = bspQR.subtract(bspText);
-        this.qrcodeMesh = CSG.toMesh(bspCut, this.qrcodeMesh.matrix);
-        this.qrcodeMesh.material = this.materialDetail;
+        this.qrcodeMesh = subtractMesh(this.qrcodeMesh, this.subtitleMesh);
       }
       if (this.iconMesh) {
-        const bspIcon = CSG.fromMesh(this.iconMesh);
-        const bspQR = CSG.fromMesh(this.qrcodeMesh);
-        const bspCut = bspQR.subtract(bspIcon);
-        this.qrcodeMesh = CSG.toMesh(bspCut, this.qrcodeMesh.matrix);
-        this.qrcodeMesh.material = this.materialDetail;
+        this.qrcodeMesh = subtractMesh(this.qrcodeMesh, this.iconMesh);
       }
     } else if (this.iconMesh) {
       this.exportedMeshes.push(this.iconMesh);

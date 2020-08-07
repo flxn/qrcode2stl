@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CSG } from 'three-csg-ts';
 
 /**
  * Returns a rounded rectangle shape with the given parameters
@@ -32,4 +33,16 @@ export const getRoundedRectShape = (x, y, width, height, radius, path = false) =
 export const getBoundingBoxSize = (mesh) => {
   const boundingBox = new THREE.Box3().setFromObject(mesh);
   return boundingBox.getSize();
+};
+
+/**
+ * Subtracts toolMesh from targetMesh and returns the resulting mesh
+ */
+export const subtractMesh = (targetMesh, toolMesh) => {
+  const bspTarget = CSG.fromMesh(targetMesh);
+  const bspTool = CSG.fromMesh(toolMesh);
+  const bspResult = bspTarget.subtract(bspTool);
+  const resultMesh = CSG.toMesh(bspResult, targetMesh.matrix);
+  resultMesh.material = targetMesh.material;
+  return resultMesh;
 };

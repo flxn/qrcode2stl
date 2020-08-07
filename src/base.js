@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { CSG } from 'three-csg-ts';
 import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
-import { getRoundedRectShape } from './utils';
+import { getRoundedRectShape, subtractMesh } from './utils';
 
 class BaseTag3D {
   constructor(options) {
@@ -45,16 +44,8 @@ class BaseTag3D {
    */
   getBaseMesh() {
     // TODO: rethink handling of rounded rectangle: Different shape category vs only corner radius adjustment
-    let cornerRadius = 0;
-    if (this.options.base.shape === 'roundedRectangle') {
-      cornerRadius = this.options.base.cornerRadius;
-    }
-
-    let textBaseOffset = 0;
-    if (this.options.base.hasText) {
-      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-    }
-
+    const cornerRadius = this.getCornerRadius();
+    const textBaseOffset = this.getTextBaseOffset();
     const shape = getRoundedRectShape(
       -(this.options.base.height + textBaseOffset) / 2,
       -this.options.base.width / 2,
@@ -116,20 +107,9 @@ class BaseTag3D {
    * @return {THREE.Mesh} the mesh of the border
    */
   getBorderMesh() {
-    let cornerRadius = 0;
-    if (this.options.base.shape === 'roundedRectangle') {
-      cornerRadius = this.options.base.cornerRadius;
-    }
-
-    let textBaseOffset = 0;
-    if (this.options.base.hasText) {
-      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-    }
-
-    let topOffset = 0;
-    if (this.options.base.textPlacement === 'top') {
-      topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
-    }
+    const cornerRadius = this.getCornerRadius();
+    const textBaseOffset = this.getTextBaseOffset();
+    const topOffset = this.getTextTopOffset();
 
     // shape covering the whole area
     const borderShape = getRoundedRectShape(
@@ -163,16 +143,32 @@ class BaseTag3D {
     }), this.materialDetail);
     holeMesh.updateMatrix();
 
-    const bspFull = CSG.fromMesh(fullShapeMesh);
-    const bspHole = CSG.fromMesh(holeMesh);
-    const bspBorder = bspFull.subtract(bspHole);
-
-    const borderMesh = CSG.toMesh(bspBorder, fullShapeMesh.matrix);
-    borderMesh.material = this.materialDetail;
+    const borderMesh = subtractMesh(fullShapeMesh, holeMesh);
     borderMesh.position.z = this.options.base.depth;
     borderMesh.updateMatrix();
 
     return borderMesh;
+  }
+
+  getCornerRadius() {
+    if (this.options.base.shape === 'roundedRectangle') {
+      return this.options.base.cornerRadius;
+    }
+    return 0;
+  }
+
+  getTextBaseOffset() {
+    if (this.options.base.hasText) {
+      return this.options.base.textSize + 2 * this.options.base.textMargin;
+    }
+    return 0;
+  }
+
+  getTextTopOffset() {
+    if (this.options.base.textPlacement === 'top') {
+      return 2 * this.getTextBaseOffset() - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
+    }
+    return 0;
   }
 
   /**

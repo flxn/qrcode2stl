@@ -196,7 +196,6 @@ export default {
       console.time('3d Model Generation');
       qrcodeModel.generate3dModel();
       console.timeEnd('3d Model Generation');
-      console.log(qrcodeModel);
       this.mesh = qrcodeModel.getCombinedMesh();
 
       this.baseMesh = qrcodeModel.baseMesh;
