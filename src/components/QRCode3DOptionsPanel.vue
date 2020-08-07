@@ -34,7 +34,7 @@
             <div class="field-body">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.width" />
+                  <input class="input is-small" type="number" v-model.number="options.base.width" @change="options.base.height = options.base.width" />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>

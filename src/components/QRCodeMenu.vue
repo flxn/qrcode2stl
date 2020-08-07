@@ -93,6 +93,7 @@ export default {
         base: {
           shape: 'roundedRectangle',
           width: 100,
+          height: 100,
           depth: 3,
           cornerRadius: 5,
           hasBorder: true,
@@ -124,7 +125,7 @@ export default {
       qrcodeMesh: null,
       borderMesh: null,
       iconMesh: null,
-      textMesh: null,
+      subtitleMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
       camera: null,
@@ -192,28 +193,19 @@ export default {
     },
     setup3dObject() {
       const qrcodeModel = new QRCode3D(this.workCanvas, this.options3d);
+      console.time('3d Model Generation');
+      qrcodeModel.generate3dModel();
+      console.timeEnd('3d Model Generation');
+      console.log(qrcodeModel);
+      this.mesh = qrcodeModel.getCombinedMesh();
+
       this.baseMesh = qrcodeModel.baseMesh;
       this.qrcodeMesh = qrcodeModel.qrcodeMesh;
       this.borderMesh = qrcodeModel.borderMesh;
       this.iconMesh = qrcodeModel.iconMesh;
-      this.textMesh = qrcodeModel.textMesh;
-      this.mesh = qrcodeModel.combinedMesh;
+      this.subtitleMesh = qrcodeModel.subtitleMesh;
 
-      if (this.baseMesh) {
-        this.scene.add(this.baseMesh);
-      }
-      if (this.qrcodeMesh) {
-        this.scene.add(this.qrcodeMesh);
-      }
-      if (this.borderMesh) {
-        this.scene.add(this.borderMesh);
-      }
-      if (this.iconMesh) {
-        this.scene.add(this.iconMesh);
-      }
-      if (this.textMesh) {
-        this.scene.add(this.textMesh);
-      }
+      qrcodeModel.getPartMeshes().forEach((m) => this.scene.add(m));
     },
     startAnimation() {
       const animate = () => {
@@ -316,8 +308,8 @@ export default {
           }
         }
 
-        if (this.textMesh) {
-          const textSTL = this.exporter.parse(this.textMesh, { binary: exportAsBinary });
+        if (this.subtitleMesh) {
+          const textSTL = this.exporter.parse(this.subtitleMesh, { binary: exportAsBinary });
           if (exportAsBinary) {
             this.saveArrayBuffer(textSTL, filenameText);
           } else {

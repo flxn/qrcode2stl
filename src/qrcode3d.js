@@ -1,130 +1,22 @@
 import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
+import BaseTag3D from './base';
+import { getRoundedRectShape, getBoundingBoxSize } from './utils';
 
 /**
  * Class used for generating the 3D model from an html5 canvas that contains the qr code image
  * TODO: Refactor actual qrcode to model translation: integrate canvas into this class or maybe roll own qr code algorithm
  */
-class QRCode3D {
+class QRCode3D extends BaseTag3D {
   constructor(canvas, options) {
-    const defaultOptions = {
-      baseColor: 0xeeeeee,
-      qrcodeColor: 0x333333,
-    };
-
-    this.options = { ...defaultOptions, ...options };
+    super(options);
     this.canvas = canvas;
-
-    // default material for the base
-    this.materialBase = new THREE.MeshPhongMaterial({
-      color: this.options.baseColor,
-      specular: 0xffffff,
-      shininess: 30,
-    });
-    // default material for qr code, border, etc.
-    this.materialBlock = new THREE.MeshPhongMaterial({
-      color: this.options.qrcodeColor,
-      specular: 0x0d0d0d,
-      shininess: 90,
-    });
-
-    // total available width without margin and borders for the qr code part
-    this.availableWidth = this.options.base.width - 2 * this.options.code.margin;
-    if (this.options.base.hasBorder) {
-      // subtract border width
-      this.availableWidth -= 2 * this.options.base.borderWidth;
-    }
-
+    this.iconMesh = null;
+    this.qrcodeMesh = null;
+    this.exportedMeshes = super.getPartMeshes();
     // the width of the actual qr code blocks
     this.blockWidth = (this.availableWidth / this.canvas.width) * (this.options.code.blockSizeMultiplier / 100);
-
-    // reset meshes
-    this.baseMesh = null;
-    this.qrcodeMesh = null;
-    this.borderMesh = null;
-    this.iconMesh = null;
-    this.textMesh = null;
-    this.combinedMesh = null;
-
-    this.generate3dModel();
-  }
-
-  /**
-   * Returns a rounded rectangle shape with the given parameters
-   * Taken from: https://threejs.org/examples/webgl_geometry_shapes.html
-   */
-  static getRoundedRectShape(x, y, width, height, radius, path = false) {
-    let ctx;
-    // can return Shape (default) or Path, used for punching the hole in the border mesh
-    // TODO: find out the differences because always using a Shape works too
-    if (path) {
-      ctx = new THREE.Path();
-    } else {
-      ctx = new THREE.Shape();
-    }
-    ctx.moveTo(x, y + radius);
-    ctx.lineTo(x, y + height - radius);
-    ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-    ctx.lineTo(x + width - radius, y + height);
-    ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-    ctx.lineTo(x + width, y + radius);
-    ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-    ctx.lineTo(x + radius, y);
-    ctx.quadraticCurveTo(x, y, x, y + radius);
-    return ctx;
-  }
-
-  /**
-   * @return {THREE.Mesh} the mesh of the base
-   */
-  getBaseMesh() {
-    // TODO: rethink handling of rounded rectangle: Different shape category vs only corner radius adjustment
-    let cornerRadius = 0;
-    if (this.options.base.shape === 'roundedRectangle') {
-      cornerRadius = this.options.base.cornerRadius;
-    }
-
-    let textBaseOffset = 0;
-    if (this.options.base.hasText) {
-      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-    }
-
-    const shape = QRCode3D.getRoundedRectShape(
-      -(this.options.base.width + textBaseOffset) / 2,
-      -this.options.base.width / 2,
-      this.options.base.width + textBaseOffset,
-      this.options.base.width,
-      cornerRadius,
-    );
-
-    const modelBase = new THREE.ExtrudeGeometry(shape, {
-      steps: 1,
-      depth: this.options.base.depth,
-      bevelEnabled: false,
-    });
-
-    const baseMesh = new THREE.Mesh(modelBase, this.materialBase);
-    baseMesh.position.set(0, 0, 0);
-
-    if (textBaseOffset > 0) {
-      // shift base in x direction to align with text
-      const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
-      baseMesh.position.x = textPlacementOffset;
-    }
-
-    baseMesh.updateMatrix();
-    return baseMesh;
-  }
-
-  /**
-   * @param {THREE.Mesh} mesh a mesh
-   * @return {THREE.Vector3} size of the given mesh's bounding box
-   */
-  static getBoundingBoxSize(mesh) {
-    const boundingBox = new THREE.Box3().setFromObject(mesh);
-    return boundingBox.getSize();
   }
 
   /**
@@ -148,7 +40,7 @@ class QRCode3D {
           bevelEnabled: false,
         });
 
-        const pathMesh = new THREE.Mesh(pathGeometry, this.materialBlock);
+        const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
         pathMesh.position.set(0, 0, 0);
         pathMesh.rotation.set(0, 0, -Math.PI / 2);
         pathMesh.updateMatrix();
@@ -156,10 +48,10 @@ class QRCode3D {
       });
     });
 
-    const iconMesh = new THREE.Mesh(iconGeometry, this.materialBlock);
+    const iconMesh = new THREE.Mesh(iconGeometry, this.materialDetail);
 
     // scale icon to correct size
-    let iconSize = QRCode3D.getBoundingBoxSize(iconMesh);
+    let iconSize = getBoundingBoxSize(iconMesh);
 
     const iconSizeRatio = this.options.code.iconSizeRatio / 100;
     const scaleRatioY = iconSize.y / (this.availableWidth * iconSizeRatio);
@@ -171,7 +63,7 @@ class QRCode3D {
     iconMesh.rotation.x = Math.PI;
 
     // move icon to center
-    iconSize = QRCode3D.getBoundingBoxSize(iconMesh);
+    iconSize = getBoundingBoxSize(iconMesh);
 
     iconMesh.position.x = -iconSize.x / 2;
     iconMesh.position.y = -iconSize.y / 2 + this.blockWidth / 2;
@@ -188,7 +80,7 @@ class QRCode3D {
   getQRCodeMesh(iconSize = null) {
     const ctx = this.canvas.getContext('2d');
     const qrcodeGeometry = new THREE.Geometry();
-    const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialBlock);
+    const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialDetail);
     let bspQRMesh = CSG.fromMesh(baseQRMesh);
     // iterate through pixels in canvas
     for (let y = 0; y < this.canvas.height; y += 1) {
@@ -208,7 +100,7 @@ class QRCode3D {
             blockDepth,
           );
 
-          const qrBlockMesh = new THREE.Mesh(qrBlock, this.materialBlock);
+          const qrBlockMesh = new THREE.Mesh(qrBlock, this.materialDetail);
 
           // qr code block positions
           let blockX = (x / this.canvas.width) * this.availableWidth;
@@ -244,7 +136,7 @@ class QRCode3D {
     }
 
     const finalBlockMesh = CSG.toMesh(bspQRMesh, baseQRMesh.matrix);
-    finalBlockMesh.material = this.materialBlock;
+    finalBlockMesh.material = this.materialDetail;
 
     if (this.options.code.invert) {
       let cornerRadius = 0;
@@ -262,7 +154,7 @@ class QRCode3D {
         topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
       }
 
-      const innerAreaShape = QRCode3D.getRoundedRectShape(
+      const innerAreaShape = getRoundedRectShape(
         -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
         -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
         this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
@@ -274,7 +166,7 @@ class QRCode3D {
         steps: 1,
         depth: this.options.code.depth,
         bevelEnabled: false,
-      }), this.materialBlock);
+      }), this.materialDetail);
       innerAreaMesh.position.z = 0;
       innerAreaMesh.updateMatrix();
 
@@ -286,7 +178,7 @@ class QRCode3D {
       const bspInverted = bspFullArea.subtract(bspQRHoles);
 
       const invertedMesh = CSG.toMesh(bspInverted, innerAreaMesh.matrix);
-      invertedMesh.material = this.materialBlock;
+      invertedMesh.material = this.materialDetail;
       invertedMesh.position.z = this.options.base.depth;
       invertedMesh.updateMatrix();
       return invertedMesh;
@@ -296,142 +188,51 @@ class QRCode3D {
   }
 
   /**
-   * @return {THREE.Mesh} the mesh of the text
+   * Returns one merged mesh of all part meshes
    */
-  getTextMesh() {
-    const textGeometry = new THREE.Geometry();
-    // create text
-    const fontHelvetikerBold = new THREE.Font(fontDefinitionHelvetikerBold);
-    const tempTextGeometry = new THREE.TextGeometry(this.options.base.textMessage, {
-      font: fontHelvetikerBold,
-      size: this.options.base.textSize,
-      height: this.options.base.textDepth,
-    });
-
-    const textMesh = new THREE.Mesh(tempTextGeometry, this.materialBlock);
-    const textBoundingBox = new THREE.Box3().setFromObject(textMesh);
-    const textSize = textBoundingBox.getSize();
-
-    // place text at correct position
-    const topSide = -this.options.base.width / 2 + this.options.base.textSize / 2 - this.options.base.textMargin;
-    const bottomSide = this.options.base.width / 2 + this.options.base.textSize / 2 + this.options.base.textMargin;
-    const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
-
-    textMesh.position.set(placement, -textSize.x / 2, this.options.base.depth);
-    textMesh.rotation.set(0, 0, Math.PI / 2);
-    textMesh.updateMatrix();
-    textGeometry.merge(textMesh.geometry, textMesh.matrix);
-
-    return new THREE.Mesh(textGeometry, this.materialBlock);
-  }
-
-  /**
-   * @return {THREE.Mesh} the mesh of the border
-   */
-  getBorderMesh() {
-    let cornerRadius = 0;
-    if (this.options.base.shape === 'roundedRectangle') {
-      cornerRadius = this.options.base.cornerRadius;
+  getCombinedMesh() {
+    const baseCombinedGeometry = super.getCombinedMesh().geometry;
+    baseCombinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
+    if (this.iconMesh && !this.options.code.invert) {
+      baseCombinedGeometry.merge(this.iconMesh.geometry, this.iconMesh.matrix);
     }
-
-    let textBaseOffset = 0;
-    if (this.options.base.hasText) {
-      textBaseOffset = this.options.base.textSize + 2 * this.options.base.textMargin;
-    }
-
-    let topOffset = 0;
-    if (this.options.base.textPlacement === 'top') {
-      topOffset = 2 * textBaseOffset - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
-    }
-
-    // shape covering the whole area
-    const borderShape = QRCode3D.getRoundedRectShape(
-      -(this.options.base.width + topOffset) / 2,
-      -this.options.base.width / 2,
-      this.options.base.width + textBaseOffset,
-      this.options.base.width,
-      cornerRadius,
-    );
-
-    const fullShapeMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(borderShape, {
-      steps: 1,
-      depth: this.options.base.borderDepth,
-      bevelEnabled: false,
-    }), this.materialBlock);
-    fullShapeMesh.updateMatrix();
-
-    // shape that covers everything except where the border should be
-    const borderHoleShape = QRCode3D.getRoundedRectShape(
-      -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
-      -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-      this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
-      this.options.base.width - this.options.base.borderWidth * 2,
-      Math.max(0, cornerRadius - this.options.base.borderWidth),
-    );
-
-    const holeMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(borderHoleShape, {
-      steps: 1,
-      depth: this.options.base.borderDepth,
-      bevelEnabled: false,
-    }), this.materialBlock);
-    holeMesh.updateMatrix();
-
-    const bspFull = CSG.fromMesh(fullShapeMesh);
-    const bspHole = CSG.fromMesh(holeMesh);
-    const bspBorder = bspFull.subtract(bspHole);
-
-    const borderMesh = CSG.toMesh(bspBorder, fullShapeMesh.matrix);
-    borderMesh.material = this.materialBlock;
-    borderMesh.position.z = this.options.base.depth;
-    borderMesh.updateMatrix();
-
-    return borderMesh;
+    this.combinedMesh = new THREE.Mesh(baseCombinedGeometry, this.materialBase);
+    return this.combinedMesh;
   }
 
   /**
    * Generates all required meshes of the 3D model and combines them
    */
   generate3dModel() {
-    const combinedGeometry = new THREE.Geometry();
+    super.generate3dModel();
 
     if (this.options.code.iconName !== 'none') {
       this.iconMesh = this.getIconMesh();
-      combinedGeometry.merge(this.iconMesh.geometry, this.iconMesh.matrix);
-    }
-
-    if (this.options.base.hasBorder) {
-      this.borderMesh = this.getBorderMesh();
-      combinedGeometry.merge(this.borderMesh.geometry, this.borderMesh.matrix);
-    }
-
-    this.baseMesh = this.getBaseMesh();
-    combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
-
-    if (this.options.code.iconName !== 'none') {
-      const iconSize = QRCode3D.getBoundingBoxSize(this.iconMesh);
+      const iconSize = getBoundingBoxSize(this.iconMesh);
       this.qrcodeMesh = this.getQRCodeMesh(iconSize);
     } else {
       this.qrcodeMesh = this.getQRCodeMesh();
     }
 
-    if (this.options.base.hasText) {
-      const tempTextMesh = this.getTextMesh();
-      if (this.options.code.invert) {
-        // this.textMesh.position.z = -this.options.base.depth;
-        tempTextMesh.updateMatrix();
-        const bspText = CSG.fromMesh(tempTextMesh);
+    if (this.options.code.invert) {
+      if (this.subtitleMesh) {
+        const bspText = CSG.fromMesh(this.subtitleMesh);
         const bspQR = CSG.fromMesh(this.qrcodeMesh);
         const bspCut = bspQR.subtract(bspText);
         this.qrcodeMesh = CSG.toMesh(bspCut, this.qrcodeMesh.matrix);
-        this.qrcodeMesh.material = this.materialBlock;
-      } else {
-        this.textMesh = tempTextMesh;
-        combinedGeometry.merge(this.textMesh.geometry, this.textMesh.matrix);
+        this.qrcodeMesh.material = this.materialDetail;
       }
+      if (this.iconMesh) {
+        const bspIcon = CSG.fromMesh(this.iconMesh);
+        const bspQR = CSG.fromMesh(this.qrcodeMesh);
+        const bspCut = bspQR.subtract(bspIcon);
+        this.qrcodeMesh = CSG.toMesh(bspCut, this.qrcodeMesh.matrix);
+        this.qrcodeMesh.material = this.materialDetail;
+      }
+    } else if (this.iconMesh) {
+      this.exportedMeshes.push(this.iconMesh);
     }
-
-    combinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
-    this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
+    this.exportedMeshes.push(this.qrcodeMesh);
   }
 }
 

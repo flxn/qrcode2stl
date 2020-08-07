@@ -108,7 +108,7 @@ export default {
       },
       options3d: {
         base: {
-          shape: 'rectangle',
+          shape: 'roundedRectangle',
           width: 100,
           height: 25,
           depth: 3,
@@ -128,6 +128,7 @@ export default {
           margin: 5,
           cityMode: false,
           depthMax: 5,
+          invert: false,
         },
       },
       spotifyCodeUrl: '',
@@ -139,7 +140,7 @@ export default {
       baseMesh: null,
       spotifyCodeMesh: null,
       borderMesh: null,
-      textMesh: null,
+      subtitleMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
       camera: null,
@@ -209,24 +210,13 @@ export default {
       this.spotifyCodeMesh = qrcodeModel.spotifyCodeMesh;
       this.borderMesh = qrcodeModel.borderMesh;
       this.iconMesh = qrcodeModel.iconMesh;
-      this.textMesh = qrcodeModel.textMesh;
-      this.mesh = qrcodeModel.combinedMesh;
+      this.subtitleMesh = qrcodeModel.subtitleMesh;
+      this.mesh = qrcodeModel.getCombinedMesh();
 
-      if (this.baseMesh) {
-        this.scene.add(this.baseMesh);
-      }
-      if (this.spotifyCodeMesh) {
-        this.scene.add(this.spotifyCodeMesh);
-      }
-      if (this.borderMesh) {
-        this.scene.add(this.borderMesh);
-      }
-      if (this.iconMesh) {
-        this.scene.add(this.iconMesh);
-      }
-      if (this.textMesh) {
-        this.scene.add(this.textMesh);
-      }
+      qrcodeModel.getPartMeshes().forEach((m) => {
+        console.log(m);
+        this.scene.add(m);
+      });
     },
     startAnimation() {
       const animate = () => {
@@ -256,6 +246,7 @@ export default {
       window._paq.push(['trackEvent', 'qrcode2stl', 'Export', this.getSettingsString()]);
     },
     async generate3dModel() {
+      this.isGenerating = true;
       this.trackGenerateEvent();
 
       setTimeout(() => {
@@ -296,8 +287,8 @@ export default {
           }
         }
 
-        if (this.textMesh) {
-          const textSTL = this.exporter.parse(this.textMesh, { binary: exportAsBinary });
+        if (this.subtitleMesh) {
+          const textSTL = this.exporter.parse(this.subtitleMesh, { binary: exportAsBinary });
           if (exportAsBinary) {
             this.saveArrayBuffer(textSTL, filenameText);
           } else {
