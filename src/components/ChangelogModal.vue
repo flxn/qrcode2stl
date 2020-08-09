@@ -7,6 +7,11 @@
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
+        <p class="content">
+          Regularly check back on this page, I have many more features planned for the future.
+          Or <a href="https://twitter.com/flxnde" target="_blank" rel="noopener nofollow"><i class="fab fa-twitter"></i> follow me on Twitter</a> where I tweet about updates and new projects.
+        </p>
+        <hr>
         <vue-markdown :source="changelog" class="content"></vue-markdown>
       </section>
       <footer class="modal-card-foot">

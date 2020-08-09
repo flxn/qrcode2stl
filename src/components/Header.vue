@@ -89,7 +89,6 @@ export default {
   methods: {
     toggleNavigation() {
       this.navbarOpen = !this.navbarOpen;
-      console.log(this.navbarOpen);
     },
     showThanks() {
       this.showThankYou = true;

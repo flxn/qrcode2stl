@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2020-08-09
+### Added
+- Added inversion feature to Spotify Codes
+
+### Fixed
+- QR Code icons are now correctly inverted
+
+### Changes
+- Internal changes in 3D model generation for easier extendability
+
 ## [1.1.0] - 2020-08-04
 ### Added
 - 🔃 QR Code blocks can now be inverted. If you choose the option the space around the blocks is extruded so the blocks form holes.

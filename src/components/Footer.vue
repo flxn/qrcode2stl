@@ -2,17 +2,17 @@
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
-        <strong>qrcode2stl</strong> by <a href="https://flxn.de">Felix Stein</a>. The source code is licensed
-        <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
-        is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
+        <strong>qrcode2stl</strong> by <a href="https://flxn.de" rel="noopener nofollow" target="_blank">Felix Stein</a>. The source code is licensed
+        <a href="http://opensource.org/licenses/mit-license.php" rel="noopener nofollow" target="_blank">MIT</a>. The website content
+        is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener nofollow" target="_blank">CC BY NC SA 4.0</a>.
       </p>
       <p>
         If you like my stuff you can follow me on
-        <a href="https://twitter.com/flxnde" target="_blank"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="https://twitter.com/flxnde" target="_blank" rel="noopener nofollow"><i class="fab fa-twitter"></i> Twitter</a>
         or on
-        <a href="https://github.com/flxn" target="_blank"><i class="fab fa-github"></i> Github</a>
+        <a href="https://github.com/flxn" target="_blank" rel="noopener nofollow"><i class="fab fa-github"></i> Github</a>
         or if you really like it you can even
-        <a href="https://ko-fi.com/flxn256" target="_blank">
+        <a href="https://ko-fi.com/flxn256" target="_blank" rel="noopener nofollow">
           💵☕️ buy me a coffee... or a tea, or a Club Mate (I actually don't like coffee)
         </a>
       </p>

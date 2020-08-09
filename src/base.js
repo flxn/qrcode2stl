@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
-import { getRoundedRectShape, subtractMesh } from './utils';
+import { getRoundedRectShape, subtractMesh, getBoundingBoxSize } from './utils';
 
 class BaseTag3D {
   constructor(options) {
@@ -87,9 +87,7 @@ class BaseTag3D {
     });
 
     const subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
-    const textBoundingBox = new THREE.Box3().setFromObject(subtitleMesh);
-    const textSize = textBoundingBox.getSize();
-
+    const textSize = getBoundingBoxSize(subtitleMesh);
     // place text at correct position
     const topSide = -this.options.base.height / 2 + this.options.base.textSize / 2 - this.options.base.textMargin;
     const bottomSide = this.options.base.height / 2 + this.options.base.textSize / 2 + this.options.base.textMargin;
