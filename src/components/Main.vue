@@ -92,6 +92,8 @@
         <div id="container3d"></div>
         <br/>
         <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
+        <br/>
+        <Promotions />
       </div>
     </div>
 
@@ -114,6 +116,7 @@ import { bus } from '../main';
 import QRCodeMenu from './QRCodeMenu.vue';
 import SpotifyMenu from './SpotifyMenu.vue';
 import PrintGuide from './PrintGuide.vue';
+import Promotions from './Promotions.vue';
 
 export default {
   name: 'Main',
@@ -126,6 +129,7 @@ export default {
     PrintGuide,
     ChangelogModal,
     VueMarkdown,
+    Promotions,
   },
   data() {
     return {

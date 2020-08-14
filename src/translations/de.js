@@ -31,6 +31,8 @@ export default {
   right: 'rechts',
   content: 'Inhalt',
   thankYou: 'Vielen Dank für die Unterstützung. Du rockst!',
+  promotionTitle: 'Du willst ins 3D-Druck Hobby einsteigen oder suchst nach einem zweiten/dritten 3D-Drucker? 😉',
+  promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile.',
 
   //
   // QR Code Options Panel
