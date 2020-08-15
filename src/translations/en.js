@@ -126,7 +126,8 @@ export default {
   keychain: 'Keychain',
   keychainHelp: 'Attach hole to the side of the tag (e.g. to attach it to your keychain).',
   mirrorHoles: 'Mirror Holes',
-  mirrorHolesHelp: 'Mirror the holes to the opposite side (e.g. to attach the tag with screws).',
+  mirrorHolesHelp: 'Mirror the holes to the opposite side (e.g. to fix it with screws).',
+  keychainHoleDiameter: 'Hole Diameter',
 
   //
   // Export Settings

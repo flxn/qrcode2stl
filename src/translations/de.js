@@ -126,6 +126,7 @@ export default {
   keychainHelp: 'Fügt ein Loch am Rand hinzu (z.B. für Schlüsselanhänger).',
   mirrorHoles: 'Löcher spiegeln',
   mirrorHolesHelp: 'Spiegelt die Löcher auf die gegenüberliegende Seite (z.B. zur Befestigung mit Schrauben).',
+  keychainHoleDiameter: 'Durchmesser des Lochs',
 
   //
   // Export Settings

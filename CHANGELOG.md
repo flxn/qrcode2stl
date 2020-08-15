@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2020-08-15
+### Changed
+- You can now set the keychain hole diameter.
+
+### Fixed
+- Fixed a bug with the keychain holes on some custom text settings.
+
 ## [1.3.0] - 2020-08-15
 ### Added
 - ⛓ A new option to add holes for attaching the QR Code to your keychain or fixing it to a surface with screws.

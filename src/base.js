@@ -157,9 +157,9 @@ class BaseTag3D {
   getKeychainAttachmentMesh() {
     const textBaseOffset = this.getTextBaseOffset();
     const textTopOffset = this.getTextTopOffset();
-    const holeRadius = 3;
-    const cornerPlacementOffset = 3;
-    const height = 9;
+    const holeRadius = this.options.base.keychainHoleDiameter / 2;
+    const cornerPlacementOffset = holeRadius * 2;
+    const height = this.options.base.keychainHoleDiameter + 3;
     const width = height + cornerPlacementOffset;
 
     const attachmentShape = getCustomRoundedRectShape(

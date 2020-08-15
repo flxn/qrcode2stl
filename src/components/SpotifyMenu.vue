@@ -124,6 +124,7 @@ export default {
           textDepth: 1,
           hasKeychainAttachment: false,
           keychainPlacement: 'left',
+          keychainHoleDiameter: 6,
           mirrorHoles: false,
         },
         code: {
