@@ -33,6 +33,7 @@ export default {
   thankYou: 'Thank you very much for the support. You rock!',
   promotionTitle: 'Want to start a new hobby? Looking for a second/third 3d printer? 😉',
   promotionSubtitle: 'Here are some recommended 3d printers and 3d printer accessories to get you covered.',
+  corner: 'corner',
 
   //
   // QR Code Options Panel
@@ -122,6 +123,10 @@ export default {
   cityModeText: 'Randomly alters the height of the blocks.',
   invert: 'Invert',
   invertText: 'Inverts the structure of the code',
+  keychain: 'Keychain',
+  keychainHelp: 'Attach hole to the side of the tag (e.g. to attach it to your keychain).',
+  mirrorHoles: 'Mirror Holes',
+  mirrorHolesHelp: 'Mirror the holes to the opposite side (e.g. to attach the tag with screws).',
 
   //
   // Export Settings

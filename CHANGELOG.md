@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2020-08-15
+### Added
+- ⛓ A new option to add holes for attaching the QR Code to your keychain or fixing it to a surface with screws.
+  You can choose between placement on the left, top and top-left corner.
+- A section with links to 3d printers and accessories.
+
 ## [1.2.0] - 2020-08-09
 ### Added
 - Added inversion feature to Spotify Codes

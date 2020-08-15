@@ -241,6 +241,60 @@
               </div>
             </div>
           </div>
+
+          <!-- Keychain Settings -->
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('keychain')}}</label> <span class="tag is-danger is-light">NEW</span>
+            </div>
+            <div class="field-body">
+              <div class="control">
+                <label class="checkbox">
+                  <div class="field">
+                    <input type="checkbox" v-model="options.base.hasKeychainAttachment" />
+                    <span class="is-size-7"><i class="fa fa-key"></i> {{$t('keychainHelp')}}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasKeychainAttachment">
+            <div class="field-label is-small">
+              <label class="label">{{$t('keychain')}} {{$t('placement')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control has-icons-left">
+                  <div class="select is-small">
+                    <select v-model="options.base.keychainPlacement">
+                      <option value="top">{{$t('top')}}</option>
+                      <option value="left">{{$t('left')}}</option>
+                      <option value="topLeft">{{$t('top')}}-{{$t('left')}} {{$t('corner')}}</option>
+                    </select>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-arrows-alt-v"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasKeychainAttachment">
+            <div class="field-label is-small">
+              <label class="label">{{$t('mirrorHoles')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="control">
+                <label class="checkbox">
+                  <div class="field">
+                    <input type="checkbox" v-model="options.base.mirrorHoles" />
+                    <span class="is-size-7">{{$t('mirrorHolesHelp')}}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Right Column -->

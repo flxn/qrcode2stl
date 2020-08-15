@@ -105,6 +105,9 @@ export default {
           textSize: 8,
           textMessage: '',
           textDepth: 1,
+          hasKeychainAttachment: false,
+          keychainPlacement: 'left',
+          mirrorHoles: false,
         },
         code: {
           depth: 1,

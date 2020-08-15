@@ -67,6 +67,11 @@
           <img src="https://ae01.alicdn.com/kf/HTB1GH6JX4uTBuNkHFNRq6A9qpXah.jpg_80x80.jpg" />
           <div class="name">V6 Nozzle Set</div>
         </a>
+
+        <a href="https://s.click.aliexpress.com/e/_dSxb1lU" target="_blank">
+          <img src="https://ae01.alicdn.com/kf/Hb180849b14be4c0eba9091108fbdf23dK.jpg_80x80.jpg" />
+          <div class="name">TS80P Soldering Iron</div>
+        </a>
       </div>
     </div>
   </nav>

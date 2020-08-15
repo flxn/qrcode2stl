@@ -33,6 +33,7 @@ export default {
   thankYou: 'Vielen Dank für die Unterstützung. Du rockst!',
   promotionTitle: 'Du willst ins 3D-Druck Hobby einsteigen oder suchst nach einem zweiten/dritten 3D-Drucker? 😉',
   promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile.',
+  corner: 'Ecke',
 
   //
   // QR Code Options Panel
@@ -121,6 +122,10 @@ export default {
   cityModeText: 'Verändert die Höhe der Blöcke zufällig.',
   invert: 'Invertieren',
   invertText: 'Kehrt die Struktur des Codes um',
+  keychain: 'Anhänger',
+  keychainHelp: 'Fügt ein Loch am Rand hinzu (z.B. für Schlüsselanhänger).',
+  mirrorHoles: 'Löcher spiegeln',
+  mirrorHolesHelp: 'Spiegelt die Löcher auf die gegenüberliegende Seite (z.B. zur Befestigung mit Schrauben).',
 
   //
   // Export Settings
