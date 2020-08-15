@@ -155,6 +155,8 @@ class BaseTag3D {
    * @return {THREE.Mesh} the mesh of the keychain attachment hole
    */
   getKeychainAttachmentMesh() {
+    const textBaseOffset = this.getTextBaseOffset();
+    const textTopOffset = this.getTextTopOffset();
     const holeRadius = 3;
     const cornerPlacementOffset = 3;
     const height = 9;
@@ -176,6 +178,7 @@ class BaseTag3D {
       depth: this.options.base.depth,
       bevelEnabled: false,
     }), this.materialBase);
+
     attachmentShapeMesh.position.z = 0;
     attachmentShapeMesh.updateMatrix();
 
@@ -188,16 +191,16 @@ class BaseTag3D {
     let finalMesh = subtractMesh(attachmentShapeMesh, holeMesh);
 
     if (this.options.base.keychainPlacement === 'left') {
-      finalMesh.position.x = 0;
+      finalMesh.position.x = (textBaseOffset - textTopOffset) / 2;
       finalMesh.position.y = -this.options.base.width / 2 - width / 2 + cornerPlacementOffset;
       finalMesh.position.z = 0;
     } else if (this.options.base.keychainPlacement === 'top') {
-      finalMesh.position.x = -this.options.base.height / 2 - height / 2 + cornerPlacementOffset / 2;
+      finalMesh.position.x = -this.options.base.height / 2 - height / 2 + cornerPlacementOffset / 2 - textTopOffset / 2;
       finalMesh.position.y = 0;
       finalMesh.position.z = 0;
       finalMesh.rotation.z = -Math.PI / 2;
     } else if (this.options.base.keychainPlacement === 'topLeft') {
-      finalMesh.position.x = -this.options.base.height / 2;
+      finalMesh.position.x = -this.options.base.height / 2 - textTopOffset / 2;
       finalMesh.position.y = -this.options.base.width / 2;
       finalMesh.position.z = 0;
       finalMesh.rotation.z = -Math.PI / 4;
@@ -207,13 +210,14 @@ class BaseTag3D {
     if (this.options.base.mirrorHoles) {
       const mirror = subtractMesh(attachmentShapeMesh, holeMesh);
       if (this.options.base.keychainPlacement === 'left') {
+        mirror.position.x = (textBaseOffset - textTopOffset) / 2;
         mirror.position.y = this.options.base.width / 2 + width / 2 - cornerPlacementOffset;
         mirror.rotation.z = Math.PI;
       } else if (this.options.base.keychainPlacement === 'top') {
-        mirror.position.x = this.options.base.height / 2 + height / 2 - cornerPlacementOffset / 2;
+        mirror.position.x = this.options.base.height / 2 + height / 2 - cornerPlacementOffset / 2 + textBaseOffset - textTopOffset / 2;
         mirror.rotation.z = Math.PI / 2;
       } else if (this.options.base.keychainPlacement === 'topLeft') {
-        mirror.position.x = this.options.base.height / 2;
+        mirror.position.x = this.options.base.height / 2 + textBaseOffset - textTopOffset / 2;
         mirror.position.y = this.options.base.width / 2;
         mirror.rotation.z = -Math.PI / 4 + Math.PI;
       }
