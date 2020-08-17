@@ -4,7 +4,7 @@ Create QR codes and download them as \*.stl file for 3d printing.
 
 ![The Web App](https://flxn.de/images/qrcode2stl_screenshot.png)
 
-Go to https://flxn.de/qrcode2stl/ to try it out.
+Go to https://printer.tools/qrcode2stl/ to try it out.
 
 Feel free to write an issue if you find a bug or have an idea for a new feature: https://github.com/flxn/qrcode2stl/issues
 

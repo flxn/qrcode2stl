@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2020-08-17
+### Changed
+- 🌍 New Domain! The site has been moved from https://flxn.de/qrcode2stl to our new domain https://printer.tools/qrcode2stl. The new place where I will host more 3d printing related tools and resources in the future.
+  Go check it out! (Though ther is not much to see yet)
+
 ## [1.3.1] - 2020-08-15
 ### Changed
 - You can now set the keychain hole diameter.
