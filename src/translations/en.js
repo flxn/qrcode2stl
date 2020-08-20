@@ -34,6 +34,7 @@ export default {
   promotionTitle: 'Want to start a new hobby? Looking for a second/third 3d printer? 😉',
   promotionSubtitle: 'Here are some recommended 3d printers and 3d printer accessories to get you covered.',
   corner: 'corner',
+  isGenerating: 'Generating 3D Model...',
 
   //
   // QR Code Options Panel

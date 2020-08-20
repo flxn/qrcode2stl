@@ -34,6 +34,7 @@ export default {
   promotionTitle: 'Du willst ins 3D-Druck Hobby einsteigen oder suchst nach einem zweiten/dritten 3D-Drucker? 😉',
   promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile.',
   corner: 'Ecke',
+  isGenerating: 'Generiere 3D Modell...',
 
   //
   // QR Code Options Panel

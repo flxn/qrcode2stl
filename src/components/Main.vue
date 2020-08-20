@@ -5,7 +5,7 @@
         <h1 class="title">{{ $t("title") }}</h1>
         <h2 class="subtitle">{{ $t("subtitle") }}</h2>
         <div id="mode-buttons">
-          <button class="button is-large" :class="{'is-primary': mode === 'QR'}" @click="mode = 'QR'">
+          <button class="button is-large" :class="{'is-primary': mode === 'QR'}" @click="changeMode('QR')">
             <span class="icon is-medium">
               <i class="fa fa-qrcode"></i>
             </span>
@@ -13,7 +13,7 @@
           </button>
           <div class="highlight">
             <span class="highlight-text">NEW</span>
-            <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="mode = 'Spotify'">
+            <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="changeMode('Spotify')">
               <span class="icon is-medium">
                 <i class="fab fa-spotify"></i>
               </span>
@@ -24,8 +24,8 @@
         </div>
         <hr />
         <!-- Menus for modes -->
-        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" @exportReady="showExport = true"/>
-        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" @exportReady="showExport = true"/>
+        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady"/>
+        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady"/>
 
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
@@ -89,7 +89,11 @@
           </div>
         </div>
         <hr />
-        <div id="container3d"></div>
+        <div v-if="isGenerating" class="has-text-centered">
+          <p class="title">{{$t('isGenerating')}}</p>
+          <hr>
+        </div>
+        <div id="container3d" :class="{ 'is-loading': isGenerating }"></div>
         <br/>
         <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
         <br/>
@@ -118,6 +122,8 @@ import SpotifyMenu from './SpotifyMenu.vue';
 import PrintGuide from './PrintGuide.vue';
 import Promotions from './Promotions.vue';
 
+const shareHashMarker = '#share-';
+
 export default {
   name: 'Main',
   props: {
@@ -139,13 +145,21 @@ export default {
       multipleParts: false,
       changelogModalVisible: false,
       changelog: changelog.split('\n').slice(3).join('\n'),
+      shareData: null,
+      isGenerating: false,
     };
   },
   created() {
     bus.$on('openChangelogModal', () => { this.changelogModalVisible = true; });
     bus.$on('closeChangelogModal', () => { this.changelogModalVisible = false; });
+    this.parseUrlShareHash();
   },
   methods: {
+    changeMode(mode) {
+      window.location.hash = '';
+      this.shareData = null;
+      this.mode = mode;
+    },
     exportSTL() {
       if (this.mode === 'QR') {
         this.$refs.qrcode.exportSTL(this.stlType, this.multipleParts);
@@ -153,7 +167,32 @@ export default {
         this.$refs.spotifycode.exportSTL(this.stlType, this.multipleParts);
       }
     },
+    parseUrlShareHash() {
+      if (window.location.hash.startsWith(shareHashMarker)) {
+        const rawShareData = window.location.hash.substring(shareHashMarker.length).split('-');
+        // eslint-disable-next-line prefer-destructuring
+        const mode = rawShareData[0];
+        if (mode !== 'Spotify' && mode !== 'QR') {
+          return;
+        }
+        this.mode = mode;
+        try {
+          this.shareData = Object.assign(JSON.parse(atob(rawShareData[1])), { mode });
+        } catch (error) {
+          this.shareData = null;
+          console.error('Invalid Sharing URL');
+          window.location.hash = '';
+        }
+      }
+    },
+    exportReady(options) {
+      console.log('Options Ready:', options);
+      this.showExport = true;
+      window.location.hash = `${shareHashMarker}${this.mode}-${btoa(JSON.stringify(options))}`;
+      this.isGenerating = false;
+    },
   },
+
 };
 </script>
 
@@ -169,6 +208,25 @@ export default {
   border-radius: 5px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+}
+
+#container3d.is-loading {
+  animation: breathing 2s linear infinite;
+}
+
+@keyframes breathing {
+  0% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.3;
+  }
 }
 
 #qr-canvas {

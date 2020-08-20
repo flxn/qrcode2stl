@@ -20,7 +20,7 @@
                   class="input"
                   type="text"
                   placeholder="spotify:track:4uLU6hMCjMI75M1A2tKUQC"
-                  v-model="optionsSpotify.spotifyUri"
+                  v-model="options.spotifyUri"
                   @change="downloadSpotifyCode"
                 />
               </div>
@@ -63,7 +63,7 @@
       </div>
     </nav>
     <!-- 3D Options -->
-    <Spotify3DOptionsPanel :options="options3d" :unit="unit" />
+    <Spotify3DOptionsPanel :options="options" :unit="unit" />
 
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
@@ -89,52 +89,54 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
+import { diff } from 'deep-object-diff';
+import merge from 'deepmerge';
 import SpotifyCode3D from '../spotifyCode3D';
 // 3D settings panel
 import Spotify3DOptionsPanel from './Spotify3DOptionsPanel.vue';
 
+const defaultOptions = {
+  spotifyUri: '',
+  base: {
+    shape: 'roundedRectangle',
+    width: 100,
+    height: 25,
+    depth: 3,
+    cornerRadius: 5,
+    hasBorder: true,
+    borderWidth: 2,
+    borderDepth: 1,
+    hasText: false,
+    textPlacement: 'bottom',
+    textMargin: 2,
+    textSize: 8,
+    textMessage: '',
+    textDepth: 1,
+    hasKeychainAttachment: false,
+    keychainPlacement: 'left',
+    keychainHoleDiameter: 6,
+    mirrorHoles: false,
+  },
+  code: {
+    depth: 1,
+    margin: 5,
+    cityMode: false,
+    depthMax: 5,
+    invert: false,
+  },
+};
+
 export default {
   name: 'SpotifyMenu',
   props: {
-    msg: String,
+    initData: Object,
   },
   components: {
     Spotify3DOptionsPanel,
   },
   data() {
     return {
-      optionsSpotify: {
-        spotifyUri: '',
-      },
-      options3d: {
-        base: {
-          shape: 'roundedRectangle',
-          width: 100,
-          height: 25,
-          depth: 3,
-          cornerRadius: 5,
-          hasBorder: true,
-          borderWidth: 2,
-          borderDepth: 1,
-          hasText: false,
-          textPlacement: 'bottom',
-          textMargin: 2,
-          textSize: 8,
-          textMessage: '',
-          textDepth: 1,
-          hasKeychainAttachment: false,
-          keychainPlacement: 'left',
-          keychainHoleDiameter: 6,
-          mirrorHoles: false,
-        },
-        code: {
-          depth: 1,
-          margin: 5,
-          cityMode: false,
-          depthMax: 5,
-          invert: false,
-        },
-      },
+      options: JSON.parse(JSON.stringify(defaultOptions)),
       spotifyCodeUrl: '',
       validSpotifyCode: false,
       workCanvas: null,
@@ -208,7 +210,7 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     async setup3dObject() {
-      const qrcodeModel = new SpotifyCode3D(this.options3d);
+      const qrcodeModel = new SpotifyCode3D(this.options);
       await qrcodeModel.generate3dModel();
       this.baseMesh = qrcodeModel.baseMesh;
       this.spotifyCodeMesh = qrcodeModel.spotifyCodeMesh;
@@ -231,9 +233,9 @@ export default {
     },
     getSettingsString() {
       let settingsString = '';
-      Object.keys(this.options3d).forEach((topLevelKey) => {
-        Object.keys(this.options3d[topLevelKey]).forEach((subLevelKey) => {
-          settingsString += `${topLevelKey}_${subLevelKey}:${this.options3d[topLevelKey][subLevelKey]} `;
+      Object.keys(this.options).forEach((topLevelKey) => {
+        Object.keys(this.options[topLevelKey]).forEach((subLevelKey) => {
+          settingsString += `${topLevelKey}_${subLevelKey}:${this.options[topLevelKey][subLevelKey]} `;
         });
       });
       return settingsString;
@@ -247,6 +249,7 @@ export default {
       window._paq.push(['trackEvent', 'qrcode2stl', 'Export', this.getSettingsString()]);
     },
     async generate3dModel() {
+      this.$emit('generating');
       this.isGenerating = true;
       this.trackGenerateEvent();
 
@@ -254,7 +257,7 @@ export default {
         this.init3d();
         this.setup3dObject();
         this.startAnimation();
-        this.$emit('exportReady');
+        this.$emit('exportReady', diff(defaultOptions, this.options));
 
         this.isGenerating = false;
       }, 100);
@@ -323,8 +326,8 @@ export default {
         filename,
       );
     },
-    downloadSpotifyCode() {
-      let uri = this.optionsSpotify.spotifyUri;
+    async downloadSpotifyCode() {
+      let uri = this.options.spotifyUri;
       if (!uri.startsWith('spotify:')) {
         const regex = /spotify\.com\/([^/]+)\/([^?/]+)/gm;
         const parts = regex.exec(uri);
@@ -336,16 +339,13 @@ export default {
       }
       const spotifyCodeSvgUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${uri}`;
       this.validSpotifyCode = true;
-      fetch(spotifyCodeSvgUrl)
-        .then((response) => {
-          const utf8Decoder = new TextDecoder('utf-8');
-          const reader = response.body.getReader();
-          reader.read().then((data) => {
-            const svgString = utf8Decoder.decode(data.value);
-            const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
-            this.spotifyCodeUrl = URL.createObjectURL(svgBlob);
-          });
-        });
+      const response = await fetch(spotifyCodeSvgUrl);
+      const utf8Decoder = new TextDecoder('utf-8');
+      const reader = response.body.getReader();
+      const data = await reader.read();
+      const svgString = utf8Decoder.decode(data.value);
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+      this.spotifyCodeUrl = URL.createObjectURL(svgBlob);
     },
   },
   async mounted() {
@@ -355,6 +355,12 @@ export default {
     // await this.handleTextChanged();
     // this.setup3dObject();
     this.startAnimation();
+    if (this.initData && this.initData.mode === 'Spotify') {
+      delete this.initData.mode;
+      this.options = merge(this.options, this.initData);
+      await this.downloadSpotifyCode();
+      this.generate3dModel();
+    }
   },
 };
 </script>

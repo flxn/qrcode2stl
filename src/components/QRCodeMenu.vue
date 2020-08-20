@@ -1,9 +1,9 @@
 <template>
   <div id="qrcodeMenu">
     <!-- QR Code Options -->
-    <QRCodeOptionsPanel :options="optionsQR" />
+    <QRCodeOptionsPanel :options="options" />
     <!-- 3D Options -->
-    <QRCode3DOptionsPanel :options="options3d" :unit="unit" />
+    <QRCode3DOptionsPanel :options="options" :unit="unit" />
 
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
@@ -37,15 +37,84 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
+import { diff } from 'deep-object-diff';
+import merge from 'deepmerge';
 import QRCode3D from '../qrcode3d';
 import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
 // 3D settings panel
 import QRCode3DOptionsPanel from './QRCode3DOptionsPanel.vue';
 
+const defaultOptions = {
+  activeTabIndex: 0,
+  errorCorrectionLevel: 'M',
+  text: '',
+  wifi: {
+    ssid: '',
+    password: '',
+    security: 'WPA',
+    hidden: false,
+  },
+  email: {
+    recipient: '',
+    subject: '',
+    body: '',
+  },
+  contact: {
+    firstName: '',
+    lastName: '',
+    organization: '',
+    role: '',
+    cell: '',
+    phone: '',
+    fax: '',
+    email: '',
+    street: '',
+    postcode: '',
+    city: '',
+    state: '',
+    country: '',
+    website: '',
+  },
+  sms: {
+    recipient: '',
+    message: '',
+  },
+  base: {
+    shape: 'roundedRectangle',
+    width: 100,
+    height: 100,
+    depth: 3,
+    cornerRadius: 5,
+    hasBorder: true,
+    borderWidth: 2,
+    borderDepth: 1,
+    hasText: false,
+    textPlacement: 'bottom',
+    textMargin: 2,
+    textSize: 8,
+    textMessage: '',
+    textDepth: 1,
+    hasKeychainAttachment: false,
+    keychainPlacement: 'left',
+    keychainHoleDiameter: 6,
+    mirrorHoles: false,
+  },
+  code: {
+    depth: 1,
+    margin: 5,
+    blockSizeMultiplier: 100,
+    iconName: 'none',
+    iconSizeRatio: 20,
+    cityMode: false,
+    depthMax: 5,
+    invert: false,
+  },
+};
+
 export default {
   name: 'QRCodeMenu',
   props: {
-    msg: String,
+    initData: Object,
   },
   components: {
     QRCodeOptionsPanel,
@@ -53,74 +122,7 @@ export default {
   },
   data() {
     return {
-      optionsQR: {
-        activeTabIndex: 0,
-        errorCorrectionLevel: 'M',
-        text: '',
-        wifi: {
-          ssid: '',
-          password: '',
-          security: 'WPA',
-          hidden: false,
-        },
-        email: {
-          recipient: '',
-          subject: '',
-          body: '',
-        },
-        contact: {
-          firstName: '',
-          lastName: '',
-          organization: '',
-          role: '',
-          cell: '',
-          phone: '',
-          fax: '',
-          email: '',
-          street: '',
-          postcode: '',
-          city: '',
-          state: '',
-          country: '',
-          website: '',
-        },
-        sms: {
-          recipient: '',
-          message: '',
-        },
-      },
-      options3d: {
-        base: {
-          shape: 'roundedRectangle',
-          width: 100,
-          height: 100,
-          depth: 3,
-          cornerRadius: 5,
-          hasBorder: true,
-          borderWidth: 2,
-          borderDepth: 1,
-          hasText: false,
-          textPlacement: 'bottom',
-          textMargin: 2,
-          textSize: 8,
-          textMessage: '',
-          textDepth: 1,
-          hasKeychainAttachment: false,
-          keychainPlacement: 'left',
-          keychainHoleDiameter: 6,
-          mirrorHoles: false,
-        },
-        code: {
-          depth: 1,
-          margin: 5,
-          blockSizeMultiplier: 100,
-          iconName: 'none',
-          iconSizeRatio: 20,
-          cityMode: false,
-          depthMax: 5,
-          invert: false,
-        },
-      },
+      options: JSON.parse(JSON.stringify(defaultOptions)),
       workCanvas: null,
       exporter: null,
       unit: 'mm',
@@ -196,7 +198,7 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
-      const qrcodeModel = new QRCode3D(this.workCanvas, this.options3d);
+      const qrcodeModel = new QRCode3D(this.workCanvas, this.options);
       console.time('3d Model Generation');
       qrcodeModel.generate3dModel();
       console.timeEnd('3d Model Generation');
@@ -222,9 +224,9 @@ export default {
     },
     getSettingsString() {
       let settingsString = '';
-      Object.keys(this.options3d).forEach((topLevelKey) => {
-        Object.keys(this.options3d[topLevelKey]).forEach((subLevelKey) => {
-          settingsString += `${topLevelKey}_${subLevelKey}:${this.options3d[topLevelKey][subLevelKey]} `;
+      Object.keys(this.options).forEach((topLevelKey) => {
+        Object.keys(this.options[topLevelKey]).forEach((subLevelKey) => {
+          settingsString += `${topLevelKey}_${subLevelKey}:${this.options[topLevelKey][subLevelKey]} `;
         });
       });
       return settingsString;
@@ -238,9 +240,10 @@ export default {
       window._paq.push(['trackEvent', 'qrcode2stl', 'Export', this.getSettingsString()]);
     },
     async generate3dModel() {
+      this.$emit('generating');
       this.trackGenerateEvent();
-      if (this.options3d.code.iconName !== 'none') {
-        this.optionsQR.errorCorrectionLevel = 'H';
+      if (this.options.code.iconName !== 'none') {
+        this.options.errorCorrectionLevel = 'H';
       }
       this.generateError = null;
       this.isGenerating = true;
@@ -255,7 +258,7 @@ export default {
         await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
           margin: 0,
           scale: 1,
-          errorCorrectionLevel: this.optionsQR.errorCorrectionLevel,
+          errorCorrectionLevel: this.options.errorCorrectionLevel,
         });
       } catch (e) {
         this.generateError = `Error during generation: ${e.message}`;
@@ -267,7 +270,8 @@ export default {
         this.init3d();
         this.setup3dObject();
         this.startAnimation();
-        this.$emit('exportReady');
+        console.log(defaultOptions, this.options);
+        this.$emit('exportReady', diff(defaultOptions, this.options));
 
         this.isGenerating = false;
       }, 100);
@@ -355,49 +359,49 @@ export default {
     getQRText() {
       const vCard = vcardjs();
       let ret = '';
-      switch (this.optionsQR.activeTabIndex) {
+      switch (this.options.activeTabIndex) {
         case 0: // Text
-          ret = this.optionsQR.text;
+          ret = this.options.text;
           break;
         case 1: // Wifi
-          if (this.optionsQR.wifi.password === '') {
-            this.optionsQR.wifi.security = 'nopass';
+          if (this.options.wifi.password === '') {
+            this.options.wifi.security = 'nopass';
           }
-          if (this.optionsQR.wifi.security === 'nopass') {
-            this.optionsQR.wifi.password = '';
+          if (this.options.wifi.security === 'nopass') {
+            this.options.wifi.password = '';
           }
           ret = `WIFI:S:${this.wifiQREscape(
-            this.optionsQR.wifi.ssid,
-          )};T:${this.wifiQREscape(this.optionsQR.wifi.security)};P:${this.wifiQREscape(
-            this.optionsQR.wifi.password,
-          )};H:${this.optionsQR.wifi.hidden ? 'true' : 'false'};`;
+            this.options.wifi.ssid,
+          )};T:${this.wifiQREscape(this.options.wifi.security)};P:${this.wifiQREscape(
+            this.options.wifi.password,
+          )};H:${this.options.wifi.hidden ? 'true' : 'false'};`;
           break;
         case 2: // E-Mail
-          ret = `mailto:${this.optionsQR.email.recipient
+          ret = `mailto:${this.options.email.recipient
             .split(',')
             .map((x) => x.trim())
             .join(',')}?subject=${encodeURI(
-            this.optionsQR.email.subject,
-          )}&body=${encodeURI(this.optionsQR.email.body)}`;
+            this.options.email.subject,
+          )}&body=${encodeURI(this.options.email.body)}`;
           break;
         case 3: // Contact
-          vCard.firstName = this.optionsQR.contact.firstName;
-          vCard.lastName = this.optionsQR.contact.lastName;
-          vCard.organization = this.optionsQR.contact.organization;
-          vCard.url = this.optionsQR.contact.website;
-          vCard.role = this.optionsQR.contact.role;
+          vCard.firstName = this.options.contact.firstName;
+          vCard.lastName = this.options.contact.lastName;
+          vCard.organization = this.options.contact.organization;
+          vCard.url = this.options.contact.website;
+          vCard.role = this.options.contact.role;
 
-          vCard.homePhone = this.optionsQR.contact.phone;
-          vCard.cellPhone = this.optionsQR.contact.cell;
-          vCard.homeFax = this.optionsQR.contact.fax;
+          vCard.homePhone = this.options.contact.phone;
+          vCard.cellPhone = this.options.contact.cell;
+          vCard.homeFax = this.options.contact.fax;
 
-          vCard.email = this.optionsQR.contact.email;
+          vCard.email = this.options.contact.email;
 
-          vCard.homeAddress.street = this.optionsQR.contact.street;
-          vCard.homeAddress.city = this.optionsQR.contact.city;
-          vCard.homeAddress.stateProvince = this.optionsQR.contact.state;
-          vCard.homeAddress.postalCode = this.optionsQR.contact.postcode;
-          vCard.homeAddress.countryRegion = this.optionsQR.contact.country;
+          vCard.homeAddress.street = this.options.contact.street;
+          vCard.homeAddress.city = this.options.contact.city;
+          vCard.homeAddress.stateProvince = this.options.contact.state;
+          vCard.homeAddress.postalCode = this.options.contact.postcode;
+          vCard.homeAddress.countryRegion = this.options.contact.country;
 
           // vCard.socialUrls.facebook = 'https://...';
           // vCard.socialUrls.linkedIn = 'https://...';
@@ -410,7 +414,7 @@ export default {
           ret = vCard.getFormattedString();
           break;
         case 4: // SMS
-          ret = `SMSTO:${this.optionsQR.sms.recipient}:${this.optionsQR.sms.message}`;
+          ret = `SMSTO:${this.options.sms.recipient}:${this.options.sms.message}`;
           break;
         default:
           break;
@@ -427,6 +431,11 @@ export default {
     // await this.handleTextChanged();
     // this.setup3dObject();
     this.startAnimation();
+    if (this.initData && this.initData.mode === 'QR') {
+      delete this.initData.mode;
+      this.options = merge(this.options, this.initData);
+      this.generate3dModel();
+    }
   },
 };
 </script>
@@ -434,14 +443,6 @@ export default {
 <style scoped>
 #main {
   margin-top: 20px;
-}
-
-#container3d {
-  width: 100%;
-  height: 600px;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 #qr-canvas {
