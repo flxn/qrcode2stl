@@ -122,7 +122,7 @@ import SpotifyMenu from './SpotifyMenu.vue';
 import PrintGuide from './PrintGuide.vue';
 import Promotions from './Promotions.vue';
 
-const shareHashMarker = '#share-';
+const shareHashMarker = '#share';
 
 export default {
   name: 'Main',
@@ -190,6 +190,7 @@ export default {
       this.showExport = true;
       window.location.hash = `${shareHashMarker}${this.mode}-${btoa(JSON.stringify(options))}`;
       this.isGenerating = false;
+      bus.$emit('exportReady');
     },
   },
 

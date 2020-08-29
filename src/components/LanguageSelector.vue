@@ -10,7 +10,7 @@
     </div>
     <div class="dropdown-menu" id="dropdown-menu" role="menu">
       <div class="dropdown-content">
-        <a href="#" class="dropdown-item" v-for="locale in locales" :key="locale" @click="changeLanguage(locale)">
+        <a class="dropdown-item" v-for="locale in locales" :key="locale" @click="changeLanguage(locale)">
           <img :src="'flags/gif/' + locale + '.gif'"/> {{ $i18n.messages[locale]['languageLocalName'] }}
         </a>
         <hr class="dropdown-divider">
@@ -36,6 +36,7 @@ export default {
       this.$i18n.locale = locale;
       this.currentLocale = locale;
       window.localStorage.setItem('locale', locale);
+      return false;
     },
   },
 };

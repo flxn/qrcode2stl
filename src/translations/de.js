@@ -35,6 +35,7 @@ export default {
   promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile.',
   corner: 'Ecke',
   isGenerating: 'Generiere 3D Modell...',
+  headerShareNotice: 'Teile deinen Code mit dieser URL',
 
   //
   // QR Code Options Panel

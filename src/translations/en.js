@@ -35,6 +35,7 @@ export default {
   promotionSubtitle: 'Here are some recommended 3d printers and 3d printer accessories to get you covered.',
   corner: 'corner',
   isGenerating: 'Generating 3D Model...',
+  headerShareNotice: 'Share your code with this URL',
 
   //
   // QR Code Options Panel
