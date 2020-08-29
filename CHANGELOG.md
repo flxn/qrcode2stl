@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2020-08-29
+### Added
+- You can now share a link to qrcode2stl which contains your QR Code data and settings.
+  After the 3d model was generated you can just copy the link from your URL bar which contains all the settings that you changed.
+  ⚠️ Please be careful when sharing links to QR codes that contain sensitive data ⚠️
+
 ## [1.3.2] - 2020-08-17
 ### Changed
 - 🌍 New Domain! The site has been moved from https://flxn.de/qrcode2stl to our new domain https://printer.tools/qrcode2stl. The new place where I will host more 3d printing related tools and resources in the future.
