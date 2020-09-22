@@ -91,6 +91,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
+import JSZip from 'jszip';
 import SpotifyCode3D from '../spotifyCode3D';
 // 3D settings panel
 import Spotify3DOptionsPanel from './Spotify3DOptionsPanel.vue';
@@ -147,6 +148,7 @@ export default {
       spotifyCodeMesh: null,
       borderMesh: null,
       subtitleMesh: null,
+      keychainAttachmentMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
       camera: null,
@@ -217,6 +219,7 @@ export default {
       this.borderMesh = qrcodeModel.borderMesh;
       this.iconMesh = qrcodeModel.iconMesh;
       this.subtitleMesh = qrcodeModel.subtitleMesh;
+      this.keychainAttachmentMesh = qrcodeModel.keychainAttachmentMesh;
       this.mesh = qrcodeModel.getCombinedMesh();
 
       qrcodeModel.getPartMeshes().forEach((m) => this.scene.add(m));
@@ -268,37 +271,37 @@ export default {
       const exportAsBinary = (stlType === 'binary');
 
       if (multipleParts) {
+        const zip = new JSZip();
         const filenameBase = `base-${timestamp}.stl`;
         const filenameQrcode = `qrcode-${timestamp}.stl`;
         const filenameBorder = `border-${timestamp}.stl`;
         const filenameText = `text-${timestamp}.stl`;
+        const filenameKeychain = `attachment-${timestamp}.stl`;
+
         const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
         const qrcodeSTL = this.exporter.parse(this.spotifyCodeMesh, { binary: exportAsBinary });
-        if (exportAsBinary) {
-          this.saveArrayBuffer(baseSTL, filenameBase);
-          this.saveArrayBuffer(qrcodeSTL, filenameQrcode);
-        } else {
-          this.saveString(baseSTL, filenameBase);
-          this.saveString(qrcodeSTL, filenameQrcode);
-        }
+        zip.file(filenameBase, baseSTL.buffer);
+        zip.file(filenameQrcode, qrcodeSTL.buffer);
 
         if (this.borderMesh) {
           const borderSTL = this.exporter.parse(this.borderMesh, { binary: exportAsBinary });
-          if (exportAsBinary) {
-            this.saveArrayBuffer(borderSTL, filenameBorder);
-          } else {
-            this.saveString(borderSTL, filenameBorder);
-          }
+          zip.file(filenameBorder, borderSTL.buffer);
         }
 
         if (this.subtitleMesh) {
           const textSTL = this.exporter.parse(this.subtitleMesh, { binary: exportAsBinary });
-          if (exportAsBinary) {
-            this.saveArrayBuffer(textSTL, filenameText);
-          } else {
-            this.saveString(textSTL, filenameText);
-          }
+          zip.file(filenameText, textSTL.buffer);
         }
+
+        if (this.keychainAttachmentMesh) {
+          const kcaSTL = this.exporter.parse(this.keychainAttachmentMesh, { binary: exportAsBinary });
+          zip.file(filenameKeychain, kcaSTL.buffer);
+        }
+
+        zip.generateAsync({ type: 'blob' })
+          .then((content) => {
+            this.save(new Blob([content]), `qrcode2stl-${timestamp}.zip`);
+          });
       } else {
         const filename = `combined-${timestamp}.stl`;
         const result = this.exporter.parse(this.mesh, { binary: exportAsBinary });
