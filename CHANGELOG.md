@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2020-09-22
+### Added
+- Export as separate parts will now create a zip archive containing all necessary STLs instead of saving them individually.
+### Fixed
+- The STL file for the Keychain attachment hole was missing when exporting as separate parts.
+
 ## [1.4.0] - 2020-08-29
 ### Added
 - You can now share a link to qrcode2stl which contains your QR Code data and settings.
