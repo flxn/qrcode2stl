@@ -1,5 +1,6 @@
 <template>
-  <nav id="promo-container" class="panel">
+  <div>
+    <nav id="promo-container" class="panel">
     <p class="panel-heading">
       {{$t('promotionTitle')}}
     </p>
@@ -23,14 +24,14 @@
           <div class="name">Creality CR-10 V2</div>
         </a>
 
-        <a href="https://s.click.aliexpress.com/e/_dWr5weS" target="_blank">
-          <img src="https://ae01.alicdn.com/kf/Hbcc336efb01f44e2b211da288a1c3092X.jpg_80x80.jpg" />
-          <div class="name">Creality Ender-6</div>
-        </a>
-
         <a href="https://s.click.aliexpress.com/e/_BffriIjG" target="_blank">
           <img src="https://ae01.alicdn.com/kf/H2580702879bc4ae1a094cb4fe80304a5x.jpg_80x80.jpg" />
           <div class="name">Creality CR-10S Pro</div>
+        </a>
+
+        <a href="https://s.click.aliexpress.com/e/_dX8dqP3" target="_blank">
+          <img src="https://ae01.alicdn.com/kf/H38f64f2601f741868f1d6d7b432470029.jpg_80x80.jpg" />
+          <div class="name">Elegoo Mars</div>
         </a>
 
         <a href="https://s.click.aliexpress.com/e/_dT7G0RG" target="_blank">
@@ -40,12 +41,12 @@
 
         <a href="https://s.click.aliexpress.com/e/_dXu6tBo" target="_blank">
           <img src="https://ae01.alicdn.com/kf/Hb64655a64fe2441fbd521ca66672994at.jpg_80x80.jpg" />
-          <div class="name">BTT SKR V1.3</div>
+          <div class="name">SKR V1.3</div>
         </a>
 
         <a href="https://s.click.aliexpress.com/e/_dTczAUQ" target="_blank">
           <img src="https://ae01.alicdn.com/kf/H6caf815aa82f47db99fbe0ebcd58b17aG.jpg_80x80.jpg" />
-          <div class="name">BTT SKR Mini E3 V2</div>
+          <div class="name">SKR Mini E3 V2</div>
         </a>
 
         <a href="https://s.click.aliexpress.com/e/_dVSbTNy" target="_blank">
@@ -55,7 +56,7 @@
 
         <a href="https://s.click.aliexpress.com/e/_dZgeEfM" target="_blank">
           <img src="https://ae01.alicdn.com/kf/HLB12GIXau3tHKVjSZSgq6x4QFXaQ.jpg_80x80.jpg" />
-          <div class="name">Trianglelab BMG Extruder</div>
+          <div class="name">BMG Extruder</div>
         </a>
 
         <a href="https://s.click.aliexpress.com/e/_d6JsfwO" target="_blank">
@@ -72,9 +73,22 @@
           <img src="https://ae01.alicdn.com/kf/Hb180849b14be4c0eba9091108fbdf23dK.jpg_80x80.jpg" />
           <div class="name">TS80P Soldering Iron</div>
         </a>
+
+        <a href="https://s.click.aliexpress.com/e/_dWysZS5" target="_blank">
+          <img src="https://ae01.alicdn.com/kf/H980ed3796a8d49b99eca44ce4fcff0aeB.jpg_80x80.jpg" />
+          <div class="name">Smart Filament Sensor</div>
+        </a>
       </div>
     </div>
   </nav>
+  <div class="notification">
+      <div class="columns">
+        <div class="column is-1 is-size-3">🌈</div>
+        <div class="column">Are you a developer/designer/engineer? Check out my newest side project <strong>landof.dev</strong> where you can <a href="https://landof.dev/awesome">discover GitHub repositories and development resources about hundreds of topics</a>.</div>
+        <div class="column is-1 is-size-3">🌈</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

@@ -8,9 +8,6 @@
         {{$t('printGuideSubtitle')}}
       </h2>
       <hr/>
-      <div class="notification is-info is-light">
-        <i class="fa fa-info-circle"></i> {{$t('printGuideWIPInfo')}}
-      </div>
       <p v-html="$t('printGuideIntro')">
       </p>
       <br/>
