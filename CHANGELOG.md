@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2020-10-13
+### Added
+- New language option: 🇧🇷 Brazilian Portuguese. Thank You *odfigor*
+
 ## [1.5.0] - 2020-09-22
 ### Added
 - Export as separate parts will now create a zip archive containing all necessary STLs instead of saving them individually.
