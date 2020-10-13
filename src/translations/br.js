@@ -31,7 +31,7 @@ export default {
   min: 'mínimo',
   max: 'máximo',
   thankYou: 'Muito obrigado pela ajuda. Você arrasa!',
-  promotionTitle: 'Gostaria de iniciar um novo hobbie? Procurando por uma segunda/terceira impressora? 😉',
+  promotionTitle: 'Gostaria de iniciar um novo hobbie? Procurando por uma segunda/terceira impressora?',
   promotionSubtitle: 'Aqui estão algumas impressoras 3D recomendadas e acessórios',
   corner: 'canto',
   isGenerating: 'Gerando modelo 3D...',
