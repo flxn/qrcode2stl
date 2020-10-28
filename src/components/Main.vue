@@ -197,7 +197,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 #main {
   margin-top: 20px;
   padding-bottom: 20px;
@@ -266,5 +266,13 @@ export default {
   font-weight: bold;
   border-radius: 3px;
   z-index: 30;
+}
+
+.subsection {
+  border-radius: 6px;
+  background: #fbfbfb;
+  border: 1px solid #ededed;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 </style>

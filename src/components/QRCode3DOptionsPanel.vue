@@ -93,41 +93,43 @@
               </div>
             </div>
           </div>
-          <div class="field is-horizontal" v-if="options.base.hasBorder">
-            <div class="field-label is-small">
-              <label class="label">{{$t('border')}} {{$t('width')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.borderWidth"
-                  />
+          <div class="subsection" v-if="options.base.hasBorder">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('border')}} {{$t('width')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.borderWidth"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasBorder">
-            <div class="field-label is-small">
-              <label class="label">{{$t('border')}} {{$t('depth')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.borderDepth"
-                  />
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('border')}} {{$t('depth')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.borderDepth"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
           </div>
@@ -148,96 +150,98 @@
               </div>
             </div>
           </div>
-          <div class="field is-horizontal" v-if="options.base.hasText">
-            <div class="field-label is-small">
-              <label class="label">{{$t('text')}} {{$t('placement')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control has-icons-left">
-                  <div class="select is-small">
-                    <select v-model="options.base.textPlacement">
-                      <option value="top">{{$t('top')}}</option>
-                      <option value="bottom">{{$t('bottom')}}</option>
-                    </select>
-                    <span class="icon is-small is-left">
-                      <i class="fa fa-arrows-alt-v"></i>
-                    </span>
+          <div class="subsection" v-if="options.base.hasText">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('text')}} {{$t('placement')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control has-icons-left">
+                    <div class="select is-small">
+                      <select v-model="options.base.textPlacement">
+                        <option value="top">{{$t('top')}}</option>
+                        <option value="bottom">{{$t('bottom')}}</option>
+                      </select>
+                      <span class="icon is-small is-left">
+                        <i class="fa fa-arrows-alt-v"></i>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasText">
-            <div class="field-label is-small">
-              <label class="label">{{$t('text')}} {{$t('content')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    v-model="options.base.textMessage"
-                    :placeholder="$t('theText')"
-                  />
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('text')}} {{$t('content')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      v-model="options.base.textMessage"
+                      :placeholder="$t('theText')"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasText">
-            <div class="field-label is-small">
-              <label class="label">{{$t('text')}} {{$t('size')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.textSize"
-                  />
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('text')}} {{$t('size')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.textSize"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasText">
-            <div class="field-label is-small">
-              <label class="label">{{$t('text')}} {{$t('margin')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.textMargin"
-                  />
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('text')}} {{$t('margin')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.textMargin"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasText">
-            <div class="field-label is-small">
-              <label class="label">{{$t('text')}} {{$t('depth')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.textDepth"
-                  />
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('text')}} {{$t('depth')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.textDepth"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
           </div>
@@ -258,58 +262,60 @@
               </div>
             </div>
           </div>
-          <div class="field is-horizontal" v-if="options.base.hasKeychainAttachment">
-            <div class="field-label is-small">
-              <label class="label">{{$t('keychain')}} {{$t('placement')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control has-icons-left">
-                  <div class="select is-small">
-                    <select v-model="options.base.keychainPlacement">
-                      <option value="top">{{$t('top')}}</option>
-                      <option value="left">{{$t('left')}}</option>
-                      <option value="topLeft">{{$t('top')}}-{{$t('left')}} {{$t('corner')}}</option>
-                    </select>
-                    <span class="icon is-small is-left">
-                      <i class="fa fa-arrows-alt-v"></i>
-                    </span>
+          <div class="subsection" v-if="options.base.hasKeychainAttachment">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('keychain')}} {{$t('placement')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control has-icons-left">
+                    <div class="select is-small">
+                      <select v-model="options.base.keychainPlacement">
+                        <option value="top">{{$t('top')}}</option>
+                        <option value="left">{{$t('left')}}</option>
+                        <option value="topLeft">{{$t('top')}}-{{$t('left')}} {{$t('corner')}}</option>
+                      </select>
+                      <span class="icon is-small is-left">
+                        <i class="fa fa-arrows-alt-v"></i>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasKeychainAttachment">
-            <div class="field-label is-small">
-              <label class="label">{{$t('keychainHoleDiameter')}}</label>
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('keychainHoleDiameter')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.keychainHoleDiameter"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
+                </div>
+              </div>
             </div>
-            <div class="field-body">
-              <div class="field has-addons">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('mirrorHoles')}}</label>
+              </div>
+              <div class="field-body">
                 <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.keychainHoleDiameter"
-                  />
+                  <label class="checkbox">
+                    <div class="field">
+                      <input type="checkbox" v-model="options.base.mirrorHoles" />
+                      <span class="is-size-7">{{$t('mirrorHolesHelp')}}</span>
+                    </div>
+                  </label>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasKeychainAttachment">
-            <div class="field-label is-small">
-              <label class="label">{{$t('mirrorHoles')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="control">
-                <label class="checkbox">
-                  <div class="field">
-                    <input type="checkbox" v-model="options.base.mirrorHoles" />
-                    <span class="is-size-7">{{$t('mirrorHolesHelp')}}</span>
-                  </div>
-                </label>
               </div>
             </div>
           </div>
@@ -330,76 +336,78 @@
               </div>
             </div>
           </div>
-          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
-            <div class="field-label is-small">
-              <label class="label">{{$t('indentation')}} {{$t('shape')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control has-icons-left">
-                  <div class="select is-small">
-                    <select v-model="options.base.nfcIndentationShape">
-                      <option value="square">{{$t('square')}}</option>
-                      <option value="round">{{$t('round')}}</option>
-                    </select>
-                    <span class="icon is-small is-left">
-                      <i class="fa fa-shapes"></i>
-                    </span>
+          <div class="subsection" v-if="options.base.hasNfcIndentation">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('indentation')}} {{$t('shape')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control has-icons-left">
+                    <div class="select is-small">
+                      <select v-model="options.base.nfcIndentationShape">
+                        <option value="square">{{$t('square')}}</option>
+                        <option value="round">{{$t('round')}}</option>
+                      </select>
+                      <span class="icon is-small is-left">
+                        <i class="fa fa-shapes"></i>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
-            <div class="field-label is-small">
-              <label class="label">{{$t('indentation')}} {{$t('size')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.nfcIndentationSize"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('indentation')}} {{$t('size')}}</label>
               </div>
-            </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
-            <div class="field-label is-small">
-              <label class="label">{{$t('indentation')}} {{$t('depth')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.nfcIndentationDepth"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
-            <div class="field-label is-small">
-              <label class="label">{{$t('hidden')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="control">
-                <label class="checkbox">
-                  <div class="field">
-                    <input type="checkbox" v-model="options.base.nfcIndentationHidden" />
-                    <span class="is-size-7"><i class="fa fa-layer-group"></i> {{$t('nfcIndentationHiddenHelp')}}</span>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.nfcIndentationSize"
+                    />
                   </div>
-                </label>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('indentation')}} {{$t('depth')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      v-model.number="options.base.nfcIndentationDepth"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('hidden')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="control">
+                  <label class="checkbox">
+                    <div class="field">
+                      <input type="checkbox" v-model="options.base.nfcIndentationHidden" />
+                      <span class="is-size-7"><i class="fa fa-layer-group"></i> {{$t('nfcIndentationHiddenHelp')}}</span>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -581,33 +589,35 @@
               </div>
             </div>
           </div>
-          <div class="field is-horizontal" v-if="options.code.cityMode">
-            <div class="field-label is-small">
-              <label class="label">{{$t('depth')}} {{$t('min')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.code.depth" />
+          <div class="subsection" v-if="options.code.cityMode">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('depth')}} {{$t('min')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input class="input is-small" type="number" v-model.number="options.code.depth" />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.code.cityMode">
-            <div class="field-label is-small">
-              <label class="label">{{$t('depth')}} {{$t('max')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.code.depthMax" />
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">{{$t('depth')}} {{$t('max')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input class="input is-small" type="number" v-model.number="options.code.depthMax" />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
                 </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
               </div>
             </div>
           </div>
