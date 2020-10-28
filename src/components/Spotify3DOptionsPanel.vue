@@ -260,7 +260,7 @@
           <!-- Keychain Settings -->
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">{{$t('keychain')}}</label> <span class="tag is-danger is-light">NEW</span>
+              <label class="label">{{$t('keychain')}}</label>
             </div>
             <div class="field-body">
               <div class="control">
@@ -323,6 +323,96 @@
                   <div class="field">
                     <input type="checkbox" v-model="options.base.mirrorHoles" />
                     <span class="is-size-7">{{$t('mirrorHolesHelp')}}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- NFC Tag Section -->
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('nfcIndentation')}}</label> <span class="tag is-danger is-light">NEW</span>
+            </div>
+            <div class="field-body">
+              <div class="control">
+                <label class="checkbox">
+                  <div class="field">
+                    <input type="checkbox" v-model="options.base.hasNfcIndentation" />
+                    <span class="is-size-7"><i class="fa fa-wifi"></i> {{$t('nfcIndentationHelp')}}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
+            <div class="field-label is-small">
+              <label class="label">{{$t('indentation')}} {{$t('shape')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control has-icons-left">
+                  <div class="select is-small">
+                    <select v-model="options.base.nfcIndentationShape">
+                      <option value="square">{{$t('square')}}</option>
+                      <option value="round">{{$t('round')}}</option>
+                    </select>
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-shapes"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
+            <div class="field-label is-small">
+              <label class="label">{{$t('indentation')}} {{$t('size')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.nfcIndentationSize"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
+            <div class="field-label is-small">
+              <label class="label">{{$t('indentation')}} {{$t('depth')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.base.nfcIndentationDepth"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">{{unit}}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.base.hasNfcIndentation">
+            <div class="field-label is-small">
+              <label class="label">{{$t('hidden')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="control">
+                <label class="checkbox">
+                  <div class="field">
+                    <input type="checkbox" v-model="options.base.nfcIndentationHidden" />
+                    <span class="is-size-7"><i class="fa fa-layer-group"></i> {{$t('nfcIndentationHiddenHelp')}}</span>
                   </div>
                 </label>
               </div>

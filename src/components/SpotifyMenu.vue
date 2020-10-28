@@ -117,6 +117,11 @@ const defaultOptions = {
     keychainPlacement: 'left',
     keychainHoleDiameter: 6,
     mirrorHoles: false,
+    hasNfcIndentation: false,
+    nfcIndentationShape: 'square',
+    nfcIndentationSize: 20,
+    nfcIndentationDepth: 1,
+    nfcIndentationHidden: false,
   },
   code: {
     depth: 1,

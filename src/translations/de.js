@@ -129,6 +129,10 @@ export default {
   mirrorHoles: 'Löcher spiegeln',
   mirrorHolesHelp: 'Spiegelt die Löcher auf die gegenüberliegende Seite (z.B. zur Befestigung mit Schrauben).',
   keychainHoleDiameter: 'Durchmesser des Lochs',
+  nfcIndentation: 'NFC/RFID',
+  nfcIndentationHelp: 'Fügt der Basis eine Einkerbung auf der Unterseite hinzu in der NFC/RFID tags platziert werden können.',
+  indentation: 'Einkerbung',
+  nfcIndentationHiddenHelp: 'Erstellt eine Aushöhlung im Inneren der Basis mit einem Abstand von 1mm zur Unterseite. Damit kannst du einen NFC Tag fest in den 3D-Druck integrieren. Stoppe den Druckvorgang vor dem Layer in dem die Aushöhlung wieder überdekt wird, platziere den Tag und setze dann den Druck fort. Passe auf, dass die Tiefe etwas höher ist als der tatsächliche Tag und passe die Höhe der Basis entsprechend der Größe des Tags an.',
 
   //
   // Export Settings

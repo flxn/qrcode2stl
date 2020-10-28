@@ -130,6 +130,10 @@ export default {
   mirrorHoles: 'Mirror Holes',
   mirrorHolesHelp: 'Mirror the holes to the opposite side (e.g. to fix it with screws).',
   keychainHoleDiameter: 'Hole Diameter',
+  nfcIndentation: 'NFC/RFID',
+  nfcIndentationHelp: 'Adds an indentation on the bottom side of the base where one can insert an NFC/RFID tag.',
+  indentation: 'Indentation',
+  nfcIndentationHiddenHelp: 'Creates a cavity inside the base with a 1mm offset from the bottom of the base. This allows you to firmly embed the NFC tag inside the 3d print itself. Pause printing before the closing layer, insert the tag, then resume printing. Make sure that the indentation depth is slightly larger than the tag itself and adjust base depth accordingly.',
 
   //
   // Export Settings

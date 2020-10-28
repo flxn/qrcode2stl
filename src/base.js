@@ -63,7 +63,7 @@ class BaseTag3D {
       bevelEnabled: false,
     });
 
-    const baseMesh = new THREE.Mesh(modelBase, this.materialBase);
+    let baseMesh = new THREE.Mesh(modelBase, this.materialBase);
     baseMesh.position.set(0, 0, 0);
 
     if (textBaseOffset > 0) {
@@ -71,8 +71,36 @@ class BaseTag3D {
       const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
       baseMesh.position.x = textPlacementOffset;
     }
-
     baseMesh.updateMatrix();
+
+    if (this.options.base.hasNfcIndentation) {
+      let holeMesh;
+      if (this.options.base.nfcIndentationShape === 'round') {
+        holeMesh = new THREE.Mesh(new THREE.CylinderGeometry(
+          this.options.base.nfcIndentationSize / 2,
+          this.options.base.nfcIndentationSize / 2,
+          this.options.base.nfcIndentationDepth,
+          32,
+        ), this.materialBase);
+        holeMesh.rotation.x = -Math.PI / 2;
+      } else {
+        // shape = square
+        holeMesh = new THREE.Mesh(new THREE.BoxGeometry(
+          this.options.base.nfcIndentationSize,
+          this.options.base.nfcIndentationSize,
+          this.options.base.nfcIndentationDepth,
+        ), this.materialBase);
+      }
+      holeMesh.position.z = this.options.base.nfcIndentationDepth / 2;
+      if (this.options.base.nfcIndentationHidden) {
+        holeMesh.position.z += 1;
+      }
+      holeMesh.updateMatrix();
+
+      baseMesh = subtractMesh(baseMesh, holeMesh);
+      baseMesh.updateMatrix();
+    }
+
     return baseMesh;
   }
 
