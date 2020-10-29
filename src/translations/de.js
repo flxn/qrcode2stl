@@ -32,7 +32,7 @@ export default {
   content: 'Inhalt',
   thankYou: 'Vielen Dank für die Unterstützung. Du rockst!',
   promotionTitle: 'Du willst ins 3D-Druck Hobby einsteigen oder suchst nach einem zweiten/dritten 3D-Drucker?',
-  promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile.',
+  promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile. Wenn du die Entwicklung dieses Tools unterstützen möchtest, würde ich mich freuen wenn du einen der unten stehenden Links benutzt um auf AliExpress oder Amazon zu kaufen.',
   corner: 'Ecke',
   isGenerating: 'Generiere 3D Modell...',
   headerShareNotice: 'Teile deinen Code mit dieser URL',

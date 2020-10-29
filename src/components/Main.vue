@@ -11,16 +11,12 @@
             </span>
             <span>QR Code</span>
           </button>
-          <div class="highlight">
-            <span class="highlight-text">NEW</span>
-            <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="changeMode('Spotify')">
-              <span class="icon is-medium">
-                <i class="fab fa-spotify"></i>
-              </span>
-              <span>Spotify Code</span>
-            </button>
-          </div>
-
+          <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="changeMode('Spotify')">
+            <span class="icon is-medium">
+              <i class="fab fa-spotify"></i>
+            </span>
+            <span>Spotify Code</span>
+          </button>
         </div>
         <hr />
         <!-- Menus for modes -->

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2020-10-29
+### Added
+- 📶 New NFC feature! Choose the NFC/RFID Indentation feature to add a cutout where you can embed an NFC tag into your QR Code.
+
 ## [1.5.1] - 2020-10-13
 ### Added
 - New language option: 🇧🇷 Brazilian Portuguese. Thank You *odfigor*

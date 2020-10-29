@@ -573,7 +573,7 @@
             </div>
           </div>
 
-          <!-- Skyraper Mode -->
+          <!-- Skyscraper Mode -->
           <div class="field is-horizontal" v-if="!options.code.invert">
             <div class="field-label is-small">
               <label class="label">{{$t('cityMode')}}</label>
