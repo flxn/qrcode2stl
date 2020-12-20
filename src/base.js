@@ -95,6 +95,9 @@ class BaseTag3D {
       if (this.options.base.nfcIndentationHidden) {
         holeMesh.position.z += 1;
       }
+
+      holeMesh.position.x = baseMesh.position.x;
+
       holeMesh.updateMatrix();
 
       baseMesh = subtractMesh(baseMesh, holeMesh);
