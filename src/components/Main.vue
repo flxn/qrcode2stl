@@ -226,10 +226,6 @@ export default {
   }
 }
 
-#qr-canvas {
-  display: none;
-}
-
 .export-button {
   margin: 0 10px;
 }

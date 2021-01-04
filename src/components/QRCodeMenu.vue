@@ -1,3 +1,4 @@
+/* eslint-disable import/no-webpack-loader-syntax */
 <template>
   <div id="qrcodeMenu">
     <!-- QR Code Options -->
@@ -27,7 +28,11 @@
       <span>{{$t('generateButton')}}</span>
     </button>
 
-    <canvas id="qr-canvas"></canvas>
+    <div class="box mt-3" v-bind:class="{'is-hidden': mesh === null}" style="width: fit-content">
+      <figure class="image is-128x128" title="A QR Code in 2D? How lame ;)">
+        <img id="qr-image"/>
+      </figure>
+    </div>
   </div>
 </template>
 
@@ -35,12 +40,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
-import QRCode3D from '../qrcode3d';
+import modelWorker from '@/model-worker';
 import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
 // 3D settings panel
 import QRCode3DOptionsPanel from './QRCode3DOptionsPanel.vue';
@@ -111,6 +118,7 @@ const defaultOptions = {
     blockSizeMultiplier: 100,
     iconName: 'none',
     iconSizeRatio: 20,
+    iconShapes: null,
     cityMode: false,
     depthMax: 5,
     invert: false,
@@ -129,7 +137,7 @@ export default {
   data() {
     return {
       options: JSON.parse(JSON.stringify(defaultOptions)),
-      workCanvas: null,
+      qrCodeBitMask: null,
       exporter: null,
       unit: 'mm',
       mesh: null,
@@ -155,6 +163,36 @@ export default {
   },
 
   methods: {
+    initWorker() {
+      modelWorker.worker.onmessage = (event) => {
+        if (event.data.type !== 'result') {
+          return;
+        }
+        const jsonLoader = new THREE.ObjectLoader();
+        const { meshes } = event.data;
+        let i = 0;
+        console.log(meshes);
+        Object.keys(meshes).forEach((key) => {
+          jsonLoader.parse(meshes[key], (parsed) => {
+            meshes[key] = parsed;
+            i += 1;
+            if (key !== 'combined') {
+              this.scene.add(meshes[key]);
+            }
+            if (i === event.data.meshCount) {
+              this.mesh = meshes.combined;
+              this.baseMesh = meshes.base;
+              this.qrcodeMesh = meshes.qrcode;
+              this.borderMesh = meshes.border;
+              this.iconMesh = meshes.icon;
+              this.subtitleMesh = meshes.subtitle;
+              this.keychainAttachmentMesh = meshes.keychainAttachment;
+              this.isGenerating = false;
+            }
+          });
+        });
+      };
+    },
     init3d() {
       this.reset3d();
       const container = document.getElementById('container3d');
@@ -205,20 +243,11 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     setup3dObject() {
-      const qrcodeModel = new QRCode3D(this.workCanvas, this.options);
-      console.time('3d Model Generation');
-      qrcodeModel.generate3dModel();
-      console.timeEnd('3d Model Generation');
-      this.mesh = qrcodeModel.getCombinedMesh();
-
-      this.baseMesh = qrcodeModel.baseMesh;
-      this.qrcodeMesh = qrcodeModel.qrcodeMesh;
-      this.borderMesh = qrcodeModel.borderMesh;
-      this.iconMesh = qrcodeModel.iconMesh;
-      this.subtitleMesh = qrcodeModel.subtitleMesh;
-      this.keychainAttachmentMesh = qrcodeModel.keychainAttachmentMesh;
-
-      qrcodeModel.getPartMeshes().forEach((m) => this.scene.add(m));
+      modelWorker.send({
+        mode: 'QR',
+        qrCodeBitMask: this.qrCodeBitMask,
+        options: this.options,
+      });
     },
     startAnimation() {
       const animate = () => {
@@ -250,11 +279,10 @@ export default {
     async generate3dModel() {
       this.$emit('generating');
       this.trackGenerateEvent();
-      if (this.options.code.iconName !== 'none') {
-        this.options.errorCorrectionLevel = 'H';
-      }
+
       this.generateError = null;
       this.isGenerating = true;
+
       const txt = this.getQRText();
       if (txt === '') {
         this.isGenerating = false;
@@ -262,11 +290,29 @@ export default {
         return;
       }
 
+      if (this.options.code.iconName !== 'none') {
+        this.options.errorCorrectionLevel = 'H';
+        const svgLoader = new SVGLoader();
+        const svgMarkup = document.querySelector('#icon-preview').contentDocument.querySelector('svg').outerHTML;
+        const svgData = svgLoader.parse(svgMarkup);
+        const shapes = svgData.paths.map((p) => p.toShapes(true, true)).flat();
+        this.options.code.iconShapes = shapes.map((s) => s.toJSON());
+      }
+
       try {
-        await qrcode.toCanvas(document.getElementById('qr-canvas'), txt, {
-          margin: 0,
-          scale: 1,
+        const qrCodeObject = await qrcode.create(txt, {
           errorCorrectionLevel: this.options.errorCorrectionLevel,
+        });
+        this.qrCodeBitMask = qrCodeObject.modules.data;
+        qrcode.toDataURL(txt, {
+          errorCorrectionLevel: this.options.errorCorrectionLevel,
+          margin: 1,
+        }, (err, url) => {
+          if (err) {
+            throw err;
+          }
+          const img = document.getElementById('qr-image');
+          img.src = url;
         });
       } catch (e) {
         this.generateError = `Error during generation: ${e.message}`;
@@ -280,8 +326,6 @@ export default {
         this.startAnimation();
         console.log(defaultOptions, this.options);
         this.$emit('exportReady', diff(defaultOptions, this.options));
-
-        this.isGenerating = false;
       }, 100);
     },
     exportSTL(stlType, multipleParts) {
@@ -429,10 +473,8 @@ export default {
   },
   async mounted() {
     this.init3d();
-    this.workCanvas = document.getElementById('qr-canvas');
+    this.initWorker();
     this.exporter = new STLExporter();
-    // await this.handleTextChanged();
-    // this.setup3dObject();
     this.startAnimation();
     if (this.initData && this.initData.mode === 'QR') {
       delete this.initData.mode;
@@ -446,10 +488,6 @@ export default {
 <style scoped>
 #main {
   margin-top: 20px;
-}
-
-#qr-canvas {
-  display: none;
 }
 
 .export-button {

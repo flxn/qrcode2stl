@@ -80,8 +80,6 @@
       </span>
       <span>{{$t('generateButton')}}</span>
     </button>
-
-    <canvas id="qr-canvas"></canvas>
   </div>
 </template>
 
@@ -89,10 +87,12 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+import pathThatSvg from 'path-that-svg';
 import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
-import SpotifyCode3D from '../spotifyCode3D';
+import modelWorker from '@/model-worker';
 // 3D settings panel
 import Spotify3DOptionsPanel from './Spotify3DOptionsPanel.vue';
 
@@ -145,7 +145,6 @@ export default {
       options: JSON.parse(JSON.stringify(defaultOptions)),
       spotifyCodeUrl: '',
       validSpotifyCode: false,
-      workCanvas: null,
       exporter: null,
       unit: 'mm',
       mesh: null,
@@ -167,6 +166,36 @@ export default {
   },
 
   methods: {
+    initWorker() {
+      modelWorker.worker.onmessage = (event) => {
+        if (event.data.type !== 'result') {
+          return;
+        }
+        const jsonLoader = new THREE.ObjectLoader();
+        const { meshes } = event.data;
+        let i = 0;
+        console.log(meshes);
+        Object.keys(meshes).forEach((key) => {
+          jsonLoader.parse(meshes[key], (parsed) => {
+            meshes[key] = parsed;
+            i += 1;
+            if (key !== 'combined') {
+              this.scene.add(meshes[key]);
+            }
+            if (i === event.data.meshCount) {
+              this.mesh = meshes.combined;
+              this.baseMesh = meshes.base;
+              this.spotifyCodeMesh = meshes.spotifyCode;
+              this.borderMesh = meshes.border;
+              this.iconMesh = meshes.icon;
+              this.subtitleMesh = meshes.subtitle;
+              this.keychainAttachmentMesh = meshes.keychainAttachment;
+              this.isGenerating = false;
+            }
+          });
+        });
+      };
+    },
     init3d() {
       this.reset3d();
       const container = document.getElementById('container3d');
@@ -217,17 +246,19 @@ export default {
       while (elem.lastChild) elem.removeChild(elem.lastChild);
     },
     async setup3dObject() {
-      const qrcodeModel = new SpotifyCode3D(this.options);
-      await qrcodeModel.generate3dModel();
-      this.baseMesh = qrcodeModel.baseMesh;
-      this.spotifyCodeMesh = qrcodeModel.spotifyCodeMesh;
-      this.borderMesh = qrcodeModel.borderMesh;
-      this.iconMesh = qrcodeModel.iconMesh;
-      this.subtitleMesh = qrcodeModel.subtitleMesh;
-      this.keychainAttachmentMesh = qrcodeModel.keychainAttachmentMesh;
-      this.mesh = qrcodeModel.getCombinedMesh();
+      const loader = new SVGLoader();
+      let svg = document.querySelector('#spotify-code-preview').contentDocument.querySelector('svg').outerHTML;
+      svg = svg.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
+      const pathedSvg = await pathThatSvg(svg);
+      const svgData = loader.parse(pathedSvg);
+      let shapes = svgData.paths.map((p) => p.toShapes(true, false)).flat();
+      shapes = shapes.map((s) => s.toJSON());
 
-      qrcodeModel.getPartMeshes().forEach((m) => this.scene.add(m));
+      modelWorker.send({
+        mode: 'Spotify',
+        spotifyCodeShapes: shapes,
+        options: this.options,
+      });
     },
     startAnimation() {
       const animate = () => {
@@ -266,8 +297,6 @@ export default {
         this.setup3dObject();
         this.startAnimation();
         this.$emit('exportReady', diff(defaultOptions, this.options));
-
-        this.isGenerating = false;
       }, 100);
     },
     exportSTL(stlType, multipleParts) {
@@ -357,11 +386,9 @@ export default {
     },
   },
   async mounted() {
+    this.initWorker();
     this.init3d();
-    this.workCanvas = document.getElementById('qr-canvas');
     this.exporter = new STLExporter();
-    // await this.handleTextChanged();
-    // this.setup3dObject();
     this.startAnimation();
     if (this.initData && this.initData.mode === 'Spotify') {
       delete this.initData.mode;

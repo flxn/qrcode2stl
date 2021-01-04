@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2021-01-04
+**Happy 2021 🥳**
+qrcode2stl is now one year old! I started working on the first version in early january 2020 and [posted it publicly](https://www.reddit.com/r/3Dprinting/comments/ergng8/inspired_by_all_the_qr_codes_lately_i_made_a_web/) on Jan 20.
+Thank you for the support and feedback!
+
+### Added
+- **⚡ qrcode2stl now utilizes Web Workers for the 3d model generation step, which should improve responsiveness and eliminate some crashes!**
+- 🖼️ You can now view and download a 2D image of the qr code (right click to save it).
+### Changed
+- The NFC Tag Indentation now better fits the base. Thank You *N-Schaef*
+- The 3D model generation has been changed to work on a binary mask of the qr code instead of the stupid canvas implementation I had before.
+
 ## [1.6.0] - 2020-10-29
 ### Added
 - 📶 New NFC feature! Choose the NFC/RFID Indentation feature to add a cutout where you can embed an NFC tag into your QR Code.

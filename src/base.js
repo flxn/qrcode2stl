@@ -39,7 +39,7 @@ class BaseTag3D {
     this.subtitleMesh = null;
     this.keychainAttachmentMesh = null;
     this.combinedMesh = null;
-    this.exportedMeshes = [];
+    this.exportedMeshes = {};
   }
 
   /**
@@ -315,23 +315,23 @@ class BaseTag3D {
    */
   generate3dModel() {
     this.baseMesh = this.getBaseMesh();
-    this.exportedMeshes.push(this.baseMesh);
+    this.exportedMeshes.base = this.baseMesh;
 
     if (this.options.base.hasBorder) {
       this.borderMesh = this.getBorderMesh();
-      this.exportedMeshes.push(this.borderMesh);
+      this.exportedMeshes.border = this.borderMesh;
     }
 
     if (this.options.base.hasText) {
       this.subtitleMesh = this.getSubtitleMesh();
       if (!this.options.code.invert) {
-        this.exportedMeshes.push(this.subtitleMesh);
+        this.exportedMeshes.subtitle = this.subtitleMesh;
       }
     }
 
     if (this.options.base.hasKeychainAttachment) {
       this.keychainAttachmentMesh = this.getKeychainAttachmentMesh();
-      this.exportedMeshes.push(this.keychainAttachmentMesh);
+      this.exportedMeshes.keychainAttachment = this.keychainAttachmentMesh;
     }
   }
 }

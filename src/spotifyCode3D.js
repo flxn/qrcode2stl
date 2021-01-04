@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-import pathThatSvg from 'path-that-svg';
 import BaseTag3D from './base';
 import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
 
@@ -8,8 +6,9 @@ import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
  * Class used for generating the 3D model of the Spotify Code
  */
 class SpotifyCode3D extends BaseTag3D {
-  constructor(options) {
+  constructor(spotifyCodeShapes, options) {
     super(options);
+    this.spotifyCodeShapes = spotifyCodeShapes.map((sj) => new THREE.Shape().fromJSON(sj));
     this.spotifyCodeMesh = null;
     this.exportedMeshes = super.getPartMeshes();
   }
@@ -19,34 +18,24 @@ class SpotifyCode3D extends BaseTag3D {
    */
   async getSpotifyCodeMesh() {
     const spotifyCodeGeometry = new THREE.Geometry();
-    const loader = new SVGLoader();
-    let svgMarkup = document.querySelector('#spotify-code-preview').contentDocument.querySelector('svg').outerHTML;
-    svgMarkup = svgMarkup.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
-    const pathedSvg = await pathThatSvg(svgMarkup);
-    const svgData = loader.parse(pathedSvg);
-    // Loop through all of the parsed paths
-    svgData.paths.forEach((path, pathNo) => {
-      const shapes = path.toShapes(true, false);
-      // Each path has array of shapes
-      shapes.forEach((shape) => {
-        let shapeDepth = this.options.code.depth;
-        if (this.options.code.cityMode && pathNo !== svgData.paths.length - 1) {
-          shapeDepth = Math.min(this.options.code.depth, this.options.code.depthMax) + Math.random() * Math.abs(this.options.code.depthMax - this.options.code.depth);
-        }
-        // Finally we can take each shape and extrude it
-        const pathGeometry = new THREE.ExtrudeGeometry(shape, {
-          steps: 1,
-          depth: shapeDepth,
-          bevelEnabled: false,
-        });
-
-        const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
-        pathMesh.position.set(0, 0, -shapeDepth + this.options.code.depth);
-        pathMesh.rotation.set(0, 0, -Math.PI / 2);
-        pathMesh.updateMatrix();
-
-        spotifyCodeGeometry.merge(pathMesh.geometry, pathMesh.matrix);
+    this.spotifyCodeShapes.forEach((shape, shapeNo) => {
+      let shapeDepth = this.options.code.depth;
+      if (this.options.code.cityMode && shapeNo !== this.spotifyCodeShapes.length - 1) {
+        shapeDepth = Math.min(this.options.code.depth, this.options.code.depthMax) + Math.random() * Math.abs(this.options.code.depthMax - this.options.code.depth);
+      }
+      // Finally we can take each shape and extrude it
+      const pathGeometry = new THREE.ExtrudeGeometry(shape, {
+        steps: 1,
+        depth: shapeDepth,
+        bevelEnabled: false,
       });
+
+      const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
+      pathMesh.position.set(0, 0, -shapeDepth + this.options.code.depth);
+      pathMesh.rotation.set(0, 0, -Math.PI / 2);
+      pathMesh.updateMatrix();
+
+      spotifyCodeGeometry.merge(pathMesh.geometry, pathMesh.matrix);
     });
 
     const spotifyCodeMesh = new THREE.Mesh(spotifyCodeGeometry, this.materialDetail);
@@ -125,7 +114,8 @@ class SpotifyCode3D extends BaseTag3D {
       }
     }
 
-    this.exportedMeshes.push(this.spotifyCodeMesh);
+    this.exportedMeshes.spotifyCode = this.spotifyCodeMesh;
+    this.exportedMeshes.combined = this.getCombinedMesh();
   }
 }
 

@@ -1,22 +1,22 @@
 import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import BaseTag3D from './base';
 import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
 
 /**
- * Class used for generating the 3D model from an html5 canvas that contains the qr code image
- * TODO: Refactor actual qrcode to model translation: integrate canvas into this class or maybe roll own qr code algorithm
+ * Class used for generating the 3D model from a bitmask that contains the QR Code Data.
+ * qrCodeBitmask must be a square number (QR Code of dimensions 21x21 => Bitmask of length 441 (21*21)).
  */
 class QRCode3D extends BaseTag3D {
-  constructor(canvas, options) {
+  constructor(qrCodeBitmask, options) {
     super(options);
-    this.canvas = canvas;
+    this.bitMask = qrCodeBitmask;
+    this.maskWidth = Math.sqrt(this.bitMask.length);
     this.iconMesh = null;
     this.qrcodeMesh = null;
     this.exportedMeshes = super.getPartMeshes();
     // the width of the actual qr code blocks
-    this.blockWidth = (this.availableWidth / this.canvas.width) * (this.options.code.blockSizeMultiplier / 100);
+    this.blockWidth = (this.availableWidth / this.maskWidth) * (this.options.code.blockSizeMultiplier / 100);
   }
 
   /**
@@ -24,28 +24,21 @@ class QRCode3D extends BaseTag3D {
    */
   getIconMesh() {
     const iconGeometry = new THREE.Geometry();
-    const loader = new SVGLoader();
-    const svgMarkup = document.querySelector('#icon-preview').contentDocument.querySelector('svg').outerHTML;
-    const svgData = loader.parse(svgMarkup);
-    // Loop through all of the parsed paths
-    svgData.paths.forEach((path) => {
-      const shapes = path.toShapes(true, true);
-
-      // Each path has array of shapes
-      shapes.forEach((shape) => {
-        // Finally we can take each shape and extrude it
-        const pathGeometry = new THREE.ExtrudeGeometry(shape, {
-          steps: 1,
-          depth: this.options.code.depth,
-          bevelEnabled: false,
-        });
-
-        const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
-        pathMesh.position.set(0, 0, 0);
-        pathMesh.rotation.set(0, 0, -Math.PI / 2);
-        pathMesh.updateMatrix();
-        iconGeometry.merge(pathMesh.geometry, pathMesh.matrix);
+    const shapes = this.options.code.iconShapes.map((sj) => new THREE.Shape().fromJSON(sj));
+    // Each path has array of shapes
+    shapes.forEach((shape) => {
+      // Finally we can take each shape and extrude it
+      const pathGeometry = new THREE.ExtrudeGeometry(shape, {
+        steps: 1,
+        depth: this.options.code.depth,
+        bevelEnabled: false,
       });
+
+      const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
+      pathMesh.position.set(0, 0, 0);
+      pathMesh.rotation.set(0, 0, -Math.PI / 2);
+      pathMesh.updateMatrix();
+      iconGeometry.merge(pathMesh.geometry, pathMesh.matrix);
     });
 
     const iconMesh = new THREE.Mesh(iconGeometry, this.materialDetail);
@@ -78,15 +71,13 @@ class QRCode3D extends BaseTag3D {
    * @return {THREE.Mesh} the mesh of the actual QR-Code segment
    */
   getQRCodeMesh() {
-    const ctx = this.canvas.getContext('2d');
     const qrcodeGeometry = new THREE.Geometry();
     const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialDetail);
     let bspQRMesh = CSG.fromMesh(baseQRMesh);
-    // iterate through pixels in canvas
-    for (let y = 0; y < this.canvas.height; y += 1) {
-      for (let x = 0; x < this.canvas.width; x += 1) {
-        const pixel = ctx.getImageData(x, y, 1, 1).data;
-        const isBlack = pixel[0] === 0;
+    // iterate through pixels in QR Code Bitmask
+    for (let y = 0; y < this.maskWidth; y += 1) {
+      for (let x = 0; x < this.maskWidth; x += 1) {
+        const isBlack = !!this.bitMask[y * this.maskWidth + x];
         if (isBlack) {
           // if pixel is black create a block
           let blockDepth = this.options.code.depth;
@@ -103,11 +94,11 @@ class QRCode3D extends BaseTag3D {
           const qrBlockMesh = new THREE.Mesh(qrBlock, this.materialDetail);
 
           // qr code block positions
-          let blockX = (x / this.canvas.width) * this.availableWidth;
+          let blockX = (x / this.maskWidth) * this.availableWidth;
           blockX -= this.availableWidth / 2;
           blockX += this.blockWidth / 2;
 
-          let blockY = (y / this.canvas.height) * this.availableWidth;
+          let blockY = (y / this.maskWidth) * this.availableWidth;
           blockY -= this.availableWidth / 2;
           blockY += this.blockWidth / 2;
 
@@ -188,7 +179,7 @@ class QRCode3D extends BaseTag3D {
   /**
    * Generates all required meshes of the 3D model and combines them
    */
-  generate3dModel() {
+  async generate3dModel() {
     super.generate3dModel();
 
     if (this.options.code.iconName !== 'none') {
@@ -205,9 +196,11 @@ class QRCode3D extends BaseTag3D {
         this.qrcodeMesh = subtractMesh(this.qrcodeMesh, this.iconMesh);
       }
     } else if (this.iconMesh) {
-      this.exportedMeshes.push(this.iconMesh);
+      this.exportedMeshes.icon = this.iconMesh;
     }
-    this.exportedMeshes.push(this.qrcodeMesh);
+
+    this.exportedMeshes.qrcode = this.qrcodeMesh;
+    this.exportedMeshes.combined = this.getCombinedMesh();
   }
 }
 
