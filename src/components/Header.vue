@@ -25,19 +25,28 @@
       </a>
     </div>
     <div class="navbar-menu" :class="{ 'is-active': navbarOpen }">
+
+    <!-- qrcode2stl Header -->
+    <div v-html="headerAd"></div>
+
       <div class="navbar-end">
-        <div class="navbar-item" v-if="showThankYou">
-          <div class="notification is-danger">
-            <i class="fa fa-heart"></i> <span>{{$t('thankYou')}}</span>
-          </div>
-        </div>
         <div class="navbar-item">
           <LanguageSelector />
         </div>
         <div class="navbar-item">
           <ShareButtons />
         </div>
-        <div class="navbar-item">
+        <div class="navbar-item" v-if="showThankYou">
+          <div class="buttons">
+            <a class="button is-danger" href="https://paypal.me/fstein42" target="_blank" @click="showThanks">
+              <span class="icon">
+                <i class="fa fa-heart"></i>
+              </span>
+              <span>Thank You!</span>
+            </a>
+          </div>
+        </div>
+        <div class="navbar-item" v-if="!showThankYou">
           <div class="buttons">
             <a class="button" href="https://paypal.me/fstein42" target="_blank" @click="showThanks">
               <span class="icon">
@@ -91,6 +100,7 @@ export default {
       appVersion: packageJson.version,
       newVersion: false,
       showShareNotice: false,
+      headerAd: '',
     };
   },
   methods: {
@@ -105,6 +115,9 @@ export default {
       window.localStorage.setItem('lastViewedVersion', this.appVersion);
       this.newVersion = false;
     },
+  },
+  mounted() {
+    this.headerAd = document.getElementById('adsenseloader-header').innerHTML;
   },
   created() {
     const lastViewedVersion = window.localStorage.getItem('lastViewedVersion') || '';
@@ -122,7 +135,7 @@ export default {
 }
 
 .unread {
-  animation: shake-horizontal 1s cubic-bezier(.645,.045,.355,1.000) 2s 1 both;
+  animation: shake-horizontal 1s cubic-bezier(.645,.045,.355,1.000) 1.5s 4;
 }
 
 .shake-vertical {
@@ -131,28 +144,28 @@ export default {
 
 @keyframes shake-horizontal {
   0%,
-  100% {
+  50% {
     -webkit-transform: translateX(0);
             transform: translateX(0);
   }
-  10%,
-  30%,
-  50%,
-  70% {
+  5%,
+  15%,
+  25%,
+  35% {
     -webkit-transform: translateX(-3px);
             transform: translateX(-3px);
   }
+  10%,
   20%,
-  40%,
-  60% {
+  30% {
     -webkit-transform: translateX(3px);
             transform: translateX(3px);
   }
-  80% {
+  40% {
     -webkit-transform: translateX(2px);
             transform: translateX(2px);
   }
-  90% {
+  45% {
     -webkit-transform: translateX(-2px);
             transform: translateX(-2px);
   }

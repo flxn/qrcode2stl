@@ -18,7 +18,7 @@ export default {
   printabilityWarning: 'Warning for 3D printability',
   printabilityWarningBody: 'At least one edge of the smallest element in the 3D model is very small: {dimensions}. Depending on your setup, this could make printing harder.',
   supportMe: 'Support Me',
-  viewOnGithub: 'View on GitHub',
+  viewOnGithub: 'GitHub',
   shareButtonTitle: 'Share this page',
   file: 'file',
   no: 'no',

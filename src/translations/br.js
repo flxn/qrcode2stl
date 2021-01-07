@@ -18,7 +18,7 @@ export default {
   printabilityWarning: 'Aviso sobre impressão 3D',
   printabilityWarningBody: 'Pelo menos um canto do menor elemento no modelo 3D é muito pequeno: {dimensions}. Dependendo das suas configurações, isso pode dificultar a impressão',
   supportMe: 'Me ajude',
-  viewOnGithub: 'Ver no GitHub',
+  viewOnGithub: 'GitHub',
   shareButtonTitle: 'Compartilhe esta página',
   file: 'arquivo',
   no: 'não',

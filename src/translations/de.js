@@ -20,7 +20,7 @@ export default {
   Mindestens ein Block im 3D Modell ist sehr kurz: {dimension}.
   Abhängig von deinem 3D-Drucker und dessen Genauigkeit könnte dies den Druck schwerer machen.`,
   supportMe: 'Unterstütze Mich',
-  viewOnGithub: 'Auf GitHub anschauen',
+  viewOnGithub: 'GitHub',
   shareButtonTitle: 'Teile diese Seite',
   file: 'Datei',
   no: 'Nein',

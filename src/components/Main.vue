@@ -104,6 +104,7 @@
       <vue-markdown :source="changelog" class="content"></vue-markdown>
     </div>
     <ChangelogModal v-if="changelogModalVisible"/>
+    <ExportModal v-if="exportModalVisible"/>
   </div>
 </template>
 
@@ -112,6 +113,7 @@ import VueMarkdown from 'vue-markdown';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import changelog from 'raw-loader!../../CHANGELOG.md';
 import ChangelogModal from './ChangelogModal.vue';
+import ExportModal from './ExportModal.vue';
 import { bus } from '../main';
 import QRCodeMenu from './QRCodeMenu.vue';
 import SpotifyMenu from './SpotifyMenu.vue';
@@ -130,6 +132,7 @@ export default {
     SpotifyMenu,
     PrintGuide,
     ChangelogModal,
+    ExportModal,
     VueMarkdown,
     Promotions,
   },
@@ -141,6 +144,7 @@ export default {
       multipleParts: false,
       changelogModalVisible: false,
       changelog: changelog.split('\n').slice(3).join('\n'),
+      exportModalVisible: false,
       shareData: null,
       isGenerating: false,
     };
@@ -148,6 +152,9 @@ export default {
   created() {
     bus.$on('openChangelogModal', () => { this.changelogModalVisible = true; });
     bus.$on('closeChangelogModal', () => { this.changelogModalVisible = false; });
+    bus.$on('openExportModal', () => { this.exportModalVisible = true; });
+    bus.$on('closeExportModal', () => { this.exportModalVisible = false; });
+
     this.parseUrlShareHash();
   },
   methods: {
@@ -157,11 +164,14 @@ export default {
       this.mode = mode;
     },
     exportSTL() {
-      if (this.mode === 'QR') {
-        this.$refs.qrcode.exportSTL(this.stlType, this.multipleParts);
-      } else if (this.mode === 'Spotify') {
-        this.$refs.spotifycode.exportSTL(this.stlType, this.multipleParts);
-      }
+      this.exportModalVisible = true;
+      setTimeout(() => {
+        if (this.mode === 'QR') {
+          this.$refs.qrcode.exportSTL(this.stlType, this.multipleParts);
+        } else if (this.mode === 'Spotify') {
+          this.$refs.spotifycode.exportSTL(this.stlType, this.multipleParts);
+        }
+      }, 5000);
     },
     parseUrlShareHash() {
       if (window.location.hash.startsWith(shareHashMarker)) {

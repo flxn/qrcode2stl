@@ -18,7 +18,7 @@ export default {
   printabilityWarning: 'Avertissement pour imprimabilité 3D',
   printabilityWarningBody: 'Au moins un bord du plus petit élément du modèle 3D est très petit: {dimensions}. Selon votre configuration, cela pourrait rendre l\'impression plus difficile.',
   supportMe: 'Me soutenir',
-  viewOnGithub: 'Voir sur GitHub',
+  viewOnGithub: 'GitHub',
   shareButtonTitle: 'Partager cette page',
   file: 'fichier',
   no: 'non',
