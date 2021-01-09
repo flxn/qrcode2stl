@@ -11,7 +11,6 @@
     <div class="panel-block">
 
       <div class="products">
-      <div>Buy on Aliexpress</div>
         <a href="https://s.click.aliexpress.com/e/_dVxD78E" target="_blank">
           <img src="https://ae01.alicdn.com/kf/Hb53a0162ce664ab7ad5e98181493d736C.jpg_80x80.jpg" />
           <div class="name">Creality Ender-3 Pro</div>
@@ -81,12 +80,6 @@
           <img src="https://ae01.alicdn.com/kf/H980ed3796a8d49b99eca44ce4fcff0aeB.jpg_80x80.jpg" />
           <div class="name">Smart Filament Sensor</div>
         </a>
-      </div>
-    </div>
-
-    <div class="panel-block">
-      <div class="products">
-        <div>Buy on Amazon.com</div>
 
         <iframe src="//rcm-na.amazon-adsystem.com/e/cm?o=1&p=21&l=ur1&category=amazonhomepage&f=ifr&linkID=49ac362b3178dbb423432ab3a2fe5499&t=flxn-20&tracking_id=flxn-20" width="125" height="125" scrolling="no" border="0" style="border:none; margin: 15px 15px -15px 15px;" frameborder="0"></iframe>
 
