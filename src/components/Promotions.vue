@@ -80,30 +80,6 @@
           <img src="https://ae01.alicdn.com/kf/H980ed3796a8d49b99eca44ce4fcff0aeB.jpg_80x80.jpg" />
           <div class="name">Smart Filament Sensor</div>
         </a>
-
-        <iframe src="//rcm-na.amazon-adsystem.com/e/cm?o=1&p=21&l=ur1&category=amazonhomepage&f=ifr&linkID=49ac362b3178dbb423432ab3a2fe5499&t=flxn-20&tracking_id=flxn-20" width="125" height="125" scrolling="no" border="0" style="border:none; margin: 15px 15px -15px 15px;" frameborder="0"></iframe>
-
-        <a href="https://www.amazon.com/Printer-Filament-SUNLU-Dimensional-Accuracy/dp/B07XG3RM58/ref=as_li_ss_il?dchild=1&keywords=pla+filament&qid=1602628826&sr=8-3&linkCode=li1&tag=flxn-20&linkId=0943663fd64190acfc2056c419e215ae" target="_blank">
-          <img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07XG3RM58&Format=_SL110_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=flxn-20" >
-          <div class="name">SUNLU PLA*</div>
-        </a>
-
-        <a href="https://www.amazon.com/AmazonBasics-Printer-Filament-1-75mm-Black/dp/B07T6WLFML/ref=as_li_ss_il?dchild=1&keywords=amazon+basics+pla+filament&qid=1602629147&sr=8-3&linkCode=li1&tag=flxn-20&linkId=23a0d9fb686722f0fc7ef8ddcbbd401a" target="_blank">
-          <img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07T6WLFML&Format=_SL110_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=flxn-20" >
-          <div class="name">AmazonBasics PLA*</div>
-        </a>
-
-        <a href="https://www.amazon.com/HATCHBOX-3D-Filament-Dimensional-Accuracy/dp/B00J0GMMP6/ref=as_li_ss_il?dchild=1&keywords=pla+filament&qid=1602629698&sr=8-5&linkCode=li1&tag=flxn-20&linkId=d80f5d0bbd7afa6b12bf5e8ada0b8bd0" target="_blank">
-          <img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00J0GMMP6&Format=_SL110_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=flxn-20" >
-          <div class="name">Hatchbox PLA*</div>
-        </a>
-
-        <a href="https://www.amazon.com/Filament-Transparent-Consumables-Dimensional-Accuracy/dp/B07SB761QR/ref=as_li_ss_il?dchild=1&keywords=petg+filament&qid=1602629635&sr=8-4&linkCode=li1&tag=flxn-20&linkId=37b0789743521d9d6c84791ef0f0926d" target="_blank">
-          <img border="0" src="//ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07SB761QR&Format=_SL110_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=flxn-20" >
-          <div class="name">Overture PETG*</div>
-        </a>
-
-        <div>* Various Colors</div>
       </div>
     </div>
 

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - 2021-02-17
+### Added
+- 📃 Support for multiline text: Add as many lines as you want and change the text alignment. You can also apply a different font styling for each line! Lines that are too long will automatically overflow into the next line.
+
 ## [1.7.0] - 2021-01-04
 **Happy 2021 🥳**
 qrcode2stl is now one year old! I started working on the first version in early january 2020 and [posted it publicly](https://www.reddit.com/r/3Dprinting/comments/ergng8/inspired_by_all_the_qr_codes_lately_i_made_a_web/) on Jan 20.
