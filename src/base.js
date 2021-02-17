@@ -124,7 +124,7 @@ class BaseTag3D {
     const fonts = [fontRegular, fontRegularItalic, fontBold, fontBoldItalic];
 
     const textLines = this.options.base.textMessage.trim().split('\n');
-    const numLines = textLines.length;
+    let numLines = textLines.length;
     const lineHeight = numLines > 1 ? 1.55 : 1.2;
 
     for (let i = 0; i < numLines; i += 1) {
@@ -137,21 +137,43 @@ class BaseTag3D {
           break;
         }
       }
-      console.log('emph:', emphLevel);
 
-      const tempTextGeometry = new THREE.TextGeometry(text, {
-        font: fonts[emphLevel],
-        size: this.options.base.textSize,
-        height: this.options.base.textDepth,
-      });
-      const subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
-      const textSize = getBoundingBoxSize(subtitleMesh);
+      let subtitleMesh = null;
+      let textSize = null;
+      let newLineCreated = false;
+      do {
+        const tempTextGeometry = new THREE.TextGeometry(text, {
+          font: fonts[emphLevel],
+          size: this.options.base.textSize,
+          height: this.options.base.textDepth,
+        });
+        subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
+        textSize = getBoundingBoxSize(subtitleMesh);
+        // Check if text width is larger than available width
+        // if true snip off the last character one at a time until it fits
+        if (textSize.x > this.availableWidth) {
+          const lastChar = text[text.length - 1];
+          text = text.substr(0, text.length - 1);
+          if (!newLineCreated) {
+            textLines.splice(i + 1, 0, lastChar);
+            numLines += 1;
+          } else {
+            textLines[i + 1] = lastChar + textLines[i + 1];
+          }
+          newLineCreated = true;
+        }
+      } while (textSize.x > this.availableWidth);
+
+      // recreate emphasis level if overflow occured
+      if (newLineCreated) {
+        textLines[i + 1] = '*'.repeat(emphLevel) + textLines[i + 1] + '*'.repeat(emphLevel);
+      }
+
       // place text at correct position
       const topSide = -this.options.base.height / 2 + this.options.base.textSize / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
       const bottomSide = this.options.base.height / 2 + this.options.base.textSize / 2 + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
       const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
-      // -textSize.x / 2
-      console.log(textSize);
+
       let xAlignment = 0;
       switch (this.options.base.textAlign) {
         case 'left':
@@ -173,6 +195,9 @@ class BaseTag3D {
       textGeometry.merge(subtitleMesh.geometry, subtitleMesh.matrix);
     }
 
+    console.log(textLines);
+    this.options.base.textMessage = textLines.join('\n');
+    console.log(this.options.base.textMessage);
     return new THREE.Mesh(textGeometry, this.materialDetail);
   }
 
@@ -357,19 +382,19 @@ class BaseTag3D {
    * Generates all required meshes of the 3D model
    */
   generate3dModel() {
+    if (this.options.base.hasText) {
+      this.subtitleMesh = this.getSubtitleMesh();
+      if (!this.options.code.invert) {
+        this.exportedMeshes.subtitle = this.subtitleMesh;
+      }
+    }
+
     this.baseMesh = this.getBaseMesh();
     this.exportedMeshes.base = this.baseMesh;
 
     if (this.options.base.hasBorder) {
       this.borderMesh = this.getBorderMesh();
       this.exportedMeshes.border = this.borderMesh;
-    }
-
-    if (this.options.base.hasText) {
-      this.subtitleMesh = this.getSubtitleMesh();
-      if (!this.options.code.invert) {
-        this.exportedMeshes.subtitle = this.subtitleMesh;
-      }
     }
 
     if (this.options.base.hasKeychainAttachment) {
