@@ -178,11 +178,34 @@
               <div class="field-body">
                 <div class="field">
                   <div class="control">
-                    <input
-                      class="input is-small"
+                    <div class="buttons are-small mb-0 is-pulled-right">
+                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'left'}" @click="options.base.textAlign = 'left'">
+                        <span class="icon is-small">
+                          <i class="fas fa-align-left"></i>
+                        </span>
+                      </button>
+                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'center'}" @click="options.base.textAlign = 'center'">
+                        <span class="icon is-small">
+                          <i class="fas fa-align-center"></i>
+                        </span>
+                      </button>
+                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'right'}" @click="options.base.textAlign = 'right'">
+                        <span class="icon is-small">
+                          <i class="fas fa-align-right"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <textarea
+                      class="textarea is-small"
+                      rows=3
                       v-model="options.base.textMessage"
                       :placeholder="$t('theText')"
                     />
+                    <p class="help content">
+                      {{$t('fontInfoText')}}<br/>
+                      <i class="fas fa-italic"></i> {{$t('italicInfoText')}}<br/>
+                      <i class="fas fa-bold"></i> {{$t('boldInfoText')}}<br/>
+                    </p>
                   </div>
                 </div>
               </div>

@@ -32,7 +32,7 @@
           </div>
           <div class="column is-2" v-if="showExport">
             <div class="field">
-              <div class="field-label is-normal">
+              <div class="field-label is-normal has-text-left">
                 <label class="label" :title="$t('exportTypeHelp')">
                   STL {{ $t('file') }}
                   <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>
@@ -55,7 +55,7 @@
           </div>
           <div class="column is-3" v-if="showExport">
             <div class="field">
-              <div class="field-label is-normal">
+              <div class="field-label is-normal has-text-left">
                 <label class="label" :title="$t('exportSeparatePartsHelp')">
                   {{$t('separateParts')}}?
                   <span class="help-icon icon has-text-info"><i class="fas fa-info-circle"></i></span>

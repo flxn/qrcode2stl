@@ -1,5 +1,8 @@
 import * as THREE from 'three';
-import fontDefinitionHelvetikerBold from 'three/examples/fonts/helvetiker_bold.typeface.json';
+import fontInterSemiBold from './assets/fonts/Inter_SemiBold.json';
+import fontInterSemiBoldItalic from './assets/fonts/Inter_SemiBold_Italic.json';
+import fontInterExtraBold from './assets/fonts/Inter_ExtraBold.json';
+import fontInterExtraBoldItalic from './assets/fonts/Inter_ExtraBold_Italic.json';
 import {
   getRoundedRectShape, getCustomRoundedRectShape, subtractMesh, unionMesh, getBoundingBoxSize,
 } from './utils';
@@ -113,24 +116,62 @@ class BaseTag3D {
   getSubtitleMesh() {
     const textGeometry = new THREE.Geometry();
     // create text
-    const fontHelvetikerBold = new THREE.Font(fontDefinitionHelvetikerBold);
-    const tempTextGeometry = new THREE.TextGeometry(this.options.base.textMessage, {
-      font: fontHelvetikerBold,
-      size: this.options.base.textSize,
-      height: this.options.base.textDepth,
-    });
+    const fontRegular = new THREE.Font(fontInterSemiBold);
+    const fontRegularItalic = new THREE.Font(fontInterSemiBoldItalic);
+    const fontBold = new THREE.Font(fontInterExtraBold);
+    const fontBoldItalic = new THREE.Font(fontInterExtraBoldItalic);
 
-    const subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
-    const textSize = getBoundingBoxSize(subtitleMesh);
-    // place text at correct position
-    const topSide = -this.options.base.height / 2 + this.options.base.textSize / 2 - this.options.base.textMargin;
-    const bottomSide = this.options.base.height / 2 + this.options.base.textSize / 2 + this.options.base.textMargin;
-    const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
+    const fonts = [fontRegular, fontRegularItalic, fontBold, fontBoldItalic];
 
-    subtitleMesh.position.set(placement, -textSize.x / 2, this.options.base.depth);
-    subtitleMesh.rotation.set(0, 0, Math.PI / 2);
-    subtitleMesh.updateMatrix();
-    textGeometry.merge(subtitleMesh.geometry, subtitleMesh.matrix);
+    const textLines = this.options.base.textMessage.trim().split('\n');
+    const numLines = textLines.length;
+    const lineHeight = numLines > 1 ? 1.55 : 1.2;
+
+    for (let i = 0; i < numLines; i += 1) {
+      let text = textLines[i];
+      let emphLevel = 0;
+      while (text[0] === '*' && text[text.length - 1] === '*') {
+        text = text.substr(1, text.length - 2);
+        emphLevel += 1;
+        if (emphLevel === 3) {
+          break;
+        }
+      }
+      console.log('emph:', emphLevel);
+
+      const tempTextGeometry = new THREE.TextGeometry(text, {
+        font: fonts[emphLevel],
+        size: this.options.base.textSize,
+        height: this.options.base.textDepth,
+      });
+      const subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
+      const textSize = getBoundingBoxSize(subtitleMesh);
+      // place text at correct position
+      const topSide = -this.options.base.height / 2 + this.options.base.textSize / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
+      const bottomSide = this.options.base.height / 2 + this.options.base.textSize / 2 + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
+      const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
+      // -textSize.x / 2
+      console.log(textSize);
+      let xAlignment = 0;
+      switch (this.options.base.textAlign) {
+        case 'left':
+          xAlignment = -this.availableWidth / 2;
+          break;
+        case 'center':
+          xAlignment = -textSize.x / 2;
+          break;
+        case 'right':
+          xAlignment = -textSize.x + this.availableWidth / 2;
+          break;
+        default:
+          xAlignment = -textSize.x / 2;
+          break;
+      }
+      subtitleMesh.position.set(placement, xAlignment, this.options.base.depth);
+      subtitleMesh.rotation.set(0, 0, Math.PI / 2);
+      subtitleMesh.updateMatrix();
+      textGeometry.merge(subtitleMesh.geometry, subtitleMesh.matrix);
+    }
 
     return new THREE.Mesh(textGeometry, this.materialDetail);
   }
@@ -268,7 +309,9 @@ class BaseTag3D {
 
   getTextBaseOffset() {
     if (this.options.base.hasText) {
-      return this.options.base.textSize + 2 * this.options.base.textMargin;
+      const numLines = this.options.base.textMessage.trim().split('\n').length;
+      const lineHeight = numLines > 1 ? 1.5 : 1.2;
+      return (this.options.base.textSize * numLines * lineHeight) + (2 * this.options.base.textMargin);
     }
     return 0;
   }

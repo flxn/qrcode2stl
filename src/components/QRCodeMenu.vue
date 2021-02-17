@@ -102,6 +102,7 @@ const defaultOptions = {
     textSize: 8,
     textMessage: '',
     textDepth: 1,
+    textAlign: 'center',
     hasKeychainAttachment: false,
     keychainPlacement: 'left',
     keychainHoleDiameter: 6,
