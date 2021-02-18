@@ -32,7 +32,7 @@ export default {
   max: 'max',
   thankYou: 'Thank you very much for the support. You rock!',
   promotionTitle: 'Want to start a new hobby? Looking for a second/third 3d printer?',
-  promotionSubtitle: 'Here are some recommended 3d printers and 3d printer accessories to get you covered. If you want to support the development of this tool please consider using the links below to buy on AliExpress or Amazon.',
+  promotionSubtitle: 'Here are some recommended 3d printers and 3d printer accessories to get you covered. If you want to support the development of this tool please consider using the links below to buy on AliExpress.',
   corner: 'corner',
   isGenerating: 'Generating 3D Model...',
   headerShareNotice: 'Share your code with this URL',

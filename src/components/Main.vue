@@ -90,9 +90,10 @@
           <hr>
         </div>
         <div id="container3d" :class="{ 'is-loading': isGenerating }"></div>
-        <br/>
-        <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
-        <br/>
+        <p class="mt-3">
+          <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
+        </p>
+        <div v-html="modelAd" class="mt-4 has-text-centered"></div>
         <Promotions />
       </div>
     </div>
@@ -147,6 +148,7 @@ export default {
       exportModalVisible: false,
       shareData: null,
       isGenerating: false,
+      modelAd: '',
     };
   },
   created() {
@@ -156,6 +158,9 @@ export default {
     bus.$on('closeExportModal', () => { this.exportModalVisible = false; });
 
     this.parseUrlShareHash();
+  },
+  mounted() {
+    this.modelAd = document.getElementById('adsenseloader-model').innerHTML;
   },
   methods: {
     changeMode(mode) {
@@ -245,7 +250,7 @@ export default {
 }
 
 .field-label {
-  text-align: left;
+  text-align: left !important;
 }
 
 #mode-buttons>button {

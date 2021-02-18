@@ -195,6 +195,7 @@ export default {
             }
           });
         });
+        this.$emit('exportReady', diff(defaultOptions, this.options));
       };
     },
     init3d() {
@@ -297,7 +298,6 @@ export default {
         this.init3d();
         this.setup3dObject();
         this.startAnimation();
-        this.$emit('exportReady', diff(defaultOptions, this.options));
       }, 100);
     },
     exportSTL(stlType, multipleParts) {
