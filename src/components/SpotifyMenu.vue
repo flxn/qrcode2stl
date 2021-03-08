@@ -283,11 +283,11 @@ export default {
     },
     trackGenerateEvent() {
       // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'qrcode2stl', 'Generate', this.getSettingsString()]);
+      window._paq.push(['trackEvent', 'qrcode2stl', 'Generate']);
     },
     trackExportEvent() {
       // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'qrcode2stl', 'Export', this.getSettingsString()]);
+      window._paq.push(['trackEvent', 'qrcode2stl', 'Export']);
     },
     async generate3dModel() {
       this.$emit('generating');
