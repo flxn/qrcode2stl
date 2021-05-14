@@ -9,5 +9,5 @@ export default {
   de: langDE,
   fr: langFR,
   br: langBR,
-  br: langCZ,
+  cz: langCZ,
 };
