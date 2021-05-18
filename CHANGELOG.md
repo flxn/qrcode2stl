@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.8.1] - 2021-05-18
+### Added
+- New language option: Czech. Thank You *Denny005*
+
 ## [1.8.0] - 2021-02-17
 ### Added
 - 📃 Support for multiline text: Add as many lines as you want and change the text alignment. You can also apply a different font styling for each line! Lines that are too long will automatically overflow into the next line.
