@@ -2,7 +2,7 @@ export default {
   //
   //  Local name of the language
   //
-  languageLocalName: 'Česky',
+  languageLocalName: 'Čeština',
 
   //
   // General
@@ -131,7 +131,7 @@ export default {
   keychain: 'Klíčenka',
   keychainHelp: 'Přidat očko na stranu tagu (Například k přidělání na klíčenku).',
   mirrorHoles: 'Zrcadlit očka',
-  mirrorHolesHelp: 'Zrcadlit očka na protější stranu (Například k přidělání pomocí šroubků).',
+  mirrorHolesHelp: 'Zrcadlit očka na protější stranu (Například k zavěšení na zeď pomocí vrutů.).',
   keychainHoleDiameter: 'Průměr očka',
   nfcIndentation: 'NFC/RFID',
   nfcIndentationHelp: 'Přidá zespodu prohlubeň pro vložení NFC/RFID tagu.',
@@ -141,7 +141,7 @@ export default {
   //
   // Export Settings
   //
-  exportTypeHelp: 'Ponechte na "binary" pro zachování nízké velikosti objektu. V případě, že objekt obyysahuje chyby, zkuste změňte toto nastavení.',
+  exportTypeHelp: 'Ponechte na "binary" pro zachování nízké velikosti objektu. V případě, že objekt obsahuje chyby, zkuste změňte toto nastavení.',
   exportSeparatePartsHelp: 'Pokud nastaveno na "Ano", pak je základna a kód uloženy jako dva soubory. Využijte toto nastavení pro dual extrusion. Pravděpodobně budete prohlížečem dotázáni na povolení stáhnutí více souborů.',
   separateParts: 'Oddělit části',
   saveAsButton: 'Stáhnout STL',
@@ -150,13 +150,13 @@ export default {
   // Print Guide
   // with HTML Tags included!
   //
-  printGuideTitle: 'Průvodcem 3D Tiskem',
+  printGuideTitle: 'Průvodce 3D Tiskem',
   printGuideSubtitle: 'Jak vytisknout dvoubarevný QR kód s pomocí jednobarevné tiskárny? (S jedním extruderem.)',
   printGuideWIPInfo: 'This guide is a work in progress.',
   printGuideIntro: `
   Pokud máte tiskárnu s jedním extruderem, je také možno tisknout více barvami. Bude potřeba vyměnit filament po dokončení požadované vrstvy.<br/>
   Tímto způsobem můžeme vytisknout základnu jednou barvou a samotný QR kód barvou druhou.<br/>
-  Díky tomuto bude kód možné přečíst.<br/>
+  Díky tomuto bude kód možné přečíst, jelikož jednobarevný kód by byl nečitelný.<br/>
   Tento porces se liší od Sliceru ke Sliceru.<br/>
   V tomto návodu se budme soustředit na Cura a PrusaSlicer. Neodpovídám za případné škody způsobeny nesprávnou manipulací s tiskárnou nebo Slicerem.<br/>`,
   printGuideSupportWarningTitle: 'Mějte na paměti, že ne všechny tiskárny/firmwary tiskáren podporují tuto funkci!',
@@ -170,7 +170,7 @@ export default {
   <li>Upravte 3D model v záložce "Možnosti 3D Modelu".</li>
   <li>Klikněte na "Generovat 3D Model"</li>
   <li>Stáhněte STL soubor kliknutím na "Stáhnout STL" vpravo nahoře.</li>`,
-  printGuideVersionDisclaimer: 'Verze {version}, se mohou lišit.',
+  printGuideVersionDisclaimer: 'Verze {version}, vzhled od vaší verze se může lišit.',
   // Cura
   printGuideCuraStep1: `
   Vyberte vrstvu, ve které chcete výměnu provést.<br/>
@@ -190,7 +190,7 @@ export default {
   <li>Reslicujte svůj model.</li>`,
   printGuideStep3: `
   Můžete vytisknout model, jako při každém tisku.<br/>
-  3D tiksárna se sama pozastaví a vyčká na zeměnu filametu.
+  3D tiksárna se sama pozastaví a vyčká na změnu filametu.
   Po výměně filamentu bude tiskárna pokračovat v tisku.`,
 
 };
