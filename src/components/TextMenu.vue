@@ -529,7 +529,7 @@ const defaultOptions = {
     borderDepth: 1,
     hasText: true,
     textPlacement: 'center',
-    textMargin: 0,
+    textMargin: 3,
     textSize: 8,
     textMessage: '',
     textDepth: 1,

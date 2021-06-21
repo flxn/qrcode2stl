@@ -190,13 +190,13 @@ class BaseTag3D {
       let xAlignment = 0;
       switch (this.options.base.textAlign) {
         case 'left':
-          xAlignment = -this.availableWidth / 2;
+          xAlignment = -this.availableWidth / 2 + this.options.base.textMargin;
           break;
         case 'center':
           xAlignment = -textSize.x / 2;
           break;
         case 'right':
-          xAlignment = -textSize.x + this.availableWidth / 2;
+          xAlignment = -textSize.x + this.availableWidth / 2 - this.options.base.textMargin;
           break;
         default:
           xAlignment = -textSize.x / 2;
@@ -392,7 +392,7 @@ class BaseTag3D {
   /**
    * Generates all required meshes of the 3D model
    */
-  generate3dModel() {
+  async generate3dModel() {
     if (this.options.base.hasText) {
       this.subtitleMesh = this.getSubtitleMesh();
       if (!this.options.code.invert) {
