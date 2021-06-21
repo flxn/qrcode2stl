@@ -34,22 +34,7 @@
             <div class="field-body">
               <div class="field has-addons">
                 <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.width" @change="options.base.height = options.base.width * 0.25" />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label">{{$t('height')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.height" :title="$t('spotifyCodeHeightInfo')"/>
+                  <input class="input is-small" type="number" v-model.number="options.base.width" @change="options.base.height = options.base.width" />
                 </div>
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>
@@ -218,7 +203,8 @@
                     />
                     <p class="help content">
                       {{$t('fontInfoText')}}<br/>
-                      <i class="fas fa-italic"></i> {{$t('italicInfoText')}} <i class="fas fa-bold"></i> {{$t('boldInfoText')}}<br/>
+                      <i class="fas fa-italic"></i> {{$t('italicInfoText')}}<br/>
+                      <i class="fas fa-bold"></i> {{$t('boldInfoText')}}<br/>
                     </p>
                   </div>
                 </div>
@@ -360,7 +346,7 @@
           <!-- NFC Tag Section -->
           <div class="field is-horizontal">
             <div class="field-label is-small">
-              <label class="label">{{$t('nfcIndentation')}}</label> <span class="tag is-danger is-light">NEW</span>
+              <label class="label">{{$t('nfcIndentation')}}</label>
             </div>
             <div class="field-body">
               <div class="control">
@@ -454,7 +440,7 @@
         <!-- Right Column -->
         <div class="column">
           <div class="model-options-title">
-            <div class="title is-size-5">Spotify Code</div>
+            <div class="title is-size-5">QR Code</div>
           </div>
           <div class="field is-horizontal">
             <div class="field-label is-small">
@@ -498,6 +484,114 @@
                 <p class="control">
                   <a class="button is-static is-small">{{unit}}</a>
                 </p>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('block')}} {{$t('size')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.code.blockSizeMultiplier"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">%</a>
+                </p>
+                <span
+                  class="help-icon icon has-text-info"
+                  :title="$t('blockSizeHelp')">
+                  <i class="fas fa-info-circle"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Icon Settings -->
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('icon')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <div class="dropdown is-hoverable">
+                    <div class="dropdown-trigger">
+                      <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu2">
+                        <span class="icon is-small">
+                          <i class="fa fa-icons" aria-hidden="true"></i>
+                        </span>
+                        <span>{{options.code.iconName}}</span>
+                        <span class="icon is-small">
+                          <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu2" role="menu">
+                      <div class="dropdown-content" id="dropdown-content2">
+                        <div class="columns is-multiline">
+                          <div class="column is-4">
+                            <div class="no-icon icon-item dropdown-item is-vcentered" @click="iconSelected('none')">
+                              <span class="title is-size-7">{{$t('noIcon')}}</span>
+                            </div>
+                          </div>
+                          <div class="column is-4" v-for="icon in icons" :key="icon">
+                            <div class="icon-item dropdown-item is-vcentered" @click="iconSelected(icon)">
+                              <img width="18" height="18" :src="'icons/' + icon + '.svg'" loading="lazy" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <object
+                    type="image/svg+xml"
+                    id="icon-preview"
+                    width="32"
+                    height="32"
+                    :data="'icons/' + options.code.iconName + '.svg'"
+                    v-if="options.code.iconName !== 'none'"
+                  />
+                  <div class="is-size-7" v-if="options.code.iconName !== 'none'">
+                    Icons by Fontawesome
+                    <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
+                    <br/>
+                    <p class="has-text-danger">
+                      This is a beta feature.<br/>
+                      Error Correction will be set to high if you use icons.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal" v-if="options.code.iconName !== 'none'">
+            <div class="field-label is-small">
+              <label class="label">{{$t('icon')}} {{$t('size')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <input
+                    class="input is-small"
+                    type="number"
+                    v-model.number="options.code.iconSizeRatio"
+                  />
+                </div>
+                <p class="control">
+                  <a class="button is-static is-small">%</a>
+                </p>
+                <span
+                  class="help-icon icon has-text-info"
+                  :title="$t('iconSizeHelp')"
+                >
+                  <i class="fas fa-info-circle"></i>
+                </span>
               </div>
             </div>
           </div>
@@ -559,15 +653,54 @@
 
 <script>
 export default {
-  name: 'QRCode3DOptionsPanel',
+  name: 'QRCodeModelOptionsPanel',
   props: {
     options: Object,
     unit: String,
   },
   data() {
-    return {};
+    return {
+      icons: [
+        'wifi',
+        'user',
+        'user-plus',
+        'key',
+        'mouse-pointer',
+        'globe',
+        'bookmark',
+        'bubble',
+        'marker',
+        'map',
+        'envelope',
+        'facebook',
+        'linkedin',
+        'twitter',
+        'paypal',
+        'share',
+        'share-alt',
+        'calendar',
+        'phone',
+        'music',
+        'play',
+        'exclamation',
+        'info',
+        'home',
+        'heart',
+        'check',
+        'lightbulb',
+        'star',
+        'thumbs-up',
+        'thumbs-down',
+        'bolt',
+        'moon',
+      ],
+    };
   },
-  methods: {},
+  methods: {
+    iconSelected(icon) {
+      this.options.code.iconName = icon;
+    },
+  },
 };
 </script>
 

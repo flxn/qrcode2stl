@@ -4,7 +4,7 @@
     <!-- QR Code Options -->
     <QRCodeOptionsPanel :options="options" />
     <!-- 3D Options -->
-    <QRCode3DOptionsPanel :options="options" :unit="unit" />
+    <QRCodeModelOptionsPanel :options="options" :unit="unit" />
 
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
@@ -38,8 +38,6 @@
 
 <script>
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 
 import qrcode from 'qrcode';
@@ -50,7 +48,9 @@ import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
 import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
 // 3D settings panel
-import QRCode3DOptionsPanel from './QRCode3DOptionsPanel.vue';
+import QRCodeModelOptionsPanel from './QRCodeModelOptionsPanel.vue';
+
+import { save, saveAsString, saveAsArrayBuffer } from '../utils';
 
 const defaultOptions = {
   activeTabIndex: 0,
@@ -130,16 +130,17 @@ export default {
   name: 'QRCodeMenu',
   props: {
     initData: Object,
+    scene: Object,
+    exporter: Object,
   },
   components: {
     QRCodeOptionsPanel,
-    QRCode3DOptionsPanel,
+    QRCodeModelOptionsPanel,
   },
   data() {
     return {
       options: JSON.parse(JSON.stringify(defaultOptions)),
       qrCodeBitMask: null,
-      exporter: null,
       unit: 'mm',
       mesh: null,
       baseMesh: null,
@@ -150,11 +151,6 @@ export default {
       keychainAttachmentMesh: null,
       stlType: 'binary',
       dualExtrusion: false,
-      camera: null,
-      scene: null,
-      renderer: null,
-      animationFrameId: null,
-      animationTimer: null,
       blockWidth: null,
       blockHeight: null,
       isGenerating: false,
@@ -169,10 +165,10 @@ export default {
         if (event.data.type !== 'result') {
           return;
         }
+        this.$emit('resetScene');
         const jsonLoader = new THREE.ObjectLoader();
         const { meshes } = event.data;
         let i = 0;
-        console.log(meshes);
         Object.keys(meshes).forEach((key) => {
           jsonLoader.parse(meshes[key], (parsed) => {
             meshes[key] = parsed;
@@ -195,80 +191,12 @@ export default {
         this.$emit('exportReady', diff(defaultOptions, this.options));
       };
     },
-    init3d() {
-      this.reset3d();
-      const container = document.getElementById('container3d');
-
-      this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0xa0a0a0);
-      this.scene.rotation.z = -Math.PI / 2;
-
-      // LIGHTS
-      const ambientLight = new THREE.AmbientLight(0x333333);
-      const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
-      directionalLight.position.x = -1;
-      directionalLight.position.y = 0;
-      directionalLight.position.z = 1;
-      this.scene.add(ambientLight);
-      this.scene.add(directionalLight);
-
-      const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
-      grid.material.opacity = 0.2;
-      grid.material.transparent = true;
-      grid.rotation.x = Math.PI / 2;
-      this.scene.add(grid);
-
-      this.camera = new THREE.PerspectiveCamera(
-        50,
-        container.clientWidth / container.clientHeight,
-        1,
-        1000,
-      );
-      this.camera.position.set(0, 0, 200);
-
-      this.renderer = new THREE.WebGLRenderer({ antialias: true });
-      this.renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(this.renderer.domElement);
-      const controls = new OrbitControls(this.camera, this.renderer.domElement);
-      controls.target.set(0, 0, 0);
-      controls.update();
-    },
-    reset3d() {
-      clearTimeout(this.animationTimer);
-      cancelAnimationFrame(this.animationFrameId);
-      this.scene = null;
-      this.mesh = null;
-      this.camera = null;
-      this.scene = null;
-      this.renderer = null;
-      const elem = document.getElementById('container3d');
-      while (elem.lastChild) elem.removeChild(elem.lastChild);
-    },
     setup3dObject() {
       modelWorker.send({
         mode: 'QR',
         qrCodeBitMask: this.qrCodeBitMask,
         options: this.options,
       });
-    },
-    startAnimation() {
-      const animate = () => {
-        // limit animation to 60 FPS
-        this.animationTimer = setTimeout(() => {
-          this.animationFrameId = requestAnimationFrame(animate);
-        }, 1000 / 60);
-        this.renderer.render(this.scene, this.camera);
-      };
-      animate();
-    },
-    getSettingsString() {
-      let settingsString = '';
-      Object.keys(this.options).forEach((topLevelKey) => {
-        Object.keys(this.options[topLevelKey]).forEach((subLevelKey) => {
-          settingsString += `${topLevelKey}_${subLevelKey}:${this.options[topLevelKey][subLevelKey]} `;
-        });
-      });
-      return settingsString;
     },
     trackGenerateEvent() {
       // eslint-disable-next-line no-underscore-dangle
@@ -323,10 +251,9 @@ export default {
       }
 
       setTimeout(() => {
-        this.init3d();
+        // this.init3d();
         this.setup3dObject();
-        this.startAnimation();
-        console.log(defaultOptions, this.options);
+        // this.startAnimation();
       }, 100);
     },
     exportSTL(stlType, multipleParts) {
@@ -369,34 +296,17 @@ export default {
 
         zip.generateAsync({ type: 'blob' })
           .then((content) => {
-            this.save(new Blob([content]), `qrcode2stl-${timestamp}.zip`);
+            save(new Blob([content]), `qrcode2stl-${timestamp}.zip`);
           });
       } else {
         const filename = `combined-${timestamp}.stl`;
         const result = this.exporter.parse(this.mesh, { binary: exportAsBinary });
         if (exportAsBinary) {
-          this.saveArrayBuffer(result, filename);
+          saveAsArrayBuffer(result, filename);
         } else {
-          this.saveString(result, filename);
+          saveAsString(result, filename);
         }
       }
-    },
-    save(blob, filename) {
-      const link = document.createElement('a');
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-    },
-    saveString(text, filename) {
-      this.save(new Blob([text], { type: 'text/plain' }), filename);
-    },
-    saveArrayBuffer(buffer, filename) {
-      this.save(
-        new Blob([buffer], { type: 'application/octet-stream' }),
-        filename,
-      );
     },
     wifiQREscape(str) {
       const regex = /([:|\\|;|,|"])/gm;
@@ -473,10 +383,7 @@ export default {
     },
   },
   async mounted() {
-    this.init3d();
     this.initWorker();
-    this.exporter = new STLExporter();
-    this.startAnimation();
     if (this.initData && this.initData.mode === 'QR') {
       delete this.initData.mode;
       this.options = merge(this.options, this.initData);

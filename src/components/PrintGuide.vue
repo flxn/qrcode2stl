@@ -1,81 +1,101 @@
 <template>
   <section id="printguide" class="section">
-    <div class="container">
-      <h1 class="title is-1">
-        <i class="fa fa-book"></i> {{$t('printGuideTitle')}}
-      </h1>
-      <h2 class="subtitle">
-        {{$t('printGuideSubtitle')}}
-      </h2>
-      <hr/>
-      <p v-html="$t('printGuideIntro')">
-      </p>
-      <br/>
-      <div class="notification is-warning is-light">
-        <i class="fa fa-exclamation-triangle"></i> <strong>{{$t('printGuideSupportWarningTitle')}}</strong><br/>
-        <span v-html="$t('printGuideSupportWarningMessage')"></span>
+    <div class="columns">
+      <div class="column is-2">
+        <div v-html="banner1" style="margin-top: 120px"></div>
+        <div v-html="banner2" style="margin-top: 600px"></div>
       </div>
+      <div class="column is-8">
 
-      <!-- General -->
-      <hr/>
-      <h3 class="title is-2">
-        {{$t('printGuideGenerateQRCode')}}
-      </h3>
-      <div class="columns">
-        <div class="column is-8">
-          <img src="../assets/printguide/generate_code.gif" alt="configure the qrcode exporter" loading="lazy">
+        <h1 class="title is-1">
+          <i class="fa fa-book"></i> {{$t('printGuideTitle')}}
+        </h1>
+        <h2 class="subtitle">
+          {{$t('printGuideSubtitle')}}
+        </h2>
+        <hr/>
+        <p v-html="$t('printGuideIntro')">
+        </p>
+        <br/>
+        <div class="notification is-warning is-light">
+          <i class="fa fa-exclamation-triangle"></i> <strong>{{$t('printGuideSupportWarningTitle')}}</strong><br/>
+          <span v-html="$t('printGuideSupportWarningMessage')"></span>
         </div>
-        <div class="column is-4">
-          <ol type="1" style="margin-left: 20px" v-html="$t('printGuideGenerateQRCodeSteps')"></ol>
-        </div>
-      </div>
 
-      <!-- Cura Guide -->
-      <hr/>
-      <h3 class="title is-2">
-        Cura
-      </h3>
-      <p class="subtitle">
-        ({{$t('printGuideVersionDisclaimer', {version: '4.4.1'} )}})
-      </p>
-      <div class="columns">
-        <div class="column">
-          <img src="../assets/printguide/cura_layers.gif" alt="find the layer where the color change should happen" loading="lazy">
-          <p v-html="$t('printGuideCuraStep1')"></p>
+        <!-- General -->
+        <hr/>
+        <h3 class="title is-2">
+          {{$t('printGuideGenerateQRCode')}}
+        </h3>
+        <div class="columns">
+          <div class="column is-8">
+            <img src="../assets/printguide/generate_code.gif" alt="configure the qrcode exporter" loading="lazy">
+          </div>
+          <div class="column is-4">
+            <ol type="1" style="margin-left: 20px" v-html="$t('printGuideGenerateQRCodeSteps')"></ol>
+          </div>
         </div>
-        <div class="column">
-          <img src="../assets/printguide/cura_add_postprocessing.gif" alt="set up the postprocessing script" loading="lazy">
-          <ol type="1" v-html="$t('printGuideCuraStep2')"></ol>
-        </div>
-      </div>
-      <p v-html="$t('printGuideStep3')"></p>
 
-      <!-- PrusaSlicer Guide -->
-      <hr/>
-      <h3 class="title is-2">
-        PrusaSlicer
-      </h3>
-      <p class="subtitle">
-        ({{$t('printGuideVersionDisclaimer', {version: '2.1.1'} )}})
-      </p>
-      <div class="columns">
-        <div class="column">
-          <img src="../assets/printguide/prusa_layers.gif" alt="find the layer where the color change should happen" loading="lazy">
-          <p v-html="$t('printGuidePrusaSlicerStep1')"></p>
+        <!-- Cura Guide -->
+        <hr/>
+        <h3 class="title is-2">
+          Cura
+        </h3>
+        <p class="subtitle">
+          ({{$t('printGuideVersionDisclaimer', {version: '4.4.1'} )}})
+        </p>
+        <div class="columns">
+          <div class="column">
+            <img src="../assets/printguide/cura_layers.gif" alt="find the layer where the color change should happen" loading="lazy">
+            <p v-html="$t('printGuideCuraStep1')"></p>
+          </div>
+          <div class="column">
+            <img src="../assets/printguide/cura_add_postprocessing.gif" alt="set up the postprocessing script" loading="lazy">
+            <ol type="1" v-html="$t('printGuideCuraStep2')"></ol>
+          </div>
         </div>
-        <div class="column">
-          <img src="../assets/printguide/prusa_add_filament_change.gif" alt="set up the filament change" loading="lazy">
-          <ol type="1" v-html="$t('printGuidePrusaSlicerStep2')"></ol>
+        <p v-html="$t('printGuideStep3')"></p>
+
+        <!-- PrusaSlicer Guide -->
+        <hr/>
+        <h3 class="title is-2">
+          PrusaSlicer
+        </h3>
+        <p class="subtitle">
+          ({{$t('printGuideVersionDisclaimer', {version: '2.1.1'} )}})
+        </p>
+        <div class="columns">
+          <div class="column">
+            <img src="../assets/printguide/prusa_layers.gif" alt="find the layer where the color change should happen" loading="lazy">
+            <p v-html="$t('printGuidePrusaSlicerStep1')"></p>
+          </div>
+          <div class="column">
+            <img src="../assets/printguide/prusa_add_filament_change.gif" alt="set up the filament change" loading="lazy">
+            <ol type="1" v-html="$t('printGuidePrusaSlicerStep2')"></ol>
+          </div>
         </div>
+        <p v-html="$t('printGuideStep3')"></p>
       </div>
-      <p v-html="$t('printGuideStep3')"></p>
     </div>
   </section>
 </template>
 
 <script>
-export default {
+import { getRandomBanner } from '../utils';
 
+export default {
+  data() {
+    return {
+      banner1: '',
+      banner2: '',
+      banner3: '',
+    };
+  },
+  mounted() {
+    this.banner1 = getRandomBanner('300x600');
+    this.banner2 = getRandomBanner('300x600');
+    this.banner3 = getRandomBanner('300x600');
+  },
 };
 </script>
 

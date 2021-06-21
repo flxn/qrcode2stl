@@ -17,7 +17,7 @@ export default {
   scrollDownForGuide: 'Faites défiler vers le bas pour voir comment imprimer votre QR Code.',
   printabilityWarning: 'Avertissement pour imprimabilité 3D',
   printabilityWarningBody: 'Au moins un bord du plus petit élément du modèle 3D est très petit: {dimensions}. Selon votre configuration, cela pourrait rendre l\'impression plus difficile.',
-  supportMe: 'Me soutenir',
+  supportMe: 'Soutenir qrcode2stl',
   viewOnGithub: 'GitHub',
   shareButtonTitle: 'Partager cette page',
   file: 'fichier',

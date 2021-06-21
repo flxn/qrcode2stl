@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.9.0] - 2021-06-21
+### Added
+- ✍ You can now skip the QR Code and just create a text tag!
+
 ## [1.8.1] - 2021-05-18
 ### Added
 - New language option: Czech. Thank You *Denny005*

@@ -19,7 +19,7 @@ export default {
   printabilityWarningBody: `
   Mindestens ein Block im 3D Modell ist sehr kurz: {dimension}.
   Abhängig von deinem 3D-Drucker und dessen Genauigkeit könnte dies den Druck schwerer machen.`,
-  supportMe: 'Unterstütze Mich',
+  supportMe: 'Unterstütze qrcode2stl',
   viewOnGithub: 'GitHub',
   shareButtonTitle: 'Teile diese Seite',
   file: 'Datei',

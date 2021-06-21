@@ -71,7 +71,13 @@ class BaseTag3D {
 
     if (textBaseOffset > 0) {
       // shift base in x direction to align with text
-      const textPlacementOffset = (this.options.base.textPlacement === 'top' ? -textBaseOffset : textBaseOffset) / 2;
+      let textPlacementOffset = textBaseOffset / 2;
+      if (this.options.base.textPlacement === 'top') {
+        textPlacementOffset = -textBaseOffset / 2;
+      } else if (this.options.base.textPlacement === 'center') {
+        textPlacementOffset = 0;
+      }
+
       baseMesh.position.x = textPlacementOffset;
     }
     baseMesh.updateMatrix();
@@ -172,7 +178,14 @@ class BaseTag3D {
       // place text at correct position
       const topSide = -this.options.base.height / 2 + this.options.base.textSize / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
       const bottomSide = this.options.base.height / 2 + this.options.base.textSize / 2 + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
-      const placement = this.options.base.textPlacement === 'top' ? topSide : bottomSide;
+      const center = (numLines > 1 ? -numLines * (this.options.base.textSize / 2) : 0) + this.options.base.textSize / 2 + this.options.base.textSize * i * lineHeight;
+
+      let placement = bottomSide;
+      if (this.options.base.textPlacement === 'top') {
+        placement = topSide;
+      } else if (this.options.base.textPlacement === 'center') {
+        placement = center;
+      }
 
       let xAlignment = 0;
       switch (this.options.base.textAlign) {
@@ -195,9 +208,7 @@ class BaseTag3D {
       textGeometry.merge(subtitleMesh.geometry, subtitleMesh.matrix);
     }
 
-    console.log(textLines);
     this.options.base.textMessage = textLines.join('\n');
-    console.log(this.options.base.textMessage);
     return new THREE.Mesh(textGeometry, this.materialDetail);
   }
 
@@ -333,7 +344,7 @@ class BaseTag3D {
   }
 
   getTextBaseOffset() {
-    if (this.options.base.hasText) {
+    if (this.options.base.hasText && this.options.base.textPlacement !== 'center') {
       const numLines = this.options.base.textMessage.trim().split('\n').length;
       const lineHeight = numLines > 1 ? 1.5 : 1.2;
       return (this.options.base.textSize * numLines * lineHeight) + (2 * this.options.base.textMargin);
@@ -401,6 +412,8 @@ class BaseTag3D {
       this.keychainAttachmentMesh = this.getKeychainAttachmentMesh();
       this.exportedMeshes.keychainAttachment = this.keychainAttachmentMesh;
     }
+
+    this.exportedMeshes.combined = this.getCombinedMesh();
   }
 }
 

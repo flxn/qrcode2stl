@@ -17,7 +17,7 @@ export default {
   scrollDownForGuide: 'Návod na tisk QR kódů níže.',
   printabilityWarning: 'Varování tisknutelnosti',
   printabilityWarningBody: 'Nejméně jedna hrana nejmenšího prvku ve 3D modelu je příliš malá: {dimensions}. V závislosti na Vašem nastavení by toto udělalo tisk obtížnější.',
-  supportMe: 'Podpořte mě',
+  supportMe: 'Podpořte qrcode2stl',
   viewOnGithub: 'GitHub',
   shareButtonTitle: 'Sdílet tuto stránku',
   file: 'soubor',

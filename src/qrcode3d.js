@@ -77,7 +77,7 @@ class QRCode3D extends BaseTag3D {
     // iterate through pixels in QR Code Bitmask
     for (let y = 0; y < this.maskWidth; y += 1) {
       for (let x = 0; x < this.maskWidth; x += 1) {
-        const isBlack = !!this.bitMask[y * this.maskWidth + x];
+        const isBlack = !!this.bitMask[x * this.maskWidth + y];
         if (isBlack) {
           // if pixel is black create a block
           let blockDepth = this.options.code.depth;

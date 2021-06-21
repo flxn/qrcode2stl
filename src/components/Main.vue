@@ -17,11 +17,18 @@
             </span>
             <span>Spotify Code</span>
           </button>
+          <button class="button is-large" :class="{'is-primary': mode === 'Text'}" @click="changeMode('Text')">
+            <span class="icon is-medium">
+              <i class="fa fa-font"></i>
+            </span>
+            <span>Text</span>
+          </button>
         </div>
         <hr />
         <!-- Menus for modes -->
-        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady"/>
-        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady"/>
+        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
+        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
+        <TextMenu v-if="mode === 'Text'" ref="text" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
 
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
@@ -110,6 +117,9 @@
 </template>
 
 <script>
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import VueMarkdown from 'vue-markdown';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import changelog from 'raw-loader!../../CHANGELOG.md';
@@ -118,8 +128,10 @@ import ExportModal from './ExportModal.vue';
 import { bus } from '../main';
 import QRCodeMenu from './QRCodeMenu.vue';
 import SpotifyMenu from './SpotifyMenu.vue';
+import TextMenu from './TextMenu.vue';
 import PrintGuide from './PrintGuide.vue';
 import Promotions from './Promotions.vue';
+import { getRandomBanner } from '../utils';
 
 const shareHashMarker = '#share';
 
@@ -131,6 +143,7 @@ export default {
   components: {
     QRCodeMenu,
     SpotifyMenu,
+    TextMenu,
     PrintGuide,
     ChangelogModal,
     ExportModal,
@@ -149,6 +162,13 @@ export default {
       shareData: null,
       isGenerating: false,
       modelAd: '',
+      exporter: null,
+      camera: null,
+      scene: null,
+      renderer: null,
+      animationFrameId: null,
+      animationTimer: null,
+      adblockEnabled: false,
     };
   },
   created() {
@@ -160,13 +180,102 @@ export default {
     this.parseUrlShareHash();
   },
   mounted() {
-    this.modelAd = document.getElementById('adsenseloader-model').innerHTML;
+    // eslint-disable-next-line camelcase
+    if (typeof __google_ad_urls === 'undefined') {
+      this.adblockEnabled = true;
+      this.modelAd = getRandomBanner('728x90');
+    } else {
+      this.modelAd = document.getElementById('adsenseloader-model').innerHTML;
+    }
+    this.initScene();
+    this.startAnimation();
+    this.exporter = new STLExporter();
   },
   methods: {
     changeMode(mode) {
       window.location.hash = '';
       this.shareData = null;
       this.mode = mode;
+    },
+    initLights() {
+      // LIGHTS
+      const ambientLight = new THREE.AmbientLight(0x333333);
+      this.scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
+      directionalLight.position.x = -1;
+      directionalLight.position.y = 0;
+      directionalLight.position.z = 1;
+      this.scene.add(directionalLight);
+
+      const directionalLightBack = new THREE.DirectionalLight(0xaaaaaa, 0.3);
+      directionalLightBack.position.x = -0.6;
+      directionalLightBack.position.y = 0;
+      directionalLightBack.position.z = -1;
+      this.scene.add(directionalLightBack);
+    },
+    initScene() {
+      clearTimeout(this.animationTimer);
+      cancelAnimationFrame(this.animationFrameId);
+      this.scene = null;
+      this.mesh = null;
+      this.camera = null;
+      this.scene = null;
+      this.renderer = null;
+      const elem = document.getElementById('container3d');
+      while (elem.lastChild) elem.removeChild(elem.lastChild);
+
+      const container = document.getElementById('container3d');
+
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0xa0a0a0);
+      this.scene.rotation.z = -Math.PI / 2;
+
+      this.initLights();
+
+      const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
+      grid.material.opacity = 0.2;
+      grid.material.transparent = true;
+      grid.rotation.x = Math.PI / 2;
+      this.scene.add(grid);
+
+      this.camera = new THREE.PerspectiveCamera(
+        50,
+        container.clientWidth / container.clientHeight,
+        1,
+        1000,
+      );
+      this.camera.position.set(0, 0, 200);
+
+      this.renderer = new THREE.WebGLRenderer({ antialias: true });
+      this.renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(this.renderer.domElement);
+      const controls = new OrbitControls(this.camera, this.renderer.domElement);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    },
+    resetScene() {
+      while (this.scene.children.length > 0) {
+        this.scene.remove(this.scene.children[0]);
+      }
+
+      this.initLights();
+
+      const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
+      grid.material.opacity = 0.2;
+      grid.material.transparent = true;
+      grid.rotation.x = Math.PI / 2;
+      this.scene.add(grid);
+    },
+    startAnimation() {
+      const animate = () => {
+        // limit animation to 60 FPS
+        this.animationTimer = setTimeout(() => {
+          this.animationFrameId = requestAnimationFrame(animate);
+        }, 1000 / 60);
+        this.renderer.render(this.scene, this.camera);
+      };
+      animate();
     },
     exportSTL() {
       this.exportModalVisible = true;
@@ -175,6 +284,8 @@ export default {
           this.$refs.qrcode.exportSTL(this.stlType, this.multipleParts);
         } else if (this.mode === 'Spotify') {
           this.$refs.spotifycode.exportSTL(this.stlType, this.multipleParts);
+        } else if (this.mode === 'Text') {
+          this.$refs.text.exportSTL(this.stlType, this.multipleParts);
         }
       }, 5000);
     },
@@ -183,7 +294,7 @@ export default {
         const rawShareData = window.location.hash.substring(shareHashMarker.length).split('-');
         // eslint-disable-next-line prefer-destructuring
         const mode = rawShareData[0];
-        if (mode !== 'Spotify' && mode !== 'QR') {
+        if (mode !== 'Spotify' && mode !== 'QR' && mode !== 'Text') {
           return;
         }
         this.mode = mode;
@@ -197,10 +308,14 @@ export default {
       }
     },
     exportReady(options) {
-      console.log('Options Ready:', options);
       this.showExport = true;
-      window.location.hash = `${shareHashMarker}${this.mode}-${btoa(JSON.stringify(options))}`;
-      this.isGenerating = false;
+      try {
+        window.location.hash = `${shareHashMarker}${this.mode}-${btoa(JSON.stringify(options))}`;
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isGenerating = false;
+      }
       bus.$emit('exportReady');
     },
   },
