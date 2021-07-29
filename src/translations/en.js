@@ -36,6 +36,9 @@ export default {
   corner: 'corner',
   isGenerating: 'Generating 3D Model...',
   headerShareNotice: 'Share your code with this URL',
+  copyExistingQRCode: 'Copy an existing QR Code',
+  holdQRCodeInView: 'Hold the QR Code into view of the camera',
+  decodedQRCodeData: 'Decoded QR Code data',
 
   //
   // QR Code Options Panel

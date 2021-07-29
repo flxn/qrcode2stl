@@ -1,6 +1,6 @@
 {
   "name": "qrcode2stl",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -24,6 +24,7 @@
     "vue": "^2.6.11",
     "vue-i18n": "^8.18.2",
     "vue-markdown": "^2.2.4",
+    "vue-qrcode-reader": "^3.0.3",
     "worker-plugin": "^5.0.0"
   },
   "devDependencies": {

@@ -1,8 +1,19 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 <template>
   <div id="qrcodeMenu">
+
+    <button
+      class="button is-info is-medium is-fullwidth mb-3"
+      @click="openQRScanner">
+      <span class="icon">
+        <i class="fa fa-camera"></i>
+      </span>
+      <span>{{$t('copyExistingQRCode')}}</span>
+    </button>
+
     <!-- QR Code Options -->
     <QRCodeOptionsPanel :options="options" />
+
     <!-- 3D Options -->
     <QRCodeModelOptionsPanel :options="options" :unit="unit" />
 
@@ -33,13 +44,14 @@
         <img id="qr-image"/>
       </figure>
     </div>
+
+    <ScannerModal v-if="scannerModalVisible" @decode="onDecode"/>
   </div>
 </template>
 
 <script>
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import { diff } from 'deep-object-diff';
@@ -49,7 +61,8 @@ import modelWorker from '@/model-worker';
 import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
 // 3D settings panel
 import QRCodeModelOptionsPanel from './QRCodeModelOptionsPanel.vue';
-
+import ScannerModal from './ScannerModal.vue';
+import { bus } from '../main';
 import { save, saveAsString, saveAsArrayBuffer } from '../utils';
 
 const defaultOptions = {
@@ -136,6 +149,7 @@ export default {
   components: {
     QRCodeOptionsPanel,
     QRCodeModelOptionsPanel,
+    ScannerModal,
   },
   data() {
     return {
@@ -155,7 +169,7 @@ export default {
       blockHeight: null,
       isGenerating: false,
       generateError: null,
-      changelogModalVisible: false,
+      scannerModalVisible: false,
     };
   },
 
@@ -308,6 +322,13 @@ export default {
         }
       }
     },
+    openQRScanner() {
+      this.scannerModalVisible = true;
+    },
+    onDecode(decodedText) {
+      this.options.text = decodedText;
+      this.options.activeTabIndex = 0;
+    },
     wifiQREscape(str) {
       const regex = /([:|\\|;|,|"])/gm;
       const subst = '\\$1';
@@ -389,6 +410,8 @@ export default {
       this.options = merge(this.options, this.initData);
       this.generate3dModel();
     }
+    bus.$on('openScannerModal', () => { this.scannerModalVisible = true; });
+    bus.$on('closeScannerModal', () => { this.scannerModalVisible = false; });
   },
 };
 </script>

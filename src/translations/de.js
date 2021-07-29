@@ -36,6 +36,9 @@ export default {
   corner: 'Ecke',
   isGenerating: 'Generiere 3D Modell...',
   headerShareNotice: 'Teile deinen Code mit dieser URL',
+  copyExistingQRCode: 'Kopiere einen existierenden QR Code',
+  holdQRCodeInView: 'Halte den QR Code in die Kamera',
+  decodedQRCodeData: 'QR Code ausgelesen',
 
   //
   // QR Code Options Panel

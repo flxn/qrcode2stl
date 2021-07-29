@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.10.0] - 2021-07-29
+### Added
+- 📷 You can now scan an existing QR Code using your webcam and create a 3D copy!
+
 ## [1.9.0] - 2021-06-21
 ### Added
 - ✍ You can now skip the QR Code and just create a text tag!

@@ -1428,6 +1428,20 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@zxing/library@^0.18.4":
+  version "0.18.6"
+  resolved "https://registry.yarnpkg.com/@zxing/library/-/library-0.18.6.tgz#717af8c6c1fd982865e21051afdd7b470ae6674c"
+  integrity sha512-bulZ9JHoLFd9W36pi+7e7DnEYNJhljYjZ1UTsKPOoLMU3qtC+REHITeCRNx40zTRJZx18W5TBRXt5pq2Uopjsw==
+  dependencies:
+    ts-custom-error "^3.0.0"
+  optionalDependencies:
+    "@zxing/text-encoding" "~0.9.0"
+
+"@zxing/text-encoding@~0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@zxing/text-encoding/-/text-encoding-0.9.0.tgz#fb50ffabc6c7c66a0c96b4c03e3d9be74864b70b"
+  integrity sha512-U/4aVJ2mxI0aDNI8Uq0wEhMgY+u4CNtEb0om3+y3+niDAsoTCOB33UF0sxpzqzdqXLqmvc+vZyAt4O8pPdfkwA==
+
 accepts@~1.3.4, accepts@~1.3.5, accepts@~1.3.7:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.3.7.tgz#531bc726517a3b2b41f850021c6cc15eaab507cd"
@@ -1811,6 +1825,14 @@ balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
   integrity sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
+
+barcode-detector@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/barcode-detector/-/barcode-detector-1.0.0.tgz#e5c590affd4150c5b5b3fdd929075a7228d9bf8b"
+  integrity sha512-LZSyqjumoq2WmMOeQZ2BiYYAqwnTlkXgqKOTcJlathpFS6IejsdSb6aIGmoSyOCjBgFNATzLgMJ9shNfklnz6A==
+  dependencies:
+    "@zxing/library" "^0.18.4"
+    jsqr "^1.3.1"
 
 base64-js@^1.0.2:
   version "1.3.1"
@@ -2296,6 +2318,11 @@ caller-path@^2.0.0:
   integrity sha1-Ro+DBE42mrIBD6xfBs7uFbsssfQ=
   dependencies:
     caller-callsite "^2.0.0"
+
+callforth@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/callforth/-/callforth-0.3.1.tgz#d40f610c7dd47d0011fd84bac32b3fe11cff1785"
+  integrity sha512-Q2zPfqnwoKsb1DTVCr4lmhe49wKNBsMmNlbudjleu3/co+Nw1pOqFHYJHrW3VZ253ou9AAr+xauQR0C55NPdzA==
 
 callsites@^2.0.0:
   version "2.0.0"
@@ -5849,6 +5876,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jsqr@^1.3.1:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/jsqr/-/jsqr-1.4.0.tgz#8efb8d0a7cc6863cb6d95116b9069123ce9eb2d1"
+  integrity sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==
+
 jszip@^3.5.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/jszip/-/jszip-3.5.0.tgz#b4fd1f368245346658e781fec9675802489e15f6"
@@ -8348,6 +8380,13 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
+rtcpeerconnection-shim@^1.2.15:
+  version "1.2.15"
+  resolved "https://registry.yarnpkg.com/rtcpeerconnection-shim/-/rtcpeerconnection-shim-1.2.15.tgz#e7cc189a81b435324c4949aa3dfb51888684b243"
+  integrity sha512-C6DxhXt7bssQ1nHb154lqeL0SXz5Dx4RczXZu2Aa/L1NJFnEVDxFwCBo3fqtuljhHIGceg5JKBV4XJ0gW5JKyw==
+  dependencies:
+    sdp "^2.6.0"
+
 run-async@^2.4.0:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.4.1.tgz#8440eccf99ea3e70bd409d49aab88e10c189a455"
@@ -8411,6 +8450,11 @@ schema-utils@^2.0.0, schema-utils@^2.5.0, schema-utils@^2.6.5, schema-utils@^2.6
     "@types/json-schema" "^7.0.4"
     ajv "^6.12.2"
     ajv-keywords "^3.4.1"
+
+sdp@^2.12.0, sdp@^2.6.0:
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/sdp/-/sdp-2.12.0.tgz#338a106af7560c86e4523f858349680350d53b22"
+  integrity sha512-jhXqQAQVM+8Xj5EjJGVweuEzgtGWb3tmEEpl3CLP3cStInSbVHSg0QWOGQzNq8pSID4JkpeV2mPqlMDLrm0/Vw==
 
 seek-bzip@^1.0.5:
   version "1.0.5"
@@ -9367,6 +9411,11 @@ tryer@^1.0.1:
   resolved "https://registry.yarnpkg.com/tryer/-/tryer-1.0.1.tgz#f2c85406800b9b0f74c9f7465b81eaad241252f8"
   integrity sha512-c3zayb8/kWWpycWYg87P71E1S1ZL6b6IJxfb5fvsUgsf0S2MVGaDhDXXjDMpdCpfWXqptc+4mXwmiy1ypXqRAA==
 
+ts-custom-error@^3.0.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/ts-custom-error/-/ts-custom-error-3.2.0.tgz#ff8f80a3812bab9dc448536312da52dce1b720fb"
+  integrity sha512-cBvC2QjtvJ9JfWLvstVnI45Y46Y5dMxIaG1TDMGAD/R87hpvqFL+7LhvUDhnRCfOnx/xitollFWWvUKKKhbN0A==
+
 ts-pnp@^1.1.6:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.2.0.tgz#a500ad084b0798f1c3071af391e65912c86bca92"
@@ -9777,6 +9826,17 @@ vue-markdown@^2.2.4:
     markdown-it-task-lists "^2.0.1"
     markdown-it-toc-and-anchor "^4.1.2"
 
+vue-qrcode-reader@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/vue-qrcode-reader/-/vue-qrcode-reader-3.0.3.tgz#8bc92257361f61f951ef89ae098f5ad0d383faa1"
+  integrity sha512-mDcDiZRpTkOY1jF9OxLvpynsiDvZ+/uNmlNs62rusLQqZ7J+q3fhlBAENQy8o2Imhw8y2MLfFfG35z8zA8NgEw==
+  dependencies:
+    barcode-detector "^1.0.0"
+    callforth "^0.3.1"
+    core-js "^3.6.5"
+    vue "^2.6.11"
+    webrtc-adapter "7.7.0"
+
 vue-style-loader@^4.1.0, vue-style-loader@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-4.1.2.tgz#dedf349806f25ceb4e64f3ad7c0a44fba735fcf8"
@@ -9963,6 +10023,14 @@ webpack@^4.0.0:
     terser-webpack-plugin "^1.4.3"
     watchpack "^1.6.1"
     webpack-sources "^1.4.1"
+
+webrtc-adapter@7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/webrtc-adapter/-/webrtc-adapter-7.7.0.tgz#e56ff25f925177ac553a7c49323ca4108d2b5f4d"
+  integrity sha512-7Bp9OBnx642oJRkom1tNAbeJjUadAq2rh5xLL9YXPw5hVyt2h4hHr5bcoPYDs1stp/mZHSPSQA34YISdnr0DBQ==
+  dependencies:
+    rtcpeerconnection-shim "^1.2.15"
+    sdp "^2.12.0"
 
 websocket-driver@0.6.5:
   version "0.6.5"
