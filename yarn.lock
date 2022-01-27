@@ -9282,10 +9282,10 @@ three-csg-ts@^2.0.0:
   resolved "https://registry.yarnpkg.com/three-csg-ts/-/three-csg-ts-2.0.0.tgz#a0ca97b4746c3dff2fbc54e2f260e4b0079cbf9d"
   integrity sha512-i6kx7oaTQLa9kIP0p1j2TVyJMdvAu/O0DaY1jmygiSj8UdwyWAn85h8LOLyS2aZkv86ZQFouYldr2vpuaBrslQ==
 
-three@^0.118.3:
-  version "0.118.3"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.118.3.tgz#c0bf8c10a68155478f12f4ccac2ff979526a4a0a"
-  integrity sha512-ijECXrNzDkHieoeh2H69kgawTGH8DiamhR4uBN8jEM7VHSKvfTdEvOoHsA8Aq7dh7PHAxhlqBsN5arBI3KixSw==
+three@^0.137.0:
+  version "0.137.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.137.0.tgz#0ebd6ba66637a332c31f234bcdd35aeec071a6e3"
+  integrity sha512-rzSDhia6cU35UCy6y+zEEws6vSgytfHqFMSaBvUcySgzwvDO6vETyswtSNi/+aVqJw8WLMwyT1mlQQ1T/dxxOA==
 
 through2@^2.0.0:
   version "2.0.5"
