@@ -15,7 +15,7 @@
     "deep-object-diff": "^1.1.0",
     "deepmerge": "^4.2.2",
     "imagemin-webpack-plugin": "^2.4.2",
-    "jszip": "^3.5.0",
+    "jszip": "^3.7.0",
     "path-that-svg": "^1.2.4",
     "qrcode": "^1.4.4",
     "three": "^0.118.3",
