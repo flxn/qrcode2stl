@@ -168,6 +168,10 @@ class QRCode3D extends BaseTag3D {
    */
   getCombinedMesh() {
     const baseCombinedGeometry = super.getCombinedMesh().geometry;
+    if (!this.qrcodeMesh) {
+      return new THREE.Mesh(baseCombinedGeometry, this.materialBase);
+    }
+
     baseCombinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
     if (this.iconMesh && !this.options.code.invert) {
       baseCombinedGeometry.merge(this.iconMesh.geometry, this.iconMesh.matrix);

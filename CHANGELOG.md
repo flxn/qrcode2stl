@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.11.0] - 2024-03-16
+First new update in three years 🥳
+### Fixed
+- Improved support for international spotify links
+- Removed stupid broken Aliexpress promo links
+
 ## [1.10.0] - 2021-07-29
 ### Added
 - 📷 You can now scan an existing QR Code using your webcam and create a 3D copy!

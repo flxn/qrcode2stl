@@ -101,7 +101,6 @@
           <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
         </p>
         <div v-html="modelAd" class="mt-4 has-text-centered"></div>
-        <Promotions />
       </div>
     </div>
 
@@ -130,7 +129,6 @@ import QRCodeMenu from './QRCodeMenu.vue';
 import SpotifyMenu from './SpotifyMenu.vue';
 import TextMenu from './TextMenu.vue';
 import PrintGuide from './PrintGuide.vue';
-import Promotions from './Promotions.vue';
 import { getRandomBanner } from '../utils';
 
 const shareHashMarker = '#share';
@@ -148,7 +146,6 @@ export default {
     ChangelogModal,
     ExportModal,
     VueMarkdown,
-    Promotions,
   },
   data() {
     return {
@@ -229,7 +226,7 @@ export default {
 
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0xa0a0a0);
-      this.scene.rotation.z = -Math.PI / 2;
+      // this.scene.rotation.z = -Math.PI / 2;
 
       this.initLights();
 

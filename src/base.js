@@ -131,7 +131,7 @@ class BaseTag3D {
 
     const textLines = this.options.base.textMessage.trim().split('\n');
     let numLines = textLines.length;
-    const lineHeight = numLines > 1 ? 1.55 : 1.2;
+    const lineHeight = 1.2;
 
     for (let i = 0; i < numLines; i += 1) {
       let text = textLines[i];
@@ -172,12 +172,13 @@ class BaseTag3D {
 
       // recreate emphasis level if overflow occured
       if (newLineCreated) {
+        console.log('line overflow');
         textLines[i + 1] = '*'.repeat(emphLevel) + textLines[i + 1] + '*'.repeat(emphLevel);
       }
 
       // place text at correct position
-      const topSide = -this.options.base.height / 2 + this.options.base.textSize / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
-      const bottomSide = this.options.base.height / 2 + this.options.base.textSize / 2 + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
+      const topSide = -this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
+      const bottomSide = this.options.base.height / 2 + this.options.base.textSize + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
       const center = (numLines > 1 ? -numLines * (this.options.base.textSize / 2) : 0) + this.options.base.textSize / 2 + this.options.base.textSize * i * lineHeight;
 
       let placement = bottomSide;
@@ -346,7 +347,7 @@ class BaseTag3D {
   getTextBaseOffset() {
     if (this.options.base.hasText && this.options.base.textPlacement !== 'center') {
       const numLines = this.options.base.textMessage.trim().split('\n').length;
-      const lineHeight = numLines > 1 ? 1.5 : 1.2;
+      const lineHeight = 1.2;
       return (this.options.base.textSize * numLines * lineHeight) + (2 * this.options.base.textMargin);
     }
     return 0;

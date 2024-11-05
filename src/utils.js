@@ -85,6 +85,8 @@ export const saveAsArrayBuffer = (buffer, filename) => {
 };
 
 export const getRandomBanner = (sizeStr) => {
+  return '';
+
   const banners = {
     '250x250': [
       '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=1ab9a933" target="_top"><img src="//assets.printer.tools/prusa/1ab9a933.jpg" alt="" title="" width="250" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=1ab9a933" width="1" height="1" alt="" />',

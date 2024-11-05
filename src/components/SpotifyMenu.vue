@@ -208,18 +208,9 @@ export default {
         options: this.options,
       });
     },
-    trackGenerateEvent() {
-      // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'qrcode2stl', 'Generate']);
-    },
-    trackExportEvent() {
-      // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'qrcode2stl', 'Export']);
-    },
     async generate3dModel() {
       this.$emit('generating');
       this.isGenerating = true;
-      this.trackGenerateEvent();
 
       setTimeout(() => {
         // this.init3d();
@@ -228,7 +219,6 @@ export default {
       }, 100);
     },
     exportSTL(stlType, multipleParts) {
-      this.trackExportEvent();
       const timestamp = new Date().getTime();
       const exportAsBinary = (stlType === 'binary');
 
@@ -277,7 +267,7 @@ export default {
     async downloadSpotifyCode() {
       let uri = this.options.spotifyUri;
       if (!uri.startsWith('spotify:')) {
-        const regex = /spotify\.com\/([^/]+)\/([^?/]+)/gm;
+        const regex = /spotify\.com\/(?:.*\/)*([^/]+)\/([^?/]+)/gm;
         const parts = regex.exec(uri);
         if (parts.length !== 3) {
           console.error('Not a valid Spotify URI or Link');

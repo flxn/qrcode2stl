@@ -607,17 +607,8 @@ export default {
         options: this.options,
       });
     },
-    trackGenerateEvent() {
-      // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'qrcode2stl', 'Generate']);
-    },
-    trackExportEvent() {
-      // eslint-disable-next-line no-underscore-dangle
-      window._paq.push(['trackEvent', 'qrcode2stl', 'Export']);
-    },
     async generate3dModel() {
       this.$emit('generating');
-      this.trackGenerateEvent();
 
       this.generateError = null;
       this.isGenerating = true;
@@ -629,7 +620,6 @@ export default {
       }, 100);
     },
     exportSTL(stlType, multipleParts) {
-      this.trackExportEvent();
       const timestamp = new Date().getTime();
       const exportAsBinary = stlType === 'binary';
 
