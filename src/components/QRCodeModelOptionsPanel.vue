@@ -162,6 +162,8 @@
                       <select v-model="options.base.textPlacement">
                         <option value="top">{{$t('top')}}</option>
                         <option value="bottom">{{$t('bottom')}}</option>
+                        <option value="left">{{$t('left')}}</option>
+                        <option value="right">{{$t('right')}}</option>
                       </select>
                       <span class="icon is-small is-left">
                         <i class="fa fa-arrows-alt-v"></i>
@@ -178,7 +180,7 @@
               <div class="field-body">
                 <div class="field">
                   <div class="control">
-                    <div class="buttons are-small mb-0 is-pulled-right">
+                    <div v-if="options.base.textPlacement === 'top' || options.base.textPlacement === 'bottom'" class="buttons are-small mb-0 is-pulled-right">
                       <button :class="{'button': true, 'is-primary': options.base.textAlign == 'left'}" @click="options.base.textAlign = 'left'">
                         <span class="icon is-small">
                           <i class="fas fa-align-left"></i>
@@ -192,6 +194,23 @@
                       <button :class="{'button': true, 'is-primary': options.base.textAlign == 'right'}" @click="options.base.textAlign = 'right'">
                         <span class="icon is-small">
                           <i class="fas fa-align-right"></i>
+                        </span>
+                      </button>
+                    </div>
+                    <div v-if="options.base.textPlacement === 'left' || options.base.textPlacement === 'right'" class="buttons are-small mb-0 is-pulled-right">
+                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'left'}" @click="options.base.textAlign = 'left'">
+                        <span class="icon is-small">
+                          <i class="fas fa-arrow-up"></i>
+                        </span>
+                      </button>
+                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'center'}" @click="options.base.textAlign = 'center'">
+                        <span class="icon is-small">
+                          <i class="fas fa-equals"></i>
+                        </span>
+                      </button>
+                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'right'}" @click="options.base.textAlign = 'right'">
+                        <span class="icon is-small">
+                          <i class="fas fa-arrow-down"></i>
                         </span>
                       </button>
                     </div>

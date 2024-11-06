@@ -153,7 +153,6 @@ export default {
   },
   data() {
     return {
-      debug: true,
       options: JSON.parse(JSON.stringify(defaultOptions)),
       qrCodeBitMask: null,
       unit: 'mm',
@@ -190,10 +189,6 @@ export default {
             i += 1;
             if (key !== 'combined') {
               this.scene.add(meshes[key]);
-              if (this.debug) {
-                const boxHelper = new THREE.BoxHelper(meshes[key], 0xffff00);
-                this.scene.add(boxHelper);
-              }
             }
             if (i === event.data.meshCount) {
               this.mesh = meshes.combined;

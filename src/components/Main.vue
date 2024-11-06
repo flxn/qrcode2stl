@@ -226,7 +226,7 @@ export default {
 
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0xa0a0a0);
-      // this.scene.rotation.z = -Math.PI / 2;
+      this.scene.rotation.z = -Math.PI / 2;
 
       this.initLights();
 

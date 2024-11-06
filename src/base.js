@@ -52,13 +52,27 @@ class BaseTag3D {
     // TODO: rethink handling of rounded rectangle: Different shape category vs only corner radius adjustment
     const cornerRadius = this.getCornerRadius();
     const textBaseOffset = this.getTextBaseOffset();
-    const shape = getRoundedRectShape(
-      -(this.options.base.height + textBaseOffset) / 2,
-      -this.options.base.width / 2,
-      this.options.base.height + textBaseOffset,
-      this.options.base.width,
-      cornerRadius,
-    );
+    const isOffsetTopBottom = this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center';
+    const isOffsetLeftRight = this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right';
+
+    let shape;
+    if (isOffsetTopBottom) {
+      shape = getRoundedRectShape(
+        -(this.options.base.height + textBaseOffset) / 2,
+        -this.options.base.width / 2,
+        this.options.base.height + textBaseOffset,
+        this.options.base.width,
+        cornerRadius,
+      );
+    } else if (isOffsetLeftRight) {
+      shape = getRoundedRectShape(
+        -this.options.base.height / 2,
+        -(this.options.base.width + textBaseOffset) / 2,
+        this.options.base.height,
+        this.options.base.width + textBaseOffset,
+        cornerRadius,
+      );
+    }
 
     const modelBase = new THREE.ExtrudeGeometry(shape, {
       steps: 1,
@@ -71,14 +85,17 @@ class BaseTag3D {
 
     if (textBaseOffset > 0) {
       // shift base in x direction to align with text
-      let textPlacementOffset = textBaseOffset / 2;
-      if (this.options.base.textPlacement === 'top') {
-        textPlacementOffset = -textBaseOffset / 2;
+      if (this.options.base.textPlacement === 'bottom') {
+        baseMesh.position.x = textBaseOffset / 2;
+      } else if (this.options.base.textPlacement === 'top') {
+        baseMesh.position.x = -textBaseOffset / 2;
       } else if (this.options.base.textPlacement === 'center') {
-        textPlacementOffset = 0;
+        baseMesh.position.x = 0;
+      } else if (this.options.base.textPlacement === 'left') {
+        baseMesh.position.y = -textBaseOffset / 2;
+      } else if (this.options.base.textPlacement === 'right') {
+        baseMesh.position.y = textBaseOffset / 2;
       }
-
-      baseMesh.position.x = textPlacementOffset;
     }
     baseMesh.updateMatrix();
 
@@ -145,65 +162,108 @@ class BaseTag3D {
       }
 
       let subtitleMesh = null;
-      let textSize = null;
-      let newLineCreated = false;
-      do {
-        const tempTextGeometry = new THREE.TextGeometry(text, {
-          font: fonts[emphLevel],
-          size: this.options.base.textSize,
-          height: this.options.base.textDepth,
-        });
-        subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
-        textSize = getBoundingBoxSize(subtitleMesh);
-        // Check if text width is larger than available width
-        // if true snip off the last character one at a time until it fits
-        if (textSize.x > this.availableWidth) {
-          const lastChar = text[text.length - 1];
-          text = text.substr(0, text.length - 1);
-          if (!newLineCreated) {
-            textLines.splice(i + 1, 0, lastChar);
-            numLines += 1;
-          } else {
-            textLines[i + 1] = lastChar + textLines[i + 1];
+
+      if (this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center') {
+        let textSize = null;
+        let newLineCreated = false;
+        do {
+          const tempTextGeometry = new THREE.TextGeometry(text, {
+            font: fonts[emphLevel],
+            size: this.options.base.textSize,
+            height: this.options.base.textDepth,
+          });
+          subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
+          textSize = getBoundingBoxSize(subtitleMesh);
+          // Check if text width is larger than available width
+          // if true snip off the last character one at a time until it fits
+          if (textSize.x > this.availableWidth) {
+            const lastChar = text[text.length - 1];
+            text = text.substr(0, text.length - 1);
+            if (!newLineCreated) {
+              textLines.splice(i + 1, 0, lastChar);
+              numLines += 1;
+            } else {
+              textLines[i + 1] = lastChar + textLines[i + 1];
+            }
+            newLineCreated = true;
           }
-          newLineCreated = true;
+        } while (textSize.x > this.availableWidth);
+
+        // recreate emphasis level if overflow occured
+        if (newLineCreated) {
+          console.log('line overflow');
+          textLines[i + 1] = '*'.repeat(emphLevel) + textLines[i + 1] + '*'.repeat(emphLevel);
         }
-      } while (textSize.x > this.availableWidth);
 
-      // recreate emphasis level if overflow occured
-      if (newLineCreated) {
-        console.log('line overflow');
-        textLines[i + 1] = '*'.repeat(emphLevel) + textLines[i + 1] + '*'.repeat(emphLevel);
+        // place text at correct position
+        // placement controls the vertical position of the text
+        // alignment controls the horizontal position of the text
+        const topSide = -this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
+        const bottomSide = this.options.base.height / 2 + this.options.base.textSize + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
+        const center = (numLines > 1 ? -numLines * (this.options.base.textSize / 2) : 0) + this.options.base.textSize / 2 + this.options.base.textSize * i * lineHeight;
+
+        let placement = bottomSide;
+        if (this.options.base.textPlacement === 'top') {
+          placement = topSide;
+        } else if (this.options.base.textPlacement === 'center') {
+          placement = center;
+        }
+
+        let alignment = 0;
+        switch (this.options.base.textAlign) {
+          case 'left':
+            alignment = -this.availableWidth / 2 + this.options.base.textMargin;
+            break;
+          case 'center':
+            alignment = -textSize.x / 2;
+            break;
+          case 'right':
+            alignment = -textSize.x + this.availableWidth / 2 - this.options.base.textMargin;
+            break;
+          default:
+            alignment = -textSize.x / 2;
+            break;
+        }
+        subtitleMesh.position.set(placement, alignment, this.options.base.depth);
+      } else if (this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right') {
+        const maxTextWidth = this.getTextRenderWidth() + (2 * this.options.base.textMargin);
+        let textSize = null;
+        do {
+          const tempTextGeometry = new THREE.TextGeometry(text, {
+            font: fonts[emphLevel],
+            size: this.options.base.textSize,
+            height: this.options.base.textDepth,
+          });
+          subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
+          textSize = getBoundingBoxSize(subtitleMesh);
+        } while (textSize.x > this.availableWidth);
+
+        // place text at correct position
+        // side controls the horizontal position of the text, always centered
+        // alignment controls the vertical position of the text (like placement in top/bottom) and takes line breaks into account
+        const leftSide = -this.options.base.width / 2 - textSize.x - (maxTextWidth - textSize.x) / 2 + (this.options.base.hasBorder ? this.options.base.borderWidth : 0);
+        const rightSide = this.options.base.width / 2 + (maxTextWidth - textSize.x) / 2 - (this.options.base.hasBorder ? this.options.base.borderWidth : 0);
+
+        let side = rightSide;
+        if (this.options.base.textPlacement === 'left') {
+          side = leftSide;
+        }
+
+        let alignment = 0;
+        switch (this.options.base.textAlign) {
+          case 'left': // actually top
+            alignment = -this.options.base.height / 2 + this.options.base.textMargin + this.options.base.textSize * (i + 1) * lineHeight;
+            break;
+          case 'right': // actually bottom
+            alignment = this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * (numLines - i) * lineHeight + this.options.base.textSize;
+            break;
+          default: // center
+            alignment = numLines === 1 ? (this.options.base.textSize / 2) : (this.options.base.textSize * (i + 1) * lineHeight) - (numLines * (this.options.base.textSize * lineHeight)) / 2;
+            break;
+        }
+        subtitleMesh.position.set(alignment, side, this.options.base.depth);
       }
 
-      // place text at correct position
-      const topSide = -this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
-      const bottomSide = this.options.base.height / 2 + this.options.base.textSize + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
-      const center = (numLines > 1 ? -numLines * (this.options.base.textSize / 2) : 0) + this.options.base.textSize / 2 + this.options.base.textSize * i * lineHeight;
-
-      let placement = bottomSide;
-      if (this.options.base.textPlacement === 'top') {
-        placement = topSide;
-      } else if (this.options.base.textPlacement === 'center') {
-        placement = center;
-      }
-
-      let xAlignment = 0;
-      switch (this.options.base.textAlign) {
-        case 'left':
-          xAlignment = -this.availableWidth / 2 + this.options.base.textMargin;
-          break;
-        case 'center':
-          xAlignment = -textSize.x / 2;
-          break;
-        case 'right':
-          xAlignment = -textSize.x + this.availableWidth / 2 - this.options.base.textMargin;
-          break;
-        default:
-          xAlignment = -textSize.x / 2;
-          break;
-      }
-      subtitleMesh.position.set(placement, xAlignment, this.options.base.depth);
       subtitleMesh.rotation.set(0, 0, Math.PI / 2);
       subtitleMesh.updateMatrix();
       textGeometry.merge(subtitleMesh.geometry, subtitleMesh.matrix);
@@ -220,15 +280,36 @@ class BaseTag3D {
     const cornerRadius = this.getCornerRadius();
     const textBaseOffset = this.getTextBaseOffset();
     const topOffset = this.getTextTopOffset();
+    const leftOffset = this.getTextLeftOffset();
+    const isOffsetTopBottom = this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center';
+    const isOffsetLeftRight = this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right';
 
+    let borderShape;
     // shape covering the whole area
-    const borderShape = getRoundedRectShape(
-      -(this.options.base.height + topOffset) / 2,
-      -this.options.base.width / 2,
-      this.options.base.height + textBaseOffset,
-      this.options.base.width,
-      cornerRadius,
-    );
+    // const borderShape = getRoundedRectShape(
+    //   -(this.options.base.height + topOffset) / 2,
+    //   -this.options.base.width / 2,
+    //   this.options.base.height + textBaseOffset,
+    //   this.options.base.width,
+    //   cornerRadius,
+    // );
+    if (isOffsetTopBottom) {
+      borderShape = getRoundedRectShape(
+        -(this.options.base.height + topOffset) / 2,
+        -this.options.base.width / 2,
+        this.options.base.height + textBaseOffset,
+        this.options.base.width,
+        cornerRadius,
+      );
+    } else if (isOffsetLeftRight) {
+      borderShape = getRoundedRectShape(
+        -this.options.base.height / 2,
+        -(this.options.base.width + leftOffset) / 2,
+        this.options.base.height,
+        this.options.base.width + textBaseOffset,
+        cornerRadius,
+      );
+    }
 
     const fullShapeMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(borderShape, {
       steps: 1,
@@ -238,13 +319,31 @@ class BaseTag3D {
     fullShapeMesh.updateMatrix();
 
     // shape that covers everything except where the border should be
-    const borderHoleShape = getRoundedRectShape(
-      -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
-      -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-      this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
-      this.options.base.width - this.options.base.borderWidth * 2,
-      Math.max(0, cornerRadius - this.options.base.borderWidth),
-    );
+    let borderHoleShape;
+    // const borderHoleShape = getRoundedRectShape(
+    //   -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
+    //   -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+    //   this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
+    //   this.options.base.width - this.options.base.borderWidth * 2,
+    //   Math.max(0, cornerRadius - this.options.base.borderWidth),
+    // );
+    if (isOffsetTopBottom) {
+      borderHoleShape = getRoundedRectShape(
+        -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
+        -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+        this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
+        this.options.base.width - this.options.base.borderWidth * 2,
+        Math.max(0, cornerRadius - this.options.base.borderWidth),
+      );
+    } else if (isOffsetLeftRight) {
+      borderHoleShape = getRoundedRectShape(
+        -(this.options.base.height - this.options.base.borderWidth * 2) / 2,
+        -(this.options.base.width + leftOffset - this.options.base.borderWidth * 2) / 2,
+        this.options.base.height - this.options.base.borderWidth * 2,
+        this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
+        Math.max(0, cornerRadius - this.options.base.borderWidth),
+      );
+    }
 
     const holeMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(borderHoleShape, {
       steps: 1,
@@ -344,18 +443,83 @@ class BaseTag3D {
     return 0;
   }
 
+  /**
+   * Returns the offset of the text in the 3D model
+   */
   getTextBaseOffset() {
-    if (this.options.base.hasText && this.options.base.textPlacement !== 'center') {
-      const numLines = this.options.base.textMessage.trim().split('\n').length;
-      const lineHeight = 1.2;
-      return (this.options.base.textSize * numLines * lineHeight) + (2 * this.options.base.textMargin);
+    if (this.options.base.hasText) {
+      if (this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom') {
+        const numLines = this.options.base.textMessage.trim().split('\n').length;
+        const lineHeight = 1.2;
+        return (this.options.base.textSize * numLines * lineHeight) + (2 * this.options.base.textMargin);
+      }
+      if (this.options.base.textPlacement === 'left') {
+        return this.getTextRenderWidth() + (2 * this.options.base.textMargin);
+      }
+      if (this.options.base.textPlacement === 'right') {
+        return this.getTextRenderWidth() + (2 * this.options.base.textMargin);
+      }
     }
     return 0;
+  }
+
+  /**
+   * Returns the size of the rendered text in the 3D model
+   * used in getSubtitleMesh to calculate the line breaks
+   */
+  getTextRenderWidth() {
+    if (!this.options.base.hasText) {
+      return 0;
+    }
+
+    const textLines = this.options.base.textMessage.trim().split('\n');
+    const numLines = textLines.length;
+
+    let maxWidth = 0;
+    for (let i = 0; i < numLines; i += 1) {
+      let text = textLines[i];
+      let emphLevel = 0;
+      while (text[0] === '*' && text[text.length - 1] === '*') {
+        text = text.substr(1, text.length - 2);
+        emphLevel += 1;
+        if (emphLevel === 3) {
+          break;
+        }
+      }
+
+      let subtitleMesh = null;
+      let textSize = null;
+
+      const tempTextGeometry = new THREE.TextGeometry(text, {
+        font: new THREE.Font(fontInterSemiBold),
+        size: this.options.base.textSize,
+        height: this.options.base.textDepth,
+      });
+      subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
+      textSize = getBoundingBoxSize(subtitleMesh);
+      // Check if text width is larger than available width
+      // if true snip off the last character one at a time until it fits
+      if (textSize.x > maxWidth) {
+        maxWidth = textSize.x;
+      }
+    }
+
+    return maxWidth;
   }
 
   getTextTopOffset() {
     if (this.options.base.textPlacement === 'top') {
       return 2 * this.getTextBaseOffset() - 0.1; // TODO: does not work without the -0.1. Find out what's wrong here.
+    }
+    return 0;
+  }
+
+  getTextLeftOffset() {
+    if (this.options.base.textPlacement === 'left') {
+      return 2 * this.getTextBaseOffset();
+    }
+    if (this.options.base.textPlacement === 'right') {
+      return 0;
     }
     return 0;
   }
@@ -403,7 +567,6 @@ class BaseTag3D {
 
     this.baseMesh = this.getBaseMesh();
     this.exportedMeshes.base = this.baseMesh;
-
     if (this.options.base.hasBorder) {
       this.borderMesh = this.getBorderMesh();
       this.exportedMeshes.border = this.borderMesh;
