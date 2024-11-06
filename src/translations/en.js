@@ -147,7 +147,8 @@ export default {
   exportTypeHelp: 'Just leave this as "binary" to keep file size low. If your software has issues with the generated file, you can try to change this option.',
   exportSeparatePartsHelp: 'If set to "yes" the base and the qr code will be saved as two separate parts for printers with dual extrusion printing. Your browser may ask for permissions to download multiple files.',
   separateParts: 'Separate parts',
-  saveAsButton: 'Save as STL',
+  saveAsButton: 'Export to STL',
+  saveAsImageButton: 'Render to PNG',
 
   //
   // Print Guide

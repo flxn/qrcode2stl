@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import * as THREE from 'three';
 import { CSG } from 'three-csg-ts';
 
@@ -37,7 +38,9 @@ export const getRoundedRectShape = (x, y, width, height, radius, path = false) =
  */
 export const getBoundingBoxSize = (mesh) => {
   const boundingBox = new THREE.Box3().setFromObject(mesh);
-  return boundingBox.getSize();
+  const target = new THREE.Vector3();
+  boundingBox.getSize(target);
+  return target;
 };
 
 /**
@@ -84,40 +87,45 @@ export const saveAsArrayBuffer = (buffer, filename) => {
   );
 };
 
-export const getRandomBanner = (sizeStr) => {
-  return '';
+// https://gist.github.com/timdown/021d9c8f2aabc7092df564996f5afbbf
+// eslint-disable-next-line func-names
+export const trimCanvas = (function () {
+  function rowBlank(imageData, width, y) {
+    for (let x = 0; x < width; ++x) {
+      if (imageData.data[y * width * 4 + x * 4 + 3] !== 0) return false;
+    }
+    return true;
+  }
 
-  const banners = {
-    '250x250': [
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=1ab9a933" target="_top"><img src="//assets.printer.tools/prusa/1ab9a933.jpg" alt="" title="" width="250" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=1ab9a933" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/66-original-prusa-mini#a_aid=flxn&amp;a_bid=fb910957" target=""><img src="//assets.printer.tools/prusa/fb910957.jpg" alt="The best home 3D printer of 2020" title="The best home 3D printer of 2020" width="250" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=fb910957" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com//51-original-prusa-i3-mk3s#a_aid=flxn&amp;a_bid=b47b249d" target=""><img src="//assets.printer.tools/prusa/b47b249d.jpg" alt="The best printer of 2020" title="The best printer of 2020" width="250" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=b47b249d" width="1" height="1" alt="" />',
-    ],
-    '160x600': [
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=6f46640a" target="_top"><img src="//assets.printer.tools/prusa/6f46640a.jpg" alt="" title="" width="160" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=6f46640a" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=363dc218" target="_top"><img src="//assets.printer.tools/prusa/363dc218.jpg" alt="" title="" width="160" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=363dc218" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/66-original-prusa-mini#a_aid=flxn&amp;a_bid=5cab2aaf" target=""><img src="//assets.printer.tools/prusa/5cab2aaf.jpg" alt="The best home 3D printer of 2020" title="The best home 3D printer of 2020" width="160" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=5cab2aaf" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com//51-original-prusa-i3-mk3s#a_aid=flxn&amp;a_bid=11110001" target=""><img src="//assets.printer.tools/prusa/11110001.jpg" alt="The best printer of 2020" title="The best printer of 2020" width="160" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=11110001" width="1" height="1" alt="" />',
-    ],
-    '300x250': [
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=61ff82fb" target="_top"><img src="//assets.printer.tools/prusa/61ff82fb.jpg" alt="" title="" width="300" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=61ff82fb" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=e2885a92" target="_top"><img src="//assets.printer.tools/prusa/e2885a92.jpg" alt="" title="" width="300" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=e2885a92" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/66-original-prusa-mini#a_aid=flxn&amp;a_bid=e9b60187" target=""><img src="//assets.printer.tools/prusa/e9b60187.jpg" alt="The best home 3D printer of 2020" title="The best home 3D printer of 2020" width="300" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=e9b60187" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com//51-original-prusa-i3-mk3s#a_aid=flxn&amp;a_bid=ec04113c" target=""><img src="//assets.printer.tools/prusa/ec04113c.jpg" alt="The best printer of 2020" title="The best printer of 2020" width="300" height="250" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=ec04113c" width="1" height="1" alt="" />',
-    ],
-    '300x600': [
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=2b8076ca" target="_top"><img src="//assets.printer.tools/prusa/2b8076ca.jpg" alt="" title="" width="300" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=2b8076ca" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=28c1abb6" target="_top"><img src="//assets.printer.tools/prusa/28c1abb6.jpg" alt="" title="" width="300" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=28c1abb6" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/66-original-prusa-mini#a_aid=flxn&amp;a_bid=d09e6c76" target=""><img src="//assets.printer.tools/prusa/d09e6c76.jpg" alt="The best home 3D printer of 2020" title="The best home 3D printer of 2020" width="300" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=d09e6c76" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com//51-original-prusa-i3-mk3s#a_aid=flxn&amp;a_bid=fe5157d7" target=""><img src="//assets.printer.tools/prusa/fe5157d7.jpg" alt="The best 3D printer of 2020" title="The best 3D printer of 2020" width="300" height="600" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=fe5157d7" width="1" height="1" alt="" />',
-    ],
-    '728x90': [
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=80672563" target="_top"><img src="//assets.printer.tools/prusa/80672563.jpg" alt="" title="" width="728" height="90" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=80672563" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/en/42-prusament#a_aid=flxn&amp;a_bid=03f15f1f" target="_top"><img src="//assets.printer.tools/prusa/03f15f1f.jpg" alt="" title="" width="728" height="90" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=03f15f1f" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com/66-original-prusa-mini#a_aid=flxn&amp;a_bid=71ba12bb" target=""><img src="//assets.printer.tools/prusa/71ba12bb.jpg" alt="The best home 3D printer of 2020" title="The best home 3D printer of 2020" width="728" height="90" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=71ba12bb" width="1" height="1" alt="" />',
-      '<a href="https://shop.prusa3d.com//51-original-prusa-i3-mk3s#a_aid=flxn&amp;a_bid=a9d5b451" target=""><img src="//assets.printer.tools/prusa/a9d5b451.jpg" alt="The best 3D printer of 2020" title="The best 3D printer of 2020" width="728" height="90" /></a><img style="border:0" src="https://partner.prusa3d.com/scripts/x0vi19?a_aid=flxn&amp;a_bid=a9d5b451" width="1" height="1" alt="" />',
-    ],
+  function columnBlank(imageData, width, x, top, bottom) {
+    for (let y = top; y < bottom; ++y) {
+      if (imageData.data[y * width * 4 + x * 4 + 3] !== 0) return false;
+    }
+    return true;
+  }
+
+  // eslint-disable-next-line func-names
+  return function (canvas) {
+    const ctx = canvas.getContext('2d');
+    const { width } = canvas;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let top = 0; let bottom = imageData.height; let left = 0; let
+      right = imageData.width;
+
+    while (top < bottom && rowBlank(imageData, width, top)) ++top;
+    while (bottom - 1 > top && rowBlank(imageData, width, bottom - 1)) --bottom;
+    while (left < right && columnBlank(imageData, width, left, top, bottom)) ++left;
+    while (right - 1 > left && columnBlank(imageData, width, right - 1, top, bottom)) --right;
+
+    const trimmed = ctx.getImageData(left, top, right - left, bottom - top);
+    const copy = canvas.ownerDocument.createElement('canvas');
+    const copyCtx = copy.getContext('2d');
+    copy.width = trimmed.width;
+    copy.height = trimmed.height;
+    copyCtx.putImageData(trimmed, 0, 0);
+
+    return copy;
   };
-  const bannerList = banners[sizeStr];
-  return bannerList[Math.floor(Math.random() * bannerList.length)];
-};
+}());
+
+export const getRandomBanner = () => '';

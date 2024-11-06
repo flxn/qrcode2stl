@@ -60,7 +60,7 @@
               </div>
             </div>
           </div>
-          <div class="column is-3" v-if="showExport">
+          <div class="column is-2" v-if="showExport">
             <div class="field">
               <div class="field-label is-normal has-text-left">
                 <label class="label" :title="$t('exportSeparatePartsHelp')">
@@ -82,12 +82,18 @@
               </div>
             </div>
           </div>
-          <div class="column is-3" style="padding-top: 2rem" v-if="showExport">
+          <div class="column is-5" style="padding-top: 2rem" v-if="showExport">
             <button class="button export-button is-primary is-medium" @click="exportSTL">
               <span class="icon">
-                <i class="fa fa-download"></i>
+                <i class="fa fa-cube"></i>
               </span>
               <span>{{$t('saveAsButton')}}</span>
+            </button>
+            <button class="button export-button is-primary is-medium" @click="renderPNG">
+              <span class="icon">
+                <i class="fa fa-image"></i>
+              </span>
+              <span>{{$t('saveAsImageButton')}}</span>
             </button>
           </div>
         </div>
@@ -129,7 +135,7 @@ import QRCodeMenu from './QRCodeMenu.vue';
 import SpotifyMenu from './SpotifyMenu.vue';
 import TextMenu from './TextMenu.vue';
 import PrintGuide from './PrintGuide.vue';
-import { getRandomBanner } from '../utils';
+import { getRandomBanner, saveAsArrayBuffer, trimCanvas } from '../utils';
 
 const shareHashMarker = '#share';
 
@@ -163,6 +169,7 @@ export default {
       camera: null,
       scene: null,
       renderer: null,
+      grid: null,
       animationFrameId: null,
       animationTimer: null,
       adblockEnabled: false,
@@ -219,6 +226,7 @@ export default {
       this.camera = null;
       this.scene = null;
       this.renderer = null;
+      this.grid = null;
       const elem = document.getElementById('container3d');
       while (elem.lastChild) elem.removeChild(elem.lastChild);
 
@@ -230,21 +238,22 @@ export default {
 
       this.initLights();
 
-      const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
-      grid.material.opacity = 0.2;
-      grid.material.transparent = true;
-      grid.rotation.x = Math.PI / 2;
-      this.scene.add(grid);
+      this.grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
+      this.grid.material.opacity = 0.2;
+      this.grid.material.transparent = true;
+      this.grid.rotation.x = Math.PI / 2;
+      this.scene.add(this.grid);
 
       this.camera = new THREE.PerspectiveCamera(
         50,
         container.clientWidth / container.clientHeight,
         1,
-        1000,
+        10000,
       );
       this.camera.position.set(0, 0, 200);
 
-      this.renderer = new THREE.WebGLRenderer({ antialias: true });
+      this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
+      this.renderer.setPixelRatio(window.devicePixelRatio);
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
       const controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -257,12 +266,16 @@ export default {
       }
 
       this.initLights();
-
-      const grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
-      grid.material.opacity = 0.2;
-      grid.material.transparent = true;
-      grid.rotation.x = Math.PI / 2;
-      this.scene.add(grid);
+      this.scene.background = new THREE.Color(0xa0a0a0);
+      // reset transparency
+      this.renderer.setClearColor(0xa0a0a0, 1);
+      this.renderer.setPixelRatio(window.devicePixelRatio);
+      this.renderer.setSize(document.getElementById('container3d').clientWidth, document.getElementById('container3d').clientHeight);
+      this.grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
+      this.grid.material.opacity = 0.2;
+      this.grid.material.transparent = true;
+      this.grid.rotation.x = Math.PI / 2;
+      this.scene.add(this.grid);
     },
     startAnimation() {
       const animate = () => {
@@ -285,6 +298,52 @@ export default {
           this.$refs.text.exportSTL(this.stlType, this.multipleParts);
         }
       }, 5000);
+    },
+    renderPNG() {
+      const container = document.getElementById('container3d');
+      // remove grid from scene
+      this.scene.remove(this.grid);
+      // remove background color
+      this.scene.background = null;
+      // make background transparent
+      this.renderer.setClearColor(0x000000, 0);
+      // set camera to be orthographic for 2D rendering, set position to center and zoom in
+      this.camera = new THREE.OrthographicCamera(
+        container.clientWidth / -2,
+        container.clientWidth / 2,
+        container.clientHeight / 2,
+        container.clientHeight / -2,
+        1,
+        10000,
+      );
+      this.camera.position.set(0, 0, 100);
+      this.camera.zoom = 2;
+      this.camera.updateProjectionMatrix();
+      // scale to 3x resolution
+      this.renderer.setPixelRatio(window.devicePixelRatio * 3);
+      this.renderer.setSize(container.clientWidth, container.clientHeight);
+
+      // render scene
+      this.renderer.render(this.scene, this.camera);
+
+      // renders three.js scene to PNG and triggers download
+      const canvas = this.renderer.domElement;
+      // copy canvas to new temporary canvas
+      let tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(canvas, 0, 0);
+
+      trimCanvas(tempCanvas).toBlob((blob) => {
+        const filename = `image-${new Date().getTime()}.png`;
+        // write to temp
+        saveAsArrayBuffer(blob, filename);
+        tempCanvas = null;
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      });
     },
     parseUrlShareHash() {
       if (window.location.hash.startsWith(shareHashMarker)) {

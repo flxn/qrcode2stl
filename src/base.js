@@ -10,23 +10,19 @@ import {
 class BaseTag3D {
   constructor(options) {
     const defaultOptions = {
-      baseColor: 0xeeeeee,
-      qrcodeColor: 0x333333,
+      baseColor: 0xffffff,
+      qrcodeColor: 0x000000,
     };
 
     this.options = { ...defaultOptions, ...options };
 
     // default material for the base
-    this.materialBase = new THREE.MeshPhongMaterial({
+    this.materialBase = new THREE.MeshBasicMaterial({
       color: this.options.baseColor,
-      specular: 0xffffff,
-      shininess: 30,
     });
     // default material for qr code, border, etc.
-    this.materialDetail = new THREE.MeshPhongMaterial({
+    this.materialDetail = new THREE.MeshBasicMaterial({
       color: this.options.qrcodeColor,
-      specular: 0x0d0d0d,
-      shininess: 90,
     });
 
     // total available width without margin and borders for the inner part
@@ -228,15 +224,13 @@ class BaseTag3D {
       } else if (this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right') {
         const maxTextWidth = this.getTextRenderWidth() + (2 * this.options.base.textMargin);
         let textSize = null;
-        do {
-          const tempTextGeometry = new THREE.TextGeometry(text, {
-            font: fonts[emphLevel],
-            size: this.options.base.textSize,
-            height: this.options.base.textDepth,
-          });
-          subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
-          textSize = getBoundingBoxSize(subtitleMesh);
-        } while (textSize.x > this.availableWidth);
+        const tempTextGeometry = new THREE.TextGeometry(text, {
+          font: fonts[emphLevel],
+          size: this.options.base.textSize,
+          height: this.options.base.textDepth,
+        });
+        subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
+        textSize = getBoundingBoxSize(subtitleMesh);
 
         // place text at correct position
         // side controls the horizontal position of the text, always centered

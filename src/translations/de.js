@@ -148,7 +148,8 @@ export default {
   exportSeparatePartsHelp: `
   Wenn diese Option aktiviert wird, werden alle Bestandteile des QR Code Modells als einzelne STL Dateien gespeichert. Hilfreich für Drucker mit mehreren Extrudern.`,
   separateParts: 'Separate Teile',
-  saveAsButton: 'Als STL speichern',
+  saveAsButton: 'Als STL exportieren',
+  saveAsImageButton: 'Als PNG rendern',
 
   //
   // Print Guide
