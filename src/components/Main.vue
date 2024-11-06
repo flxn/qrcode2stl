@@ -300,50 +300,53 @@ export default {
       }, 5000);
     },
     renderPNG() {
-      const container = document.getElementById('container3d');
-      // remove grid from scene
-      this.scene.remove(this.grid);
-      // remove background color
-      this.scene.background = null;
-      // make background transparent
-      this.renderer.setClearColor(0x000000, 0);
-      // set camera to be orthographic for 2D rendering, set position to center and zoom in
-      this.camera = new THREE.OrthographicCamera(
-        container.clientWidth / -2,
-        container.clientWidth / 2,
-        container.clientHeight / 2,
-        container.clientHeight / -2,
-        1,
-        10000,
-      );
-      this.camera.position.set(0, 0, 100);
-      this.camera.zoom = 2;
-      this.camera.updateProjectionMatrix();
-      // scale to 3x resolution
-      this.renderer.setPixelRatio(window.devicePixelRatio * 3);
-      this.renderer.setSize(container.clientWidth, container.clientHeight);
+      this.exportModalVisible = true;
+      setTimeout(() => {
+        const container = document.getElementById('container3d');
+        // remove grid from scene
+        this.scene.remove(this.grid);
+        // remove background color
+        this.scene.background = null;
+        // make background transparent
+        this.renderer.setClearColor(0x000000, 0);
+        // set camera to be orthographic for 2D rendering, set position to center and zoom in
+        this.camera = new THREE.OrthographicCamera(
+          container.clientWidth / -2,
+          container.clientWidth / 2,
+          container.clientHeight / 2,
+          container.clientHeight / -2,
+          1,
+          10000,
+        );
+        this.camera.position.set(0, 0, 100);
+        this.camera.zoom = 2;
+        this.camera.updateProjectionMatrix();
+        // scale to 3x resolution
+        this.renderer.setPixelRatio(window.devicePixelRatio * 3);
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
 
-      // render scene
-      this.renderer.render(this.scene, this.camera);
+        // render scene
+        this.renderer.render(this.scene, this.camera);
 
-      // renders three.js scene to PNG and triggers download
-      const canvas = this.renderer.domElement;
-      // copy canvas to new temporary canvas
-      let tempCanvas = document.createElement('canvas');
-      tempCanvas.width = canvas.width;
-      tempCanvas.height = canvas.height;
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.drawImage(canvas, 0, 0);
-
-      trimCanvas(tempCanvas).toBlob((blob) => {
-        const filename = `image-${new Date().getTime()}.png`;
-        // write to temp
-        saveAsArrayBuffer(blob, filename);
-        tempCanvas = null;
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-      });
+        // renders three.js scene to PNG and triggers download
+        const canvas = this.renderer.domElement;
+        // copy canvas to new temporary canvas
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(canvas, 0, 0);
+        trimCanvas(tempCanvas).toBlob((blob) => {
+          const filename = `image-${new Date().getTime()}.png`;
+          // write to temp
+          setTimeout(() => {
+            saveAsArrayBuffer(blob, filename);
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          }, 4000);
+        });
+      }, 1000);
     },
     parseUrlShareHash() {
       if (window.location.hash.startsWith(shareHashMarker)) {

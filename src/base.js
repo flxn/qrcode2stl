@@ -7,6 +7,8 @@ import {
   getRoundedRectShape, getCustomRoundedRectShape, subtractMesh, unionMesh, getBoundingBoxSize,
 } from './utils';
 
+const LINE_HEIGHT = 1.5;
+
 class BaseTag3D {
   constructor(options) {
     const defaultOptions = {
@@ -144,7 +146,6 @@ class BaseTag3D {
 
     const textLines = this.options.base.textMessage.trim().split('\n');
     let numLines = textLines.length;
-    const lineHeight = 1.2;
 
     for (let i = 0; i < numLines; i += 1) {
       let text = textLines[i];
@@ -194,9 +195,9 @@ class BaseTag3D {
         // place text at correct position
         // placement controls the vertical position of the text
         // alignment controls the horizontal position of the text
-        const topSide = -this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * i * lineHeight;
-        const bottomSide = this.options.base.height / 2 + this.options.base.textSize + this.options.base.textMargin + this.options.base.textSize * i * lineHeight;
-        const center = (numLines > 1 ? -numLines * (this.options.base.textSize / 2) : 0) + this.options.base.textSize / 2 + this.options.base.textSize * i * lineHeight;
+        const topSide = -this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * i * LINE_HEIGHT;
+        const bottomSide = this.options.base.height / 2 + this.options.base.textMargin + this.options.base.textSize * (i + 1) * LINE_HEIGHT - (this.options.base.hasBorder ? this.options.base.borderWidth : 0);
+        const center = (numLines > 1 ? -numLines * (this.options.base.textSize / 2) : 0) + this.options.base.textSize / 2 + this.options.base.textSize * i * LINE_HEIGHT;
 
         let placement = bottomSide;
         if (this.options.base.textPlacement === 'top') {
@@ -246,13 +247,13 @@ class BaseTag3D {
         let alignment = 0;
         switch (this.options.base.textAlign) {
           case 'left': // actually top
-            alignment = -this.options.base.height / 2 + this.options.base.textMargin + this.options.base.textSize * (i + 1) * lineHeight;
+            alignment = -this.options.base.height / 2 + this.options.base.textMargin + this.options.base.textSize * (i + 1) * LINE_HEIGHT;
             break;
           case 'right': // actually bottom
-            alignment = this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * (numLines - i) * lineHeight + this.options.base.textSize;
+            alignment = this.options.base.height / 2 - this.options.base.textMargin - this.options.base.textSize * (numLines - i) * LINE_HEIGHT + this.options.base.textSize;
             break;
           default: // center
-            alignment = numLines === 1 ? (this.options.base.textSize / 2) : (this.options.base.textSize * (i + 1) * lineHeight) - (numLines * (this.options.base.textSize * lineHeight)) / 2;
+            alignment = numLines === 1 ? (this.options.base.textSize / 2) : (this.options.base.textSize * (i + 1) * LINE_HEIGHT) - (numLines * (this.options.base.textSize * LINE_HEIGHT)) / 2;
             break;
         }
         subtitleMesh.position.set(alignment, side, this.options.base.depth);
@@ -356,9 +357,9 @@ class BaseTag3D {
   /**
    * @return {THREE.Mesh} the mesh of the keychain attachment hole
    */
-  getKeychainAttachmentMesh() {
-    const textBaseOffset = this.getTextBaseOffset();
-    const textTopOffset = this.getTextTopOffset();
+  getKeychainAttachmentMesh(baseMesh) {
+    // const textBaseOffset = this.getTextBaseOffset();
+    // const textTopOffset = this.getTextTopOffset();
     const holeRadius = this.options.base.keychainHoleDiameter / 2;
     const cornerPlacementOffset = holeRadius * 2;
     const height = this.options.base.keychainHoleDiameter + 3;
@@ -391,19 +392,23 @@ class BaseTag3D {
     holeMesh.updateMatrix();
 
     let finalMesh = subtractMesh(attachmentShapeMesh, holeMesh);
-
+    const baseBox = getBoundingBoxSize(baseMesh);
+    // set position and rotation based on the mesh provided via the baseMesh parameter
+    // left -> on the center of the left side
+    // top -> on the center of the top side
+    // topLeft -> on the top left corner
     if (this.options.base.keychainPlacement === 'left') {
-      finalMesh.position.x = (textBaseOffset - textTopOffset) / 2;
-      finalMesh.position.y = -this.options.base.width / 2 - width / 2 + cornerPlacementOffset;
+      finalMesh.position.x = baseMesh.position.x;
+      finalMesh.position.y = baseMesh.position.y - baseBox.y / 2 - height + cornerPlacementOffset;
       finalMesh.position.z = 0;
     } else if (this.options.base.keychainPlacement === 'top') {
-      finalMesh.position.x = -this.options.base.height / 2 - height / 2 + cornerPlacementOffset / 2 - textTopOffset / 2;
-      finalMesh.position.y = 0;
+      finalMesh.position.x = baseMesh.position.x - baseBox.x / 2 - height + cornerPlacementOffset;
+      finalMesh.position.y = baseMesh.position.y;
       finalMesh.position.z = 0;
       finalMesh.rotation.z = -Math.PI / 2;
     } else if (this.options.base.keychainPlacement === 'topLeft') {
-      finalMesh.position.x = -this.options.base.height / 2 - textTopOffset / 2;
-      finalMesh.position.y = -this.options.base.width / 2;
+      finalMesh.position.x = baseMesh.position.x - baseBox.x / 2;
+      finalMesh.position.y = baseMesh.position.y - baseBox.y / 2;
       finalMesh.position.z = 0;
       finalMesh.rotation.z = -Math.PI / 4;
     }
@@ -412,16 +417,17 @@ class BaseTag3D {
     if (this.options.base.mirrorHoles) {
       const mirror = subtractMesh(attachmentShapeMesh, holeMesh);
       if (this.options.base.keychainPlacement === 'left') {
-        mirror.position.x = (textBaseOffset - textTopOffset) / 2;
-        mirror.position.y = this.options.base.width / 2 + width / 2 - cornerPlacementOffset;
+        mirror.position.x = baseMesh.position.x;
+        mirror.position.y = baseMesh.position.y + baseBox.y / 2 + height - cornerPlacementOffset;
         mirror.rotation.z = Math.PI;
       } else if (this.options.base.keychainPlacement === 'top') {
-        mirror.position.x = this.options.base.height / 2 + height / 2 - cornerPlacementOffset / 2 + textBaseOffset - textTopOffset / 2;
+        mirror.position.x = baseMesh.position.x + baseBox.x / 2 + height - cornerPlacementOffset;
+        mirror.position.y = baseMesh.position.y;
         mirror.rotation.z = Math.PI / 2;
       } else if (this.options.base.keychainPlacement === 'topLeft') {
-        mirror.position.x = this.options.base.height / 2 + textBaseOffset - textTopOffset / 2;
-        mirror.position.y = this.options.base.width / 2;
-        mirror.rotation.z = -Math.PI / 4 + Math.PI;
+        mirror.position.x = baseMesh.position.x + baseBox.x / 2;
+        mirror.position.y = baseMesh.position.y + baseBox.y / 2;
+        mirror.rotation.z = Math.PI / 2 + Math.PI / 4;
       }
       mirror.updateMatrix();
       finalMesh = unionMesh(finalMesh, mirror);
@@ -444,8 +450,7 @@ class BaseTag3D {
     if (this.options.base.hasText) {
       if (this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom') {
         const numLines = this.options.base.textMessage.trim().split('\n').length;
-        const lineHeight = 1.2;
-        return (this.options.base.textSize * numLines * lineHeight) + (2 * this.options.base.textMargin);
+        return (this.options.base.textSize * numLines * LINE_HEIGHT) + (2 * this.options.base.textMargin);
       }
       if (this.options.base.textPlacement === 'left') {
         return this.getTextRenderWidth() + (2 * this.options.base.textMargin);
@@ -567,7 +572,7 @@ class BaseTag3D {
     }
 
     if (this.options.base.hasKeychainAttachment) {
-      this.keychainAttachmentMesh = this.getKeychainAttachmentMesh();
+      this.keychainAttachmentMesh = this.getKeychainAttachmentMesh(this.baseMesh);
       this.exportedMeshes.keychainAttachment = this.keychainAttachmentMesh;
     }
 

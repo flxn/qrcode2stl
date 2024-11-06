@@ -134,14 +134,35 @@ class QRCode3D extends BaseTag3D {
       const cornerRadius = this.getCornerRadius();
       const textBaseOffset = this.getTextBaseOffset();
       const topOffset = this.getTextTopOffset();
+      const leftOffset = this.getTextLeftOffset();
+      const isOffsetTopBottom = this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center';
+      const isOffsetLeftRight = this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right';
 
-      const innerAreaShape = getRoundedRectShape(
-        -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
-        -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-        this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
-        this.options.base.width - this.options.base.borderWidth * 2,
-        Math.max(0, cornerRadius - this.options.base.borderWidth),
-      );
+      // const innerAreaShape = getRoundedRectShape(
+      //   -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
+      //   -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+      //   this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
+      //   this.options.base.width - this.options.base.borderWidth * 2,
+      //   Math.max(0, cornerRadius - this.options.base.borderWidth),
+      // );
+      let innerAreaShape;
+      if (isOffsetTopBottom) {
+        innerAreaShape = getRoundedRectShape(
+          -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
+          -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+          this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
+          this.options.base.width - this.options.base.borderWidth * 2,
+          Math.max(0, cornerRadius - this.options.base.borderWidth),
+        );
+      } else if (isOffsetLeftRight) {
+        innerAreaShape = getRoundedRectShape(
+          -(this.options.base.height - this.options.base.borderWidth * 2) / 2,
+          -(this.options.base.width + leftOffset - this.options.base.borderWidth * 2) / 2,
+          this.options.base.height - this.options.base.borderWidth * 2,
+          this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
+          Math.max(0, cornerRadius - this.options.base.borderWidth),
+        );
+      }
 
       const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(innerAreaShape, {
         steps: 1,

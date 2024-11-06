@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.12.0] - 2024-11-06
+🚀 Thank You [Plasmics](https://plasmics.com) for sponsoring this update.
+
+### Added
+- Option to add text to the left and right of the qr code
+- Export as PNG
+### Fixed
+- Improved top and bottom text behaviour
+
 ## [1.11.0] - 2024-03-16
 First new update in three years 🥳
 ### Fixed
