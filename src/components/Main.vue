@@ -1,29 +1,29 @@
 <template>
-  <div id="main" class="container is-fluid">
-    <div class="columns is-multiline">
+  <main id="main" class="container is-fluid">
+    <article class="columns is-multiline">
       <div class="column is-5-widescreen is-5-fullhd is-12">
-        <h1 class="title">{{ $t("title") }}</h1>
-        <h2 class="subtitle">{{ $t("subtitle") }}</h2>
-        <div id="mode-buttons">
-          <button class="button is-large" :class="{'is-primary': mode === 'QR'}" @click="changeMode('QR')">
-            <span class="icon is-medium">
+        <h1 class="title" itemprop="name">{{ $t("title") }}</h1>
+        <h2 class="subtitle" itemprop="description">{{ $t("subtitle") }}</h2>
+        <nav id="mode-buttons" aria-label="QR Code type selection">
+          <button class="button is-large" :class="{'is-primary': mode === 'QR'}" @click="changeMode('QR')" aria-pressed="mode === 'QR'">
+            <span class="icon is-medium" aria-hidden="true">
               <i class="fa fa-qrcode"></i>
             </span>
             <span>QR Code</span>
           </button>
-          <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="changeMode('Spotify')">
-            <span class="icon is-medium">
+          <button class="button is-large" :class="{'is-primary': mode === 'Spotify'}" @click="changeMode('Spotify')" aria-pressed="mode === 'Spotify'">
+            <span class="icon is-medium" aria-hidden="true">
               <i class="fab fa-spotify"></i>
             </span>
             <span>Spotify Code</span>
           </button>
-          <button class="button is-large" :class="{'is-primary': mode === 'Text'}" @click="changeMode('Text')">
-            <span class="icon is-medium">
+          <button class="button is-large" :class="{'is-primary': mode === 'Text'}" @click="changeMode('Text')" aria-pressed="mode === 'Text'">
+            <span class="icon is-medium" aria-hidden="true">
               <i class="fa fa-font"></i>
             </span>
             <span>Text</span>
           </button>
-        </div>
+        </nav>
         <hr />
         <!-- Menus for modes -->
         <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
@@ -34,8 +34,8 @@
       <div class="column is-7-widescreen is-7-fullhd is-12">
         <div class="columns">
           <div class="column">
-            <p class="title">{{$t('preview')}}</p>
-            <p class="subtitle">{{ $t("controlsHint") }}</p>
+            <h2 class="title">{{$t('preview')}}</h2>
+            <p class="subtitle" role="note">{{ $t("controlsHint") }}</p>
           </div>
           <div class="column is-2" v-if="showExport">
             <div class="field">
@@ -98,27 +98,30 @@
           </div>
         </div>
         <hr />
-        <div v-if="isGenerating" class="has-text-centered">
+        <div v-if="isGenerating" class="has-text-centered" role="status" aria-live="polite">
           <p class="title">{{$t('isGenerating')}}</p>
           <hr>
         </div>
-        <div id="container3d" :class="{ 'is-loading': isGenerating }"></div>
+        <div id="container3d" :class="{ 'is-loading': isGenerating }" role="img" :aria-label="$t('preview')"></div>
         <p class="mt-3">
           <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
         </p>
         <div v-html="modelAd" class="mt-4 has-text-centered"></div>
       </div>
-    </div>
+    </article>
 
-    <PrintGuide />
-    <div class="content container">
+    <section id="printguide">
+      <PrintGuide />
+    </section>
+
+    <section class="content container">
       <h2 class="title">Changelog</h2>
       <hr>
       <vue-markdown :source="changelog" class="content"></vue-markdown>
-    </div>
+    </section>
     <ChangelogModal v-if="changelogModalVisible"/>
     <ExportModal v-if="exportModalVisible"/>
-  </div>
+  </main>
 </template>
 
 <script>

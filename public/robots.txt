@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://printer.tools/qrcode2stl/sitemap.xml

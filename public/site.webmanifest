@@ -1,6 +1,7 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "QRCode2STL - 3D Printable QR Code Generator",
+    "short_name": "QRCode2STL",
+    "description": "Create custom 3D printable QR codes and generate STL files for 3D printing",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -15,5 +16,9 @@
     ],
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
-    "display": "standalone"
+    "display": "standalone",
+    "start_url": "/",
+    "scope": "/",
+    "categories": ["utilities", "productivity"],
+    "lang": "en"
 }
