@@ -199,4 +199,19 @@ export default {
   Du kannst nun den Gcode wie gewohnt ausdrucken.<br/>
   Der 3D-Drucker wird an der gewünschten Stelle pausieren und zum Ursprung des Druckbetts fahren.<br/>
   Jetzt kannst du das Filament wechseln und den Druck über das Menü des 3D-Druckers fortsetzen.`,
+
+  //
+  // FAQ Section
+  //
+  faqTitle: 'Häufig gestellte Fragen',
+  faqQuestion1: 'Welche Dateiformate kann ich exportieren?',
+  faqAnswer1: 'Du kannst deine 3D-Modelle als STL-Dateien (sowohl binär als auch ASCII-Format) für den 3D-Druck oder als PNG-Bilder zur Vorschau exportieren.',
+  faqQuestion2: 'Was ist der Unterschied zwischen den Fehlerkorrektur-Leveln?',
+  faqAnswer2: 'Höhere Fehlerkorrektur-Level machen den QR-Code resistenter gegen Beschädigungen und Scan-Fehler, machen den Code aber auch dichter mit mehr Modulen. Für den 3D-Druck funktionieren meist Medium (M) oder Quartile (Q) Level am besten.',
+  faqQuestion3: 'Warum kann mein QR-Code nach dem Drucken nicht richtig gescannt werden?',
+  faqAnswer3: 'Stelle sicher, dass genug Kontrast zwischen den QR-Code-Modulen und der Basis vorhanden ist. Verwende verschiedenfarbige Filamente oder stelle sicher, dass der Höhenunterschied signifikant genug ist. Prüfe auch, ob die Auflösung deines Druckers für die QR-Code-Größe ausreichend ist.',
+  faqQuestion4: 'Funktioniert mein QR-Code für immer oder läuft er ab?',
+  faqAnswer4: 'Der generierte QR-Code selbst wird für immer funktionieren. Wenn du jedoch den QR-Code verwendest, um auf eine externe Seite zu verlinken, kann der Link mit der Zeit nicht mehr funktionieren. Das liegt außerhalb unserer Kontrolle. Wenn es eine Seite ist, die dir gehört, stelle sicher, dass der Link online bleibt. Wenn es eine Drittanbieter-Seite ist und diese ihre Seite aktualisiert, könnte der Link nicht mehr funktionieren. Du kannst einen URL-Shortener verwenden, der es dir ermöglicht, den Ziel-Link nach der Erstellung zu ändern. Spotify-Codes funktionieren, bis Spotify diese Funktion einstellt.',
+  faqQuestion5: 'Wie kann ich QR-Codes mit meinem Mehrfarben-3D-Drucker drucken?',
+  faqAnswer5: 'Beim Exportieren des QR-Codes wähle die Option, das 3D-Modell in mehreren Teilen herunterzuladen. Diese Option befindet sich oben auf der Seite, direkt links vom STL-Export-Button. Dies erstellt eine ZIP-Datei mit allen verschiedenen Teilen des 3D-Modells. Lade alle Teile in deinen Slicer und überlagere sie aufeinander. Nun kannst du den verschiedenen Teilen in deinem Slicer Farben zuweisen. Du kannst auch einen 2D-aussehenden gedruckten QR-Code erstellen, indem du die Höhe deines QR-Codes auf einen sehr niedrigen Wert einstellst (z.B. 0,1mm). Bitte überprüfe die Vorschau in deinem Slicer, um sicherzustellen, dass alles wie erwartet funktioniert.',
 };

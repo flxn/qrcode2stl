@@ -103,9 +103,11 @@
           <hr>
         </div>
         <div id="container3d" :class="{ 'is-loading': isGenerating }" role="img" :aria-label="$t('preview')"></div>
-        <p class="mt-3">
+        <div class="internal-nav-links">
           <a class="title is-4" href="#printguide"><i class="fa fa-angle-double-down"></i> {{$t('scrollDownForGuide')}}</a>
-        </p>
+          <a class="title is-4" href="#faq"><i class="fa fa-angle-double-down"></i> {{$t('faqTitle')}}</a>
+          <a class="title is-4" href="#changelog"><i class="fa fa-angle-double-down"></i> Changelog</a>
+        </div>
         <div v-html="modelAd" class="mt-4 has-text-centered"></div>
       </div>
     </article>
@@ -114,7 +116,11 @@
       <PrintGuide />
     </section>
 
-    <section class="content container">
+    <section id="faq">
+      <FAQ />
+    </section>
+
+    <section class="pt-4 content container">
       <h2 class="title">Changelog</h2>
       <hr>
       <vue-markdown :source="changelog" class="content"></vue-markdown>
@@ -138,6 +144,7 @@ import QRCodeMenu from './QRCodeMenu.vue';
 import SpotifyMenu from './SpotifyMenu.vue';
 import TextMenu from './TextMenu.vue';
 import PrintGuide from './PrintGuide.vue';
+import FAQ from './FAQ.vue';
 import { getRandomBanner, saveAsArrayBuffer, trimCanvas } from '../utils';
 
 const shareHashMarker = '#share';
@@ -152,6 +159,7 @@ export default {
     SpotifyMenu,
     TextMenu,
     PrintGuide,
+    FAQ,
     ChangelogModal,
     ExportModal,
     VueMarkdown,
@@ -458,5 +466,26 @@ export default {
   border: 1px solid #ededed;
   padding: 1rem;
   margin-bottom: 1rem;
+}
+
+.internal-nav-links {
+  margin-top: 20px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+.internal-nav-links a {
+  display: block;
+  margin-bottom: 10px;
+  color: #3273dc;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.internal-nav-links a:hover {
+  color: #2366d1;
+  transform: translateY(-2px);
+}
+.internal-nav-links a i {
+  margin-right: 10px;
 }
 </style>

@@ -197,4 +197,18 @@ export default {
   The 3d printer will pause on the specified layer and move to the origin of the print bed.
   Now you can swap the filament and restart the print job from your printers menu.`,
 
+  //
+  // FAQ Section
+  //
+  faqTitle: 'Frequently Asked Questions',
+  faqQuestion1: 'What file formats can I export?',
+  faqAnswer1: 'You can export your 3D models as STL files (both binary and ASCII formats) for 3D printing, or as PNG images for previewing.',
+  faqQuestion2: 'What\'s the difference between error correction levels?',
+  faqAnswer2: 'Higher error correction levels make the QR code more resistant to damage and scanning errors, but also make the code denser with more modules. For 3D printing, Medium (M) or Quartile (Q) levels usually work best.',
+  faqQuestion3: 'Why does my QR code not scan properly after printing?',
+  faqAnswer3: 'Make sure there\'s enough contrast between the QR code modules and the base. Use different colored filaments or ensure the height difference is significant enough. Also check that your printer\'s resolution is sufficient for the QR code size.',
+  faqQuestion4: 'Will my QR Code keep working forever or does it expire?',
+  faqAnswer4: 'The generated QR code itself will continue to work forever. However, if you\'re using the QR code to link to an external page, the link may break over time. This is out of our control. If it\'s a page you own, make sure the link stays online. If it\'s a third-party page and they update their site, the link may stop working. You can use a URL shortener that allows you to change the destination link after creation. Spotify codes will work until Spotify discontinues this feature.',
+  faqQuestion5: 'How can I print QR codes with my multicolor 3D printer?',
+  faqAnswer5: 'When exporting the QR code, select the option to download the 3D model in multiple parts. This option is located at the top of the page, directly to the left of the STL export button. This creates a zip file containing all the different parts of the 3D model. Load all parts into your slicer and overlay them on top of each other. Now you can assign colors to the different parts in your slicer. You can also create a 2D-looking printed QR code by setting the height value of your QR code to a very low setting (e.g., 0.1mm). Please check the preview in your slicer to ensure everything works as expected.',
 };

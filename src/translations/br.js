@@ -189,4 +189,19 @@ export default {
   Sua impressora 3D irá pausar na camada especificada e mover-se para a origem da mesa de impressão.
   Agora, você poderá trocar o filamento e reiniciar o processo de impressão no menu da sua impressora.`,
 
+  //
+  // FAQ Section
+  //
+  faqTitle: 'Perguntas Frequentes',
+  faqQuestion1: 'Que formatos de arquivo posso exportar?',
+  faqAnswer1: 'Você pode exportar seus modelos 3D como arquivos STL (formatos binário e ASCII) para impressão 3D, ou como imagens PNG para visualização.',
+  faqQuestion2: 'Qual é a diferença entre os níveis de correção de erro?',
+  faqAnswer2: 'Níveis mais altos de correção de erro tornam o código QR mais resistente a danos e erros de digitalização, mas também tornam o código mais denso com mais módulos. Para impressão 3D, os níveis Medium (M) ou Quartile (Q) geralmente funcionam melhor.',
+  faqQuestion3: 'Por que meu código QR não escaneia corretamente após a impressão?',
+  faqAnswer3: 'Certifique-se de que há contraste suficiente entre os módulos do código QR e a base. Use filamentos de cores diferentes ou certifique-se de que a diferença de altura seja significativa. Verifique também se a resolução da sua impressora é suficiente para o tamanho do código QR.',
+  faqQuestion4: 'Meu código QR continuará funcionando para sempre ou expira?',
+  faqAnswer4: 'O código QR gerado em si continuará funcionando para sempre. No entanto, se você estiver usando o código QR para vincular a uma página externa, o link pode quebrar com o tempo. Isso está fora do nosso controle. Se for uma página sua, certifique-se de que o link permaneça online. Se for uma página de terceiros e eles atualizarem seu site, o link pode parar de funcionar. Você pode usar um encurtador de URL que permite alterar o link de destino após a criação. Os códigos do Spotify funcionarão até que o Spotify descontinue este recurso.',
+  faqQuestion5: 'Como posso imprimir códigos QR com minha impressora 3D multicolorida?',
+  faqAnswer5: 'Ao exportar o código QR, selecione a opção para baixar o modelo 3D em várias partes. Esta opção está localizada no topo da página, diretamente à esquerda do botão de exportação STL. Isso cria um arquivo zip contendo todas as diferentes partes do modelo 3D. Carregue todas as partes no seu fatiador e sobreponha-as umas sobre as outras. Agora você pode atribuir cores às diferentes partes no seu fatiador. Você também pode criar um código QR impresso com aparência 2D definindo o valor da altura do seu código QR para uma configuração muito baixa (por exemplo, 0,1mm). Por favor, verifique a visualização no seu fatiador para garantir que tudo funcione como esperado.',
+
 };

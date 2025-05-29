@@ -158,4 +158,18 @@ export default {
   L'imprimante 3D s'arrêtera sur la couche spécifiée et se déplacera à l'origine du plateau d'impression.
   Vous pouvez maintenant échanger le filament et redémarrer le travail d'impression à partir du menu de votre imprimante.`,
 
+  //
+  // FAQ Section
+  //
+  faqTitle: 'Questions Fréquemment Posées',
+  faqQuestion1: 'Quels formats de fichiers puis-je exporter?',
+  faqAnswer1: 'Vous pouvez exporter vos modèles 3D en fichiers STL (formats binaire et ASCII) pour l\'impression 3D, ou en images PNG pour l\'aperçu.',
+  faqQuestion2: 'Quelle est la différence entre les niveaux de correction d\'erreur?',
+  faqAnswer2: 'Des niveaux de correction d\'erreur plus élevés rendent le code QR plus résistant aux dommages et aux erreurs de numérisation, mais rendent également le code plus dense avec plus de modules. Pour l\'impression 3D, les niveaux Medium (M) ou Quartile (Q) fonctionnent généralement le mieux.',
+  faqQuestion3: 'Pourquoi mon code QR ne se scanne-t-il pas correctement après l\'impression?',
+  faqAnswer3: 'Assurez-vous qu\'il y a suffisamment de contraste entre les modules du code QR et la base. Utilisez des filaments de couleurs différentes ou assurez-vous que la différence de hauteur est suffisamment importante. Vérifiez également que la résolution de votre imprimante est suffisante pour la taille du code QR.',
+  faqQuestion4: 'Mon code QR continuera-t-il à fonctionner pour toujours ou expire-t-il?',
+  faqAnswer4: 'Le code QR généré lui-même continuera à fonctionner pour toujours. Cependant, si vous utilisez le code QR pour créer un lien vers une page externe, le lien peut cesser de fonctionner avec le temps. Ceci est hors de notre contrôle. Si c\'est une page qui vous appartient, assurez-vous que le lien reste en ligne. Si c\'est une page tierce et qu\'ils mettent à jour leur site, le lien peut cesser de fonctionner. Vous pouvez utiliser un raccourcisseur d\'URL qui vous permet de changer le lien de destination après la création. Les codes Spotify fonctionneront jusqu\'à ce que Spotify arrête cette fonctionnalité.',
+  faqQuestion5: 'Comment puis-je imprimer des codes QR avec mon imprimante 3D multicolore?',
+  faqAnswer5: 'Lors de l\'exportation du code QR, sélectionnez l\'option pour télécharger le modèle 3D en plusieurs parties. Cette option se trouve en haut de la page, directement à gauche du bouton d\'exportation STL. Cela crée un fichier zip contenant toutes les différentes parties du modèle 3D. Chargez toutes les parties dans votre trancheur et superposez-les les unes sur les autres. Maintenant, vous pouvez assigner des couleurs aux différentes parties dans votre trancheur. Vous pouvez également créer un code QR imprimé d\'aspect 2D en réglant la valeur de hauteur de votre code QR sur un réglage très bas (par exemple, 0,1 mm). Veuillez vérifier l\'aperçu dans votre trancheur pour vous assurer que tout fonctionne comme prévu.',
 };
