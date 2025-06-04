@@ -120,7 +120,7 @@
       <FAQ />
     </section>
 
-    <section class="pt-4 content container">
+    <section id="changelog" class="pt-4 content container">
       <h2 class="title">Changelog</h2>
       <hr>
       <vue-markdown :source="changelog" class="content"></vue-markdown>

@@ -12,15 +12,19 @@
         or on
         <a href="https://github.com/flxn" target="_blank" rel="noopener nofollow"><i class="fab fa-github"></i> Github</a>
         or if you really like it you can even
-        <a href="https://ko-fi.com/flxn256" target="_blank" rel="noopener nofollow">
-          💵☕️ buy me a coffee... or a tea, or a Club Mate (I actually don't like coffee)
+        <a href="https://paypal.me/fstein42" target="_blank" rel="noopener nofollow">
+          💵☕️ buy me a coffee
         </a>
       </p>
       <p>
         If you need help or have some great idea, you can write me a mail:
         <a href="mailto:mail@flxn.de"><i class="fa fa-envelope"></i> mail@flxn.de</a>
       </p>
-      <ShareButtons />
+      <p>
+        📢 Check out my latest project "foldericon.app" where you can
+          <a href="https://foldericon.app"><i class="fa fa-folder"></i> create customized macOS and Windows folder icons</a>
+      </p>
+      <ShareButtons/>
     </div>
   </footer>
 </template>

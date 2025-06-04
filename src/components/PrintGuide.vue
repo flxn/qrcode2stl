@@ -1,11 +1,6 @@
 <template>
   <section id="printguide" class="section">
-    <div class="columns">
-      <div class="column is-2">
-        <div v-html="banner1" style="margin-top: 120px"></div>
-        <div v-html="banner2" style="margin-top: 600px"></div>
-      </div>
-      <div class="column is-8">
+    <div class="container">
 
         <h1 class="title is-1">
           <i class="fa fa-book"></i> {{$t('printGuideTitle')}}
@@ -76,7 +71,6 @@
         </div>
         <p v-html="$t('printGuideStep3')"></p>
       </div>
-    </div>
   </section>
 </template>
 
