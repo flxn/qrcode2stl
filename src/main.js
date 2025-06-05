@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import VueMarkdown from 'vue-markdown';
 import translations from './translations/loader';
 
 import App from './App.vue';
 
+import './main.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import 'bulma/css/bulma.css';
 
@@ -16,8 +16,6 @@ const i18n = new VueI18n({
   fallbackLocale: 'en',
   messages: translations,
 });
-
-Vue.use(VueMarkdown);
 
 // eslint-disable-next-line import/prefer-default-export
 export const bus = new Vue();

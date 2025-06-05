@@ -1,4 +1,6 @@
-const worker = new Worker('./worker.js', { type: 'module' });
+import WorkerUrl from './worker.js?worker&url';
+
+const worker = new Worker(WorkerUrl, { type: 'module' });
 
 const send = (message) => worker.postMessage(message);
 

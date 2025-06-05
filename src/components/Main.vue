@@ -134,17 +134,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
-import VueMarkdown from 'vue-markdown';
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import changelog from 'raw-loader!../../CHANGELOG.md';
-import ChangelogModal from './ChangelogModal.vue';
-import ExportModal from './ExportModal.vue';
+import changelog from '../../CHANGELOG.md?raw';
 import { bus } from '../main';
-import QRCodeMenu from './QRCodeMenu.vue';
-import SpotifyMenu from './SpotifyMenu.vue';
-import TextMenu from './TextMenu.vue';
-import PrintGuide from './PrintGuide.vue';
-import FAQ from './FAQ.vue';
 import { getRandomBanner, saveAsArrayBuffer, trimCanvas } from '../utils';
 
 const shareHashMarker = '#share';
@@ -155,14 +147,14 @@ export default {
     msg: String,
   },
   components: {
-    QRCodeMenu,
-    SpotifyMenu,
-    TextMenu,
-    PrintGuide,
-    FAQ,
-    ChangelogModal,
-    ExportModal,
-    VueMarkdown,
+    QRCodeMenu: () => import('./QRCodeMenu.vue'),
+    SpotifyMenu: () => import('./SpotifyMenu.vue'),
+    TextMenu: () => import('./TextMenu.vue'),
+    PrintGuide: () => import('./PrintGuide.vue'),
+    FAQ: () => import('./FAQ.vue'),
+    ChangelogModal: () => import('./ChangelogModal.vue'),
+    ExportModal: () => import('./ExportModal.vue'),
+    VueMarkdown: () => import('vue-markdown'),
   },
   data() {
     return {

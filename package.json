@@ -1,64 +1,44 @@
 {
   "name": "qrcode2stl",
   "version": "1.11.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.vue"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.13.1",
+    "@tailwindcss/vite": "^4.1.8",
+    "babel-runtime": "^6.26.0",
     "bulma": "^0.9.0",
-    "compression-webpack-plugin": "^4.0.0",
     "core-js": "^3.6.5",
     "deep-object-diff": "^1.1.0",
     "deepmerge": "^4.2.2",
-    "imagemin-webpack-plugin": "^2.4.2",
     "jszip": "^3.5.0",
+    "markdown-it": "^14.0.0",
     "path-that-svg": "^1.2.4",
     "qrcode": "^1.4.4",
+    "tailwindcss": "^4.1.8",
     "three": "^0.118.3",
     "three-csg-ts": "^2.0.0",
     "vcards-js": "^2.10.0",
-    "vue": "^2.6.11",
-    "vue-i18n": "^8.18.2",
+    "vue": "^2.7.16",
+    "vue-i18n": "^8.28.2",
     "vue-markdown": "^2.2.4",
-    "vue-qrcode-reader": "^3.0.3",
-    "worker-plugin": "^5.0.0"
+    "vue-qrcode-reader": "^3.0.3"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.4.6",
-    "@vue/cli-plugin-eslint": "^4.4.6",
-    "@vue/cli-service": "^4.4.6",
-    "@vue/eslint-config-airbnb": "^5.1.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.4.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "raw-loader": "^4.0.1",
-    "vue-template-compiler": "^2.6.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended",
-      "@vue/airbnb"
-    ],
-    "rules": {
-      "max-len": "off",
-      "no-console": "off"
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
+    "@babel/runtime": "^7.27.4",
+    "@vitejs/plugin-vue2": "^2.3.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.20.1",
+    "vite": "^5.1.4"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ],
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  ]
 }

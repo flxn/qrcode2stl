@@ -12,7 +12,7 @@
           Or <a href="https://twitter.com/flxnde" target="_blank" rel="noopener nofollow"><i class="fab fa-twitter"></i> follow me on Twitter</a> where I tweet about updates and new projects.
         </p>
         <hr>
-        <vue-markdown :source="changelog" class="content"></vue-markdown>
+        <MarkdownRenderer :source="changelog" class="content"></MarkdownRenderer>
       </section>
       <footer class="modal-card-foot">
         <button class="button" @click="close">OK</button>
@@ -24,7 +24,7 @@
 <script>
 import VueMarkdown from 'vue-markdown';
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import changelog from 'raw-loader!../../CHANGELOG.md';
+import changelog from '../../CHANGELOG.md?raw';
 import packageJson from '../../package.json';
 import { bus } from '../main';
 

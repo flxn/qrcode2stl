@@ -58,10 +58,6 @@ import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
-import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
-// 3D settings panel
-import QRCodeModelOptionsPanel from './QRCodeModelOptionsPanel.vue';
-import ScannerModal from './ScannerModal.vue';
 import { bus } from '../main';
 import { save, saveAsString, saveAsArrayBuffer } from '../utils';
 
@@ -147,9 +143,9 @@ export default {
     exporter: Object,
   },
   components: {
-    QRCodeOptionsPanel,
-    QRCodeModelOptionsPanel,
-    ScannerModal,
+    QRCodeOptionsPanel: () => import('./QRCodeOptionsPanel.vue'),
+    QRCodeModelOptionsPanel: () => import('./QRCodeModelOptionsPanel.vue'),
+    ScannerModal: () => import('./ScannerModal.vue'),
   },
   data() {
     return {
