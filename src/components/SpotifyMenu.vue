@@ -212,11 +212,11 @@ export default {
       this.$emit('generating');
       this.isGenerating = true;
 
-      setTimeout(() => {
+      nextTick(() => {
         // this.init3d();
         this.setup3dObject();
         // this.startAnimation();
-      }, 100);
+      });
     },
     exportSTL(stlType, multipleParts) {
       const timestamp = new Date().getTime();

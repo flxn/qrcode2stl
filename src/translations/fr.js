@@ -68,6 +68,20 @@ export default {
   phonePlaceholder: 'Numero de portable du destinataire',
   smsMessage: 'Message',
   smsMessagePlaceholder: 'Message SMS',
+  // Calendar
+  calendar: 'Calendrier',
+  eventName: 'Nom de l\'événement',
+  eventNamePlaceholder: 'Nom de l\'événement',
+  startDate: 'Date de début',
+  startTime: 'Heure de début',
+  endDate: 'Date de fin',
+  endTime: 'Heure de fin',
+  allDay: 'Toute la journée',
+  allDayEvent: 'Événement d\'une journée entière',
+  location: 'Lieu',
+  locationPlaceholder: 'Lieu de l\'événement (optionnel)',
+  description: 'Description',
+  descriptionPlaceholder: 'Description de l\'événement (optionnel)',
 
   //
   // 3D Model Options Panel
@@ -172,4 +186,8 @@ export default {
   faqAnswer4: 'Le code QR généré lui-même continuera à fonctionner pour toujours. Cependant, si vous utilisez le code QR pour créer un lien vers une page externe, le lien peut cesser de fonctionner avec le temps. Ceci est hors de notre contrôle. Si c\'est une page qui vous appartient, assurez-vous que le lien reste en ligne. Si c\'est une page tierce et qu\'ils mettent à jour leur site, le lien peut cesser de fonctionner. Vous pouvez utiliser un raccourcisseur d\'URL qui vous permet de changer le lien de destination après la création. Les codes Spotify fonctionneront jusqu\'à ce que Spotify arrête cette fonctionnalité.',
   faqQuestion5: 'Comment puis-je imprimer des codes QR avec mon imprimante 3D multicolore?',
   faqAnswer5: 'Lors de l\'exportation du code QR, sélectionnez l\'option pour télécharger le modèle 3D en plusieurs parties. Cette option se trouve en haut de la page, directement à gauche du bouton d\'exportation STL. Cela crée un fichier zip contenant toutes les différentes parties du modèle 3D. Chargez toutes les parties dans votre trancheur et superposez-les les unes sur les autres. Maintenant, vous pouvez assigner des couleurs aux différentes parties dans votre trancheur. Vous pouvez également créer un code QR imprimé d\'aspect 2D en réglant la valeur de hauteur de votre code QR sur un réglage très bas (par exemple, 0,1 mm). Veuillez vérifier l\'aperçu dans votre trancheur pour vous assurer que tout fonctionne comme prévu.',
+  
+  // FAQ Footer
+  faqFooter: 'Si vous avez des questions supplémentaires, n\'hésitez pas à me contacter et je les ajouterai à la liste:',
+  faqContact: 'Envoyez-moi un e-mail avec votre question',
 };

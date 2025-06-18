@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.13.0] - 2025-06-18
+
+### Added
+- Generate Calendar (iCal) events from QR Codes
+- FAQ Section with answers to common questions, if you have any more questions feel free to contact me and I will add them to the FAQ
+### Fixed
+- Huge performance improvements for the 3D model generation step when not using the inversion feature
+
 ## [1.12.0] - 2024-11-06
 🚀 Thank You [Plasmics](https://plasmics.com) for sponsoring this update.
 

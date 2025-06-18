@@ -2,10 +2,12 @@
   <div class="dropdown is-hoverable">
     <div class="dropdown-trigger">
       <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-        <span><img :src="'flags/gif/' + currentLocale + '.gif'"/> {{$t("changeLanguage")}}</span>
-        <span class="icon is-small">
+        <div class="dropdown-item">
+          <img :src="'flags/gif/' + currentLocale + '.gif'"/> {{$t("changeLanguage")}}
+          <span class="icon is-small">
           <i class="fas fa-angle-down" aria-hidden="true"></i>
         </span>
+        </div>
       </button>
     </div>
     <div class="dropdown-menu" id="dropdown-menu" role="menu">
@@ -14,7 +16,7 @@
           <img :src="'flags/gif/' + locale + '.gif'"/> {{ $i18n.messages[locale]['languageLocalName'] }}
         </a>
         <hr class="dropdown-divider">
-        <a href="https://github.com/flxn/qrcode2stl#contribute-a-translation" class="dropdown-item" rel="nofollow noopener" target="_blank">
+         <a href="https://github.com/flxn/qrcode2stl#contribute-a-translation" class="dropdown-item" rel="nofollow noopener" target="_blank">
           <i class="fab fa-github"></i> {{$t('contributeTranslation')}}
         </a>
       </div>
@@ -43,5 +45,16 @@ export default {
 </script>
 
 <style>
-
+.dropdown .dropdown-item img {
+  width: 24px;
+  height: 16px;
+  margin-right: 8px;
+}
+.dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+}
+.dropdown .dropdown-item i {
+  margin-right: 4px;
+}
 </style>

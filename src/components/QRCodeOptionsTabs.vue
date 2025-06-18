@@ -41,6 +41,14 @@
           <span>SMS</span>
         </a>
       </li>
+      <li v-bind:class="{ 'is-active': activeTabIndex === 5 }" @click="$emit('tabChanged', 5)">
+        <a>
+          <span class="icon is-small">
+            <i class="far fa-calendar" aria-hidden="true"></i>
+          </span>
+          <span>{{$t('calendar')}}</span>
+        </a>
+      </li>
     </ul>
   </div>
 </template>

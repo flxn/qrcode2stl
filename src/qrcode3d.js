@@ -71,6 +71,39 @@ class QRCode3D extends BaseTag3D {
    * @return {THREE.Mesh} the mesh of the actual QR-Code segment
    */
   getQRCodeMesh() {
+    const invert = this.options.code.invert;
+    const iconSize = this.iconMesh ? getBoundingBoxSize(this.iconMesh) : null;
+    // fast path for non-inverted QR codes
+    if (!invert) {
+      const qrcodeGeometry = new THREE.Geometry();
+      for (let y = 0; y < this.maskWidth; y += 1) {
+        for (let x = 0; x < this.maskWidth; x += 1) {
+          if (!this.bitMask[x * this.maskWidth + y]) continue;
+          let blockDepth = this.options.code.depth;
+          if (this.options.code.cityMode) {
+            blockDepth = Math.min(this.options.code.depth, this.options.code.depthMax)
+              + Math.random() * Math.abs(this.options.code.depthMax - this.options.code.depth);
+          }
+          const blockGeo = new THREE.BoxGeometry(this.blockWidth, this.blockWidth, blockDepth);
+          const blockMesh = new THREE.Mesh(blockGeo, this.materialDetail);
+          const blockX = (x / this.maskWidth) * this.availableWidth - this.availableWidth / 2 + this.blockWidth / 2;
+          const blockY = (y / this.maskWidth) * this.availableWidth - this.availableWidth / 2 + this.blockWidth / 2;
+          if (this.iconMesh) {
+            const margin = Math.min(this.blockWidth * 1.5, 4);
+            if (blockX > -iconSize.x / 2 - margin && blockX < iconSize.x / 2 + margin
+              && blockY > -iconSize.y / 2 - margin && blockY < iconSize.y / 2 + margin) {
+              continue;
+            }
+          }
+          blockMesh.position.set(blockX, blockY, this.options.base.depth + blockDepth / 2);
+          blockMesh.updateMatrix();
+          qrcodeGeometry.merge(blockMesh.geometry, blockMesh.matrix);
+        }
+      }
+      return new THREE.Mesh(qrcodeGeometry, this.materialDetail);
+    }
+
+    // slow path for inverted QR codes
     const qrcodeGeometry = new THREE.Geometry();
     const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialDetail);
     let bspQRMesh = CSG.fromMesh(baseQRMesh);
@@ -104,7 +137,6 @@ class QRCode3D extends BaseTag3D {
 
           if (this.iconMesh) {
             // don't draw block if it collides with icon bounding box
-            const iconSize = getBoundingBoxSize(this.iconMesh);
             const safetyMargin = Math.min(this.blockWidth * 1.5, 4);
             if ((blockX > -iconSize.x / 2 - safetyMargin
               && blockX < iconSize.x / 2 + safetyMargin)

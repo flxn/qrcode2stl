@@ -60,6 +60,7 @@ import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
 import { bus } from '../main';
 import { save, saveAsString, saveAsArrayBuffer } from '../utils';
+import { nextTick } from 'vue';
 
 const defaultOptions = {
   activeTabIndex: 0,
@@ -95,6 +96,16 @@ const defaultOptions = {
   sms: {
     recipient: '',
     message: '',
+  },
+  calendar: {
+    eventName: '',
+    startDate: new Date().toISOString().split('T')[0],
+    startTime: '09:00',
+    endDate: new Date().toISOString().split('T')[0],
+    endTime: '10:00',
+    allDay: false,
+    location: '',
+    description: '',
   },
   base: {
     shape: 'roundedRectangle',
@@ -231,6 +242,7 @@ export default {
       }
 
       try {
+        console.time('2D QR Code Generation');
         const qrCodeObject = await qrcode.create(txt, {
           errorCorrectionLevel: this.options.errorCorrectionLevel,
         });
@@ -239,6 +251,7 @@ export default {
           errorCorrectionLevel: this.options.errorCorrectionLevel,
           margin: 1,
         }, (err, url) => {
+          console.timeEnd('2D QR Code Generation');
           if (err) {
             throw err;
           }
@@ -251,11 +264,11 @@ export default {
         return;
       }
 
-      setTimeout(() => {
+      nextTick(() => {
         // this.init3d();
         this.setup3dObject();
         // this.startAnimation();
-      }, 100);
+      });
     },
     exportSTL(stlType, multipleParts) {
       const timestamp = new Date().getTime();
@@ -321,6 +334,82 @@ export default {
       const result = str.replace(regex, subst);
       return result;
     },
+    generateICalString() {
+      const calendar = this.options.calendar;
+
+      // Validate required fields
+      if (!calendar.eventName || !calendar.startDate || !calendar.endDate) {
+        return 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//QRCode2STL//printer.tools//EN\r\nEND:VCALENDAR';
+      }
+
+      // Helper function to format date for iCal
+      const formatICalDate = (date, time, allDay) => {
+        if (allDay) {
+          // For all-day events, use YYYYMMDD format
+          return date.replace(/-/g, '');
+        } else {
+          // For timed events, use YYYYMMDDTHHMMSSZ format
+          const dateTime = `${date}T${time}:00`;
+          return new Date(dateTime).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+      };
+
+      // Helper function to escape special characters in iCal
+      const escapeICalString = (str) => {
+        if (!str) return '';
+        return str
+          .replace(/\\/g, '\\\\')
+          .replace(/;/g, '\\;')
+          .replace(/,/g, '\\,')
+          .replace(/\n/g, '\\n')
+          .replace(/\r/g, '');
+      };
+
+      // Generate unique identifier
+      const uid = Date.now().toString(36);
+
+      // Format dates
+      const dtstart = formatICalDate(calendar.startDate, calendar.startTime, calendar.allDay);
+      let dtend = formatICalDate(calendar.endDate, calendar.endTime, calendar.allDay);
+
+      // For all-day events, add one day to end date (iCal standard)
+      if (calendar.allDay) {
+        const endDate = new Date(calendar.endDate);
+        endDate.setDate(endDate.getDate() + 1);
+        dtend = endDate.toISOString().split('T')[0].replace(/-/g, '');
+      }
+
+      // Build iCal string
+      let icalString = 'BEGIN:VCALENDAR\r\n';
+      icalString += 'VERSION:2.0\r\n';
+      icalString += 'PRODID:-//QRCode2STL//printer.tools//EN\r\n';
+      icalString += 'BEGIN:VEVENT\r\n';
+      icalString += `UID:${uid}\r\n`;
+      icalString += `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z\r\n`;
+
+      if (calendar.allDay) {
+        icalString += `DTSTART;VALUE=DATE:${dtstart}\r\n`;
+        icalString += `DTEND;VALUE=DATE:${dtend}\r\n`;
+      } else {
+        icalString += `DTSTART:${dtstart}\r\n`;
+        icalString += `DTEND:${dtend}\r\n`;
+      }
+
+      icalString += `SUMMARY:${escapeICalString(calendar.eventName)}\r\n`;
+
+      if (calendar.description) {
+        icalString += `DESCRIPTION:${escapeICalString(calendar.description)}\r\n`;
+      }
+
+      if (calendar.location) {
+        icalString += `LOCATION:${escapeICalString(calendar.location)}\r\n`;
+      }
+
+      icalString += 'END:VEVENT\r\n';
+      icalString += 'END:VCALENDAR';
+
+      return icalString;
+    },
     getQRText() {
       const vCard = vcardjs();
       let ret = '';
@@ -380,6 +469,9 @@ export default {
           break;
         case 4: // SMS
           ret = `SMSTO:${this.options.sms.recipient}:${this.options.sms.message}`;
+          break;
+        case 5: // Calendar
+          ret = this.generateICalString();
           break;
         default:
           break;

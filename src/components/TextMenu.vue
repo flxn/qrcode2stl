@@ -512,6 +512,7 @@ import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
 
 import { save, saveAsString, saveAsArrayBuffer } from '../utils';
+import { nextTick } from 'vue';
 
 const defaultOptions = {
   code: {
@@ -613,11 +614,11 @@ export default {
       this.generateError = null;
       this.isGenerating = true;
 
-      setTimeout(() => {
+      nextTick(() => {
         // this.init3d();
         this.setup3dObject();
         // this.startAnimation();
-      }, 100);
+      });
     },
     exportSTL(stlType, multipleParts) {
       const timestamp = new Date().getTime();

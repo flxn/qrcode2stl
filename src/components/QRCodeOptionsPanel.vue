@@ -34,6 +34,11 @@
       <SMSForm :sms="options.sms" />
     </div>
 
+    <!-- Calendar -->
+    <div class="option-pane" v-if="options.activeTabIndex === 5">
+      <CalendarForm :calendar="options.calendar" />
+    </div>
+
     <!-- Error Correction -->
     <div class="option-pane">
       <div class="field is-horizontal">
@@ -68,6 +73,7 @@ import WifiForm from './forms/Wifi.vue';
 import EmailForm from './forms/Email.vue';
 import ContactForm from './forms/Contact.vue';
 import SMSForm from './forms/SMS.vue';
+import CalendarForm from './forms/Calendar.vue';
 
 export default {
   name: 'QRCodeOptionsPanel',
@@ -79,6 +85,7 @@ export default {
     EmailForm,
     ContactForm,
     SMSForm,
+    CalendarForm,
     QRCodeOptionsTabs,
   },
   methods: {

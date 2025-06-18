@@ -15,8 +15,9 @@ addEventListener('message', async (event) => {
   } else {
     return;
   }
-
+  console.time('3D Model Generation');
   await generator.generate3dModel();
+  console.timeEnd('3D Model Generation');
   const parts = generator.getPartMeshes();
 
   let count = 0;

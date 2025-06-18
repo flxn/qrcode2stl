@@ -40,6 +40,13 @@
         </div>
       </div>
     </div>
+
+    <p class="has-text-centered mt-5">
+      {{ $t('faqFooter') }}
+      <a href="mailto:qrcode2stl@flxn.de" class="has-text-link">
+        {{ $t('faqContact') }}
+      </a>
+    </p>
   </section>
 </template>
 

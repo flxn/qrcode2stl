@@ -79,6 +79,20 @@ export default {
   phonePlaceholder: 'The phone number of the recipient',
   smsMessage: 'Message',
   smsMessagePlaceholder: 'The SMS message',
+  // Calendar
+  calendar: 'Calendar',
+  eventName: 'Event Name',
+  eventNamePlaceholder: 'Name of the event',
+  startDate: 'Start Date',
+  startTime: 'Start Time',
+  endDate: 'End Date',
+  endTime: 'End Time',
+  allDay: 'All Day',
+  allDayEvent: 'All day event',
+  location: 'Location',
+  locationPlaceholder: 'Event location (optional)',
+  description: 'Description',
+  descriptionPlaceholder: 'Event description (optional)',
 
   //
   // Spotify Options Panel
@@ -211,4 +225,8 @@ export default {
   faqAnswer4: 'The generated QR code itself will continue to work forever. However, if you\'re using the QR code to link to an external page, the link may break over time. This is out of our control. If it\'s a page you own, make sure the link stays online. If it\'s a third-party page and they update their site, the link may stop working. You can use a URL shortener that allows you to change the destination link after creation. Spotify codes will work until Spotify discontinues this feature.',
   faqQuestion5: 'How can I print QR codes with my multicolor 3D printer?',
   faqAnswer5: 'When exporting the QR code, select the option to download the 3D model in multiple parts. This option is located at the top of the page, directly to the left of the STL export button. This creates a zip file containing all the different parts of the 3D model. Load all parts into your slicer and overlay them on top of each other. Now you can assign colors to the different parts in your slicer. You can also create a 2D-looking printed QR code by setting the height value of your QR code to a very low setting (e.g., 0.1mm). Please check the preview in your slicer to ensure everything works as expected.',
+  
+  // FAQ Footer
+  faqFooter: 'If you have any additional questions, feel free to contact me and I will add them to the list:',
+  faqContact: 'Send me an email with your question',
 };
