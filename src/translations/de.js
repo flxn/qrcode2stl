@@ -228,7 +228,7 @@ export default {
   faqAnswer4: 'Der generierte QR-Code selbst wird für immer funktionieren. Wenn du jedoch den QR-Code verwendest, um auf eine externe Seite zu verlinken, kann der Link mit der Zeit nicht mehr funktionieren. Das liegt außerhalb unserer Kontrolle. Wenn es eine Seite ist, die dir gehört, stelle sicher, dass der Link online bleibt. Wenn es eine Drittanbieter-Seite ist und diese ihre Seite aktualisiert, könnte der Link nicht mehr funktionieren. Du kannst einen URL-Shortener verwenden, der es dir ermöglicht, den Ziel-Link nach der Erstellung zu ändern. Spotify-Codes funktionieren, bis Spotify diese Funktion einstellt.',
   faqQuestion5: 'Wie kann ich QR-Codes mit meinem Mehrfarben-3D-Drucker drucken?',
   faqAnswer5: 'Beim Exportieren des QR-Codes wähle die Option, das 3D-Modell in mehreren Teilen herunterzuladen. Diese Option befindet sich oben auf der Seite, direkt links vom STL-Export-Button. Dies erstellt eine ZIP-Datei mit allen verschiedenen Teilen des 3D-Modells. Lade alle Teile in deinen Slicer und überlagere sie aufeinander. Nun kannst du den verschiedenen Teilen in deinem Slicer Farben zuweisen. Du kannst auch einen 2D-aussehenden gedruckten QR-Code erstellen, indem du die Höhe deines QR-Codes auf einen sehr niedrigen Wert einstellst (z.B. 0,1mm). Bitte überprüfe die Vorschau in deinem Slicer, um sicherzustellen, dass alles wie erwartet funktioniert.',
-  
+
   // FAQ Footer
   faqFooter: 'Wenn du weitere Fragen hast, kontaktiere mich gerne und ich werde sie zur Liste hinzufügen:',
   faqContact: 'Sende mir eine E-Mail mit deiner Frage',

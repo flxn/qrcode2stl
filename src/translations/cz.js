@@ -221,7 +221,7 @@ export default {
   faqAnswer4: 'Samotný vygenerovaný QR kód bude fungovat navždy. Pokud však používáte QR kód k odkazu na externí stránku, odkaz se může časem pokazit. To je mimo naši kontrolu. Pokud je to stránka, kterou vlastníte, ujistěte se, že odkaz zůstane online. Pokud je to stránka třetí strany a oni aktualizují svou stránku, odkaz může přestat fungovat. Můžete použít zkracovač URL, který vám umožní změnit cílový odkaz po vytvoření. Spotify kódy budou fungovat, dokud Spotify tuto funkci nezruší.',
   faqQuestion5: 'Jak mohu tisknout QR kódy s mou vícebarevnou 3D tiskárnou?',
   faqAnswer5: 'Při exportu QR kódu vyberte možnost stáhnout 3D model v několika částech. Tato možnost se nachází v horní části stránky, přímo vlevo od tlačítka STL exportu. Tím se vytvoří zip soubor obsahující všechny různé části 3D modelu. Načtěte všechny části do vašeho sliceru a překryjte je jedna přes druhou. Nyní můžete přiřadit barvy různým částem ve vašem sliceru. Můžete také vytvořit 2D vypadající tištěný QR kód nastavením hodnoty výšky vašeho QR kódu na velmi nízké nastavení (např. 0,1 mm). Prosím zkontrolujte náhled ve vašem sliceru, abyste se ujistili, že vše funguje podle očekávání.',
-  
+
   // FAQ Footer
   faqFooter: 'Máte-li další otázky, neváhejte mě kontaktovat a já je přidám na seznam:',
   faqContact: 'Pošlete mi e-mail s vaší otázkou',

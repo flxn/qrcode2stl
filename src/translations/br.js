@@ -217,7 +217,7 @@ export default {
   faqAnswer4: 'O código QR gerado em si continuará funcionando para sempre. No entanto, se você estiver usando o código QR para vincular a uma página externa, o link pode quebrar com o tempo. Isso está fora do nosso controle. Se for uma página sua, certifique-se de que o link permaneça online. Se for uma página de terceiros e eles atualizarem seu site, o link pode parar de funcionar. Você pode usar um encurtador de URL que permite alterar o link de destino após a criação. Os códigos do Spotify funcionarão até que o Spotify descontinue este recurso.',
   faqQuestion5: 'Como posso imprimir códigos QR com minha impressora 3D multicolorida?',
   faqAnswer5: 'Ao exportar o código QR, selecione a opção para baixar o modelo 3D em várias partes. Esta opção está localizada no topo da página, diretamente à esquerda do botão de exportação STL. Isso cria um arquivo zip contendo todas as diferentes partes do modelo 3D. Carregue todas as partes no seu fatiador e sobreponha-as umas sobre as outras. Agora você pode atribuir cores às diferentes partes no seu fatiador. Você também pode criar um código QR impresso com aparência 2D definindo o valor da altura do seu código QR para uma configuração muito baixa (por exemplo, 0,1mm). Por favor, verifique a visualização no seu fatiador para garantir que tudo funcione como esperado.',
-  
+
   // FAQ Footer
   faqFooter: 'Se você tiver perguntas adicionais, sinta-se à vontade para me contatar e eu as adicionarei à lista:',
   faqContact: 'Envie-me um email com sua pergunta',

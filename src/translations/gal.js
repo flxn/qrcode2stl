@@ -225,7 +225,7 @@ export default {
   faqAnswer4: 'O código QR xerado en si mesmo seguirá funcionando para sempre. Sen embargo, se estás usando o código QR para enlazar cunha páxina externa, o enlace pode romperse co tempo. Isto está fóra do noso control. Se é unha páxina túa, asegúrate de que o enlace permaneza en liña. Se é unha páxina de terceiros e actualizan o seu sitio, o enlace pode deixar de funcionar. Podes usar un acortador de URL que che permita cambiar o enlace de destino despois da creación. Os códigos de Spotify funcionarán ata que Spotify descontinúe esta función.',
   faqQuestion5: 'Como podo imprimir códigos QR coa miña impresora 3D multicolor?',
   faqAnswer5: 'Ao exportar o código QR, selecciona a opción para descargar o modelo 3D en varias partes. Esta opción está situada na parte superior da páxina, directamente á esquerda do botón de exportación STL. Isto crea un arquivo zip que contén todas as diferentes partes do modelo 3D. Carga todas as partes no teu slicer e sobrepón unhas sobre outras. Agora podes asignar cores ás diferentes partes no teu slicer. Tamén podes crear un código QR impreso con aspecto 2D establecendo o valor da altura do teu código QR nunha configuración moi baixa (por exemplo, 0,1mm). Por favor, comproba a vista previa no teu slicer para asegurarte de que todo funciona como se espera.',
-  
+
   // FAQ Footer
   faqFooter: 'Se tes preguntas adicionais, non dubides en contactar comigo e engadiráas á lista:',
   faqContact: 'Envíame un correo electrónico coa túa pregunta',
