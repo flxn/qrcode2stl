@@ -22,16 +22,16 @@
 </template>
 
 <script>
-import VueMarkdown from 'vue-markdown';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import changelog from '../../CHANGELOG.md?raw';
 import packageJson from '../../package.json';
 import { bus } from '../main';
+import MarkdownRenderer from './MarkdownRenderer.vue';
 
 export default {
   name: 'ChangelogModal',
   components: {
-    VueMarkdown,
+    MarkdownRenderer,
   },
   data() {
     return {

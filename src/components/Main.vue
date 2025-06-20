@@ -123,7 +123,7 @@
     <section id="changelog" class="pt-4 content container">
       <h2 class="title">Changelog</h2>
       <hr>
-      <vue-markdown :source="changelog" class="content"></vue-markdown>
+      <MarkdownRenderer :source="changelog" class="content" />
     </section>
     <ChangelogModal v-if="changelogModalVisible"/>
     <ExportModal v-if="exportModalVisible"/>
@@ -154,7 +154,7 @@ export default {
     FAQ: () => import('./FAQ.vue'),
     ChangelogModal: () => import('./ChangelogModal.vue'),
     ExportModal: () => import('./ExportModal.vue'),
-    VueMarkdown: () => import('vue-markdown'),
+    MarkdownRenderer: () => import('./MarkdownRenderer.vue'),
   },
   data() {
     return {

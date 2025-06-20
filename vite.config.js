@@ -18,7 +18,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     commonjsOptions: {
-      include: [/vue-markdown/, /node_modules/],
+      include: [/node_modules/],
     },
     rollupOptions: {
       output: {
@@ -34,6 +34,6 @@ export default defineConfig({
     format: 'es',
   },
   optimizeDeps: {
-    include: ['vue', 'vue-i18n', 'three', 'qrcode', 'vue-markdown'],
+    include: ['vue', 'vue-i18n', 'three', 'qrcode'],
   },
 });

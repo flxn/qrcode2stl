@@ -27,7 +27,6 @@
     "vcards-js": "^2.10.0",
     "vue": "^2.7.16",
     "vue-i18n": "^8.28.2",
-    "vue-markdown": "^2.2.4",
     "vue-qrcode-reader": "^3.2.1"
   },
   "devDependencies": {
