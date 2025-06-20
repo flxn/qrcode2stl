@@ -72,9 +72,10 @@ class QRCode3D extends BaseTag3D {
    */
   getQRCodeMesh() {
     const invert = this.options.code.invert;
+    const useOldCompatMode = this.options.code.compatibilityMode;
     const iconSize = this.iconMesh ? getBoundingBoxSize(this.iconMesh) : null;
     // fast path for non-inverted QR codes
-    if (!invert) {
+    if (!invert && !useOldCompatMode) {
       const qrcodeGeometry = new THREE.Geometry();
       for (let y = 0; y < this.maskWidth; y += 1) {
         for (let x = 0; x < this.maskWidth; x += 1) {

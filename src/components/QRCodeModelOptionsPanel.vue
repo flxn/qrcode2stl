@@ -664,6 +664,27 @@
             </div>
           </div>
 
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{$t('compatibilityMode')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field has-addons">
+                <div class="control">
+                  <label class="checkbox">
+                    <input type="checkbox" v-model="options.code.compatibilityMode" />
+                    <span class="is-size-7">{{$t("compatibilityModeLabel")}}</span>
+                  </label>
+                </div>
+                <span
+                  class="help-icon icon has-text-info"
+                  :title="$t('compatibilityModeHelp')">
+                  <i class="fas fa-info-circle"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

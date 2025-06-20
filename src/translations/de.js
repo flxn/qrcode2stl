@@ -153,6 +153,9 @@ export default {
   nfcIndentationHelp: 'Fügt der Basis eine Einkerbung auf der Unterseite hinzu in der NFC/RFID tags platziert werden können.',
   indentation: 'Einkerbung',
   nfcIndentationHiddenHelp: 'Erstellt eine Aushöhlung im Inneren der Basis mit einem Abstand von 1mm zur Unterseite. Damit kannst du einen NFC Tag fest in den 3D-Druck integrieren. Stoppe den Druckvorgang vor dem Layer in dem die Aushöhlung wieder überdekt wird, platziere den Tag und setze dann den Druck fort. Passe auf, dass die Tiefe etwas höher ist als der tatsächliche Tag und passe die Höhe der Basis entsprechend der Größe des Tags an.',
+  compatibilityMode: 'Kompatibilitätsmodus',
+  compatibilityModeLabel: 'Alter Modellerstellungsmodus (bei Problemen, z.B. in TinkerCAD)',
+  compatibilityModeHelp: `Ich habe kürzlich eine Verbesserung vorgenommen, die die Geschwindigkeit der Modellerstellung erhöht. Wenn du Probleme mit dem generierten Modell hast, kannst du versuchen, diese Option zu aktivieren. Dadurch wird das Modell auf die alte Weise generiert, was eventuelle Probleme mit deinem Slicer/CAD-Programm beheben könnte.`,
 
   //
   // Export Settings

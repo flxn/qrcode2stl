@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.14.0] - 2025-06-20
+
+- There seems to be a problem with the faster 3D model generation step when importing the STL into certain CAD software like TinkerCAD. I added a new "compatibility mode" option that uses the old 3D model generation step which should fix the problem. You can enable it in the settings.
+
 ## [1.13.0] - 2025-06-18
 
 ### Added

@@ -138,6 +138,7 @@ import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
 import changelog from '../../CHANGELOG.md?raw';
 import { bus } from '../main';
 import { getRandomBanner, saveAsArrayBuffer, trimCanvas } from '../utils';
+import ChangelogModal from './ChangelogModal.vue';
 
 const shareHashMarker = '#share';
 
@@ -152,7 +153,7 @@ export default {
     TextMenu: () => import('./TextMenu.vue'),
     PrintGuide: () => import('./PrintGuide.vue'),
     FAQ: () => import('./FAQ.vue'),
-    ChangelogModal: () => import('./ChangelogModal.vue'),
+    ChangelogModal,
     ExportModal: () => import('./ExportModal.vue'),
     MarkdownRenderer: () => import('./MarkdownRenderer.vue'),
   },

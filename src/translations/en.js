@@ -154,6 +154,9 @@ export default {
   nfcIndentationHelp: 'Adds an indentation on the bottom side of the base where one can insert an NFC/RFID tag.',
   indentation: 'Indentation',
   nfcIndentationHiddenHelp: 'Creates a cavity inside the base with a 1mm offset from the bottom of the base. This allows you to firmly embed the NFC tag inside the 3d print itself. Pause printing before the closing layer, insert the tag, then resume printing. Make sure that the indentation depth is slightly larger than the tag itself and adjust base depth accordingly.',
+  compatibilityMode: 'Compatibility Mode',
+  compatibilityModeLabel: 'Old Model Generation (when having problems, e.g. in TinkerCAD)',
+  compatibilityModeHelp: 'I recently made an improvement that increases the speed of the model generation. If you are having problems with the generated model, you can try to enable this option. It will generate the model in the old way, which may fix some issues with your slicer/CAD software.',
 
   //
   // Export Settings

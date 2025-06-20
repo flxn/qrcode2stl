@@ -143,6 +143,7 @@ const defaultOptions = {
     cityMode: false,
     depthMax: 5,
     invert: false,
+    compatibilityMode: false,
   },
 };
 
