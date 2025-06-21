@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
-  base: process.env.NODE_ENV === 'production' ? '/qrcode2stl/' : '/',
+  base: '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
