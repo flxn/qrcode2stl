@@ -62,7 +62,7 @@
 </template>
 
 <script>
-const url = 'https://printer.tools/qrcode2stl/';
+const url = 'https://qrcode2stl.printer.tools/';
 const title = 'Generate 3d printable QR codes';
 const text = 'With this web app you can create QR codes and directly download them as a file for 3d printing';
 const imageUrl = 'https://flxn.de/qrcode2stl/img/generate_code.9da711b0.gif';
