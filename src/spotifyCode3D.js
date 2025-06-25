@@ -96,7 +96,9 @@ class SpotifyCode3D extends BaseTag3D {
    */
   getCombinedMesh() {
     const baseCombinedGeometry = super.getCombinedMesh().geometry;
-    baseCombinedGeometry.merge(this.spotifyCodeMesh.geometry, this.spotifyCodeMesh.matrix);
+    if (this.spotifyCodeMesh && this.spotifyCodeMesh.geometry) {
+      baseCombinedGeometry.merge(this.spotifyCodeMesh.geometry, this.spotifyCodeMesh.matrix);
+    }
     this.combinedMesh = new THREE.Mesh(baseCombinedGeometry, this.materialBase);
     return this.combinedMesh;
   }

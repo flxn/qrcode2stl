@@ -94,6 +94,7 @@ import modelWorker from '@/model-worker';
 // 3D settings panel
 import SpotifyModelOptionsPanel from './SpotifyModelOptionsPanel.vue';
 import { save, saveAsString, saveAsArrayBuffer } from '../utils';
+import { nextTick } from 'vue';
 
 const defaultOptions = {
   spotifyUri: '',
