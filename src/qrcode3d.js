@@ -59,7 +59,7 @@ class QRCode3D extends BaseTag3D {
     iconSize = getBoundingBoxSize(iconMesh);
 
     iconMesh.position.x = -iconSize.x / 2;
-    iconMesh.position.y = -iconSize.y / 2 + this.blockWidth / 2;
+    iconMesh.position.y = -iconSize.y / 2;
     iconMesh.position.z = this.options.base.depth + this.options.code.depth;
     this.iconMesh = iconMesh;
     iconMesh.updateMatrix();
