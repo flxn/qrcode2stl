@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { Font } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import fontInterSemiBold from './assets/fonts/Inter_SemiBold.json';
 import fontInterSemiBoldItalic from './assets/fonts/Inter_SemiBold_Italic.json';
 import fontInterExtraBold from './assets/fonts/Inter_ExtraBold.json';
@@ -135,12 +138,12 @@ class BaseTag3D {
    * @return {THREE.Mesh} the mesh of the text
    */
   getSubtitleMesh() {
-    const textGeometry = new THREE.Geometry();
+    const textGeometry = new THREE.BufferGeometry();
     // create text
-    const fontRegular = new THREE.Font(fontInterSemiBold);
-    const fontRegularItalic = new THREE.Font(fontInterSemiBoldItalic);
-    const fontBold = new THREE.Font(fontInterExtraBold);
-    const fontBoldItalic = new THREE.Font(fontInterExtraBoldItalic);
+    const fontRegular = new Font(fontInterSemiBold);
+    const fontRegularItalic = new Font(fontInterSemiBoldItalic);
+    const fontBold = new Font(fontInterExtraBold);
+    const fontBoldItalic = new Font(fontInterExtraBoldItalic);
 
     const fonts = [fontRegular, fontRegularItalic, fontBold, fontBoldItalic];
 
@@ -164,7 +167,7 @@ class BaseTag3D {
         let textSize = null;
         let newLineCreated = false;
         do {
-          const tempTextGeometry = new THREE.TextGeometry(text, {
+          const tempTextGeometry = new TextGeometry(text, {
             font: fonts[emphLevel],
             size: this.options.base.textSize,
             height: this.options.base.textDepth,
@@ -225,7 +228,7 @@ class BaseTag3D {
       } else if (this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right') {
         const maxTextWidth = this.getTextRenderWidth() + (2 * this.options.base.textMargin);
         let textSize = null;
-        const tempTextGeometry = new THREE.TextGeometry(text, {
+        const tempTextGeometry = new TextGeometry(text, {
           font: fonts[emphLevel],
           size: this.options.base.textSize,
           height: this.options.base.textDepth,
@@ -261,7 +264,21 @@ class BaseTag3D {
 
       subtitleMesh.rotation.set(0, 0, Math.PI / 2);
       subtitleMesh.updateMatrix();
-      textGeometry.merge(subtitleMesh.geometry, subtitleMesh.matrix);
+      // Convert BufferGeometry merge operation
+      const tempGeometry = subtitleMesh.geometry.clone();
+      tempGeometry.applyMatrix4(subtitleMesh.matrix);
+      
+      if (!textGeometry.attributes.position) {
+        textGeometry.copy(tempGeometry);
+      } else {
+        // Ensure both geometries are non-indexed for compatibility
+        const geo1 = textGeometry.index !== null ? textGeometry.toNonIndexed() : textGeometry;
+        const geo2 = tempGeometry.index !== null ? tempGeometry.toNonIndexed() : tempGeometry;
+        
+        // Use BufferGeometryUtils to merge instead of deprecated merge method
+        const mergedGeometry = BufferGeometryUtils.mergeGeometries([geo1, geo2]);
+        textGeometry.copy(mergedGeometry);
+      }
     }
 
     this.options.base.textMessage = textLines.join('\n');
@@ -489,8 +506,8 @@ class BaseTag3D {
       let subtitleMesh = null;
       let textSize = null;
 
-      const tempTextGeometry = new THREE.TextGeometry(text, {
-        font: new THREE.Font(fontInterSemiBold),
+      const tempTextGeometry = new TextGeometry(text, {
+        font: new Font(fontInterSemiBold),
         size: this.options.base.textSize,
         height: this.options.base.textDepth,
       });
@@ -534,22 +551,43 @@ class BaseTag3D {
    * Returns one merged mesh of all part meshes
    */
   getCombinedMesh() {
-    const combinedGeometry = new THREE.Geometry();
-    combinedGeometry.merge(this.baseMesh.geometry, this.baseMesh.matrix);
+    const geometries = [];
+    
+    // Collect base mesh
+    const baseGeo = this.baseMesh.geometry.clone();
+    baseGeo.applyMatrix4(this.baseMesh.matrix);
+    geometries.push(baseGeo);
 
     if (this.borderMesh) {
-      combinedGeometry.merge(this.borderMesh.geometry, this.borderMesh.matrix);
+      const borderGeo = this.borderMesh.geometry.clone();
+      borderGeo.applyMatrix4(this.borderMesh.matrix);
+      geometries.push(borderGeo);
     }
 
     if (this.subtitleMesh && !this.options.code.invert) {
-      combinedGeometry.merge(this.subtitleMesh.geometry, this.subtitleMesh.matrix);
+      const subtitleGeo = this.subtitleMesh.geometry.clone();
+      subtitleGeo.applyMatrix4(this.subtitleMesh.matrix);
+      geometries.push(subtitleGeo);
     }
 
     if (this.keychainAttachmentMesh) {
-      combinedGeometry.merge(this.keychainAttachmentMesh.geometry, this.keychainAttachmentMesh.matrix);
+      const keychainGeo = this.keychainAttachmentMesh.geometry.clone();
+      keychainGeo.applyMatrix4(this.keychainAttachmentMesh.matrix);
+      geometries.push(keychainGeo);
     }
 
-    const combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
+    // Ensure all geometries are non-indexed to avoid compatibility issues
+    const compatibleGeometries = geometries.map(geo => {
+      if (geo.index !== null) {
+        return geo.toNonIndexed();
+      }
+      return geo;
+    });
+
+    // Use BufferGeometryUtils to merge geometries
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
+    
+    const combinedMesh = new THREE.Mesh(mergedGeometry, this.materialBase);
     return combinedMesh;
   }
 

@@ -22,7 +22,7 @@ addEventListener('message', async (event) => {
 
   let count = 0;
   Object.keys(parts).forEach((key) => {
-    parts[key].geometry = new THREE.BufferGeometry().fromGeometry(parts[key].geometry);
+    // No need to convert geometry since we're already using BufferGeometry
     parts[key] = parts[key].toJSON();
     count += 1;
   });

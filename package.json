@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext .js,.vue"
+    "lint": "eslint src --ext .js,.vue",
+    "serve": "npx serve public"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
@@ -22,8 +23,8 @@
     "path-that-svg": "^1.2.4",
     "qrcode": "^1.4.4",
     "tailwindcss": "^4.1.8",
-    "three": "^0.118.3",
-    "three-csg-ts": "^2.3.0",
+    "three": "^0.178.0",
+    "three-csg-ts": "^3.2.0",
     "vcards-js": "^2.10.0",
     "vue": "^2.7.16",
     "vue-i18n": "^8.28.2",

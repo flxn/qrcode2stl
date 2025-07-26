@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { CSG } from 'three-csg-ts';
 import BaseTag3D from './base';
 import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
@@ -23,24 +24,70 @@ class QRCode3D extends BaseTag3D {
    * @return {THREE.Mesh} the 3D mesh of the icon
    */
   getIconMesh() {
-    const iconGeometry = new THREE.Geometry();
-    const shapes = this.options.code.iconShapes.map((sj) => new THREE.Shape().fromJSON(sj));
-    // Each path has array of shapes
-    shapes.forEach((shape) => {
-      // Finally we can take each shape and extrude it
-      const pathGeometry = new THREE.ExtrudeGeometry(shape, {
-        steps: 1,
-        depth: this.options.code.depth,
-        bevelEnabled: false,
+    const geometries = [];
+    
+    if (!this.options.code.iconShapes || this.options.code.iconShapes.length === 0) {
+      console.warn('No icon shapes available for 3D generation');
+      return null;
+    }
+    
+    try {
+      // Handle shape format with proper hole support (r127+)
+      this.options.code.iconShapes.forEach((shapeData) => {
+        try {
+          let shape, holes = [];
+          
+          // Handle new format with holes
+          if (shapeData.shape && shapeData.holes !== undefined) {
+            shape = new THREE.Shape().fromJSON(shapeData.shape);
+            holes = shapeData.holes.map(holeData => new THREE.Path().fromJSON(holeData));
+          } else {
+            // Fallback for simple format
+            shape = new THREE.Shape().fromJSON(shapeData);
+          }
+          
+          // Set holes if any
+          if (holes.length > 0) {
+            shape.holes = holes;
+          }
+          
+          // Finally we can take each shape and extrude it
+          const pathGeometry = new THREE.ExtrudeGeometry(shape, {
+            steps: 1,
+            depth: this.options.code.depth,
+            bevelEnabled: false,
+          });
+
+          const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
+          pathMesh.position.set(0, 0, 0);
+          pathMesh.rotation.set(0, 0, -Math.PI / 2);
+          pathMesh.updateMatrix();
+          const clonedGeometry = pathGeometry.clone();
+          clonedGeometry.applyMatrix4(pathMesh.matrix);
+          geometries.push(clonedGeometry);
+        } catch (shapeError) {
+          console.warn('Error processing individual shape:', shapeError);
+          // Continue with other shapes
+        }
       });
+    } catch (error) {
+      console.error('Error creating icon shapes:', error);
+      return null;
+    }
 
-      const pathMesh = new THREE.Mesh(pathGeometry, this.materialDetail);
-      pathMesh.position.set(0, 0, 0);
-      pathMesh.rotation.set(0, 0, -Math.PI / 2);
-      pathMesh.updateMatrix();
-      iconGeometry.merge(pathMesh.geometry, pathMesh.matrix);
+    if (geometries.length === 0) {
+      return null;
+    }
+    
+    // Ensure all geometries are non-indexed for compatibility
+    const compatibleGeometries = geometries.map(geo => {
+      if (geo.index !== null) {
+        return geo.toNonIndexed();
+      }
+      return geo;
     });
-
+    
+    const iconGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
     const iconMesh = new THREE.Mesh(iconGeometry, this.materialDetail);
 
     // scale icon to correct size
@@ -76,7 +123,7 @@ class QRCode3D extends BaseTag3D {
     const iconSize = this.iconMesh ? getBoundingBoxSize(this.iconMesh) : null;
     // fast path for non-inverted QR codes
     if (!invert && !useOldCompatMode) {
-      const qrcodeGeometry = new THREE.Geometry();
+      const geometries = [];
       for (let y = 0; y < this.maskWidth; y += 1) {
         for (let x = 0; x < this.maskWidth; x += 1) {
           if (!this.bitMask[x * this.maskWidth + y]) continue;
@@ -98,14 +145,29 @@ class QRCode3D extends BaseTag3D {
           }
           blockMesh.position.set(blockX, blockY, this.options.base.depth + blockDepth / 2);
           blockMesh.updateMatrix();
-          qrcodeGeometry.merge(blockMesh.geometry, blockMesh.matrix);
+          const clonedBlockGeometry = blockGeo.clone();
+          clonedBlockGeometry.applyMatrix4(blockMesh.matrix);
+          geometries.push(clonedBlockGeometry);
         }
       }
+      if (geometries.length === 0) {
+        return new THREE.Mesh(new THREE.BufferGeometry(), this.materialDetail);
+      }
+      
+      // Ensure all geometries are non-indexed for compatibility
+      const compatibleGeometries = geometries.map(geo => {
+        if (geo.index !== null) {
+          return geo.toNonIndexed();
+        }
+        return geo;
+      });
+      
+      const qrcodeGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
       return new THREE.Mesh(qrcodeGeometry, this.materialDetail);
     }
 
     // slow path for inverted QR codes
-    const qrcodeGeometry = new THREE.Geometry();
+    const qrcodeGeometry = new THREE.BufferGeometry();
     const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialDetail);
     let bspQRMesh = CSG.fromMesh(baseQRMesh);
     // iterate through pixels in QR Code Bitmask
@@ -221,16 +283,31 @@ class QRCode3D extends BaseTag3D {
    * Returns one merged mesh of all part meshes
    */
   getCombinedMesh() {
-    const baseCombinedGeometry = super.getCombinedMesh().geometry;
-    if (!this.qrcodeMesh) {
-      return new THREE.Mesh(baseCombinedGeometry, this.materialBase);
+    const baseCombined = super.getCombinedMesh();
+    const geometries = [baseCombined.geometry.clone()];
+    
+    if (this.qrcodeMesh) {
+      const qrcodeGeo = this.qrcodeMesh.geometry.clone();
+      qrcodeGeo.applyMatrix4(this.qrcodeMesh.matrix);
+      geometries.push(qrcodeGeo);
     }
-
-    baseCombinedGeometry.merge(this.qrcodeMesh.geometry, this.qrcodeMesh.matrix);
+    
     if (this.iconMesh && !this.options.code.invert) {
-      baseCombinedGeometry.merge(this.iconMesh.geometry, this.iconMesh.matrix);
+      const iconGeo = this.iconMesh.geometry.clone();
+      iconGeo.applyMatrix4(this.iconMesh.matrix);
+      geometries.push(iconGeo);
     }
-    this.combinedMesh = new THREE.Mesh(baseCombinedGeometry, this.materialBase);
+    
+    // Ensure all geometries are non-indexed for compatibility
+    const compatibleGeometries = geometries.map(geo => {
+      if (geo.index !== null) {
+        return geo.toNonIndexed();
+      }
+      return geo;
+    });
+    
+    const combinedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
+    this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
     return this.combinedMesh;
   }
 
@@ -242,6 +319,11 @@ class QRCode3D extends BaseTag3D {
 
     if (this.options.code.iconName !== 'none') {
       this.iconMesh = this.getIconMesh();
+      // If icon generation failed, reset to no icon
+      if (!this.iconMesh) {
+        console.warn('Icon mesh generation failed, disabling icon');
+        this.options.code.iconName = 'none';
+      }
     }
 
     this.qrcodeMesh = this.getQRCodeMesh();

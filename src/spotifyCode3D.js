@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import BaseTag3D from './base';
 import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
 
@@ -8,7 +9,28 @@ import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
 class SpotifyCode3D extends BaseTag3D {
   constructor(spotifyCodeShapes, options) {
     super(options);
-    this.spotifyCodeShapes = spotifyCodeShapes.map((sj) => new THREE.Shape().fromJSON(sj));
+    
+    // Handle shape format with proper hole support (r127+)
+    this.spotifyCodeShapes = spotifyCodeShapes.map((shapeData) => {
+      let shape, holes = [];
+      
+      // Handle new format with holes
+      if (shapeData.shape && shapeData.holes !== undefined) {
+        shape = new THREE.Shape().fromJSON(shapeData.shape);
+        holes = shapeData.holes.map(holeData => new THREE.Path().fromJSON(holeData));
+      } else {
+        // Fallback for simple format
+        shape = new THREE.Shape().fromJSON(shapeData);
+      }
+      
+      // Set holes if any
+      if (holes.length > 0) {
+        shape.holes = holes;
+      }
+      
+      return shape;
+    });
+    
     this.spotifyCodeMesh = null;
     this.exportedMeshes = super.getPartMeshes();
   }
@@ -17,7 +39,7 @@ class SpotifyCode3D extends BaseTag3D {
    * @return {THREE.Mesh} the 3D mesh of the icon
    */
   async getSpotifyCodeMesh() {
-    const spotifyCodeGeometry = new THREE.Geometry();
+    const geometries = [];
     this.spotifyCodeShapes.forEach((shape, shapeNo) => {
       let shapeDepth = this.options.code.depth;
       if (this.options.code.cityMode && shapeNo !== this.spotifyCodeShapes.length - 1) {
@@ -35,9 +57,24 @@ class SpotifyCode3D extends BaseTag3D {
       pathMesh.rotation.set(0, 0, -Math.PI / 2);
       pathMesh.updateMatrix();
 
-      spotifyCodeGeometry.merge(pathMesh.geometry, pathMesh.matrix);
+      const clonedGeometry = pathGeometry.clone();
+      clonedGeometry.applyMatrix4(pathMesh.matrix);
+      geometries.push(clonedGeometry);
     });
 
+    if (geometries.length === 0) {
+      return null;
+    }
+    
+    // Ensure all geometries are non-indexed for compatibility
+    const compatibleGeometries = geometries.map(geo => {
+      if (geo.index !== null) {
+        return geo.toNonIndexed();
+      }
+      return geo;
+    });
+    
+    const spotifyCodeGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
     const spotifyCodeMesh = new THREE.Mesh(spotifyCodeGeometry, this.materialDetail);
     // scale icon to correct size
     let iconSize = getBoundingBoxSize(spotifyCodeMesh);
@@ -95,11 +132,25 @@ class SpotifyCode3D extends BaseTag3D {
    * Returns one merged mesh of all part meshes
    */
   getCombinedMesh() {
-    const baseCombinedGeometry = super.getCombinedMesh().geometry;
+    const baseCombined = super.getCombinedMesh();
+    const geometries = [baseCombined.geometry.clone()];
+    
     if (this.spotifyCodeMesh && this.spotifyCodeMesh.geometry) {
-      baseCombinedGeometry.merge(this.spotifyCodeMesh.geometry, this.spotifyCodeMesh.matrix);
+      const spotifyGeo = this.spotifyCodeMesh.geometry.clone();
+      spotifyGeo.applyMatrix4(this.spotifyCodeMesh.matrix);
+      geometries.push(spotifyGeo);
     }
-    this.combinedMesh = new THREE.Mesh(baseCombinedGeometry, this.materialBase);
+    
+    // Ensure all geometries are non-indexed for compatibility
+    const compatibleGeometries = geometries.map(geo => {
+      if (geo.index !== null) {
+        return geo.toNonIndexed();
+      }
+      return geo;
+    });
+    
+    const combinedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
+    this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
     return this.combinedMesh;
   }
 

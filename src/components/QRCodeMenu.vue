@@ -51,7 +51,7 @@
 
 <script>
 import * as THREE from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import { diff } from 'deep-object-diff';
@@ -235,11 +235,60 @@ export default {
 
       if (this.options.code.iconName !== 'none') {
         this.options.errorCorrectionLevel = 'H';
-        const svgLoader = new SVGLoader();
-        const svgMarkup = document.querySelector('#icon-preview').contentDocument.querySelector('svg').outerHTML;
-        const svgData = svgLoader.parse(svgMarkup);
-        const shapes = svgData.paths.map((p) => p.toShapes(true, true)).flat();
-        this.options.code.iconShapes = shapes.map((s) => s.toJSON());
+        try {
+          const svgLoader = new SVGLoader();
+          const iconPreview = document.querySelector('#icon-preview');
+          
+          // Wait for SVG to load if needed
+          if (!iconPreview || !iconPreview.contentDocument) {
+            console.warn('Icon preview not loaded yet, retrying...');
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          
+          let svgMarkup;
+          if (iconPreview && iconPreview.contentDocument) {
+            const svgElement = iconPreview.contentDocument.querySelector('svg');
+            if (svgElement) {
+              svgMarkup = svgElement.outerHTML;
+            } else {
+              // Fallback: load SVG directly from file
+              const response = await fetch(`icons/${this.options.code.iconName}.svg`);
+              svgMarkup = await response.text();
+            }
+          } else {
+            // Fallback: load SVG directly from file
+            const response = await fetch(`icons/${this.options.code.iconName}.svg`);
+            svgMarkup = await response.text();
+          }
+          
+          const svgData = svgLoader.parse(svgMarkup);
+          
+          // Use SVGLoader.createShapes for proper hole handling (r127+)
+          const processedShapes = [];
+          
+          svgData.paths.forEach(path => {
+            try {
+              // Use the modern createShapes method
+              const shapes = SVGLoader.createShapes(path);
+              
+              shapes.forEach(shape => {
+                processedShapes.push({
+                  shape: shape.toJSON(),
+                  holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+                });
+              });
+            } catch (pathError) {
+              console.warn('Error processing SVG path:', pathError);
+            }
+          });
+          
+          this.options.code.iconShapes = processedShapes;
+        } catch (error) {
+          console.error(`Error processing ${this.options.code.iconName} icon:`, error);
+          // Reset to no icon on error
+          this.options.code.iconName = 'none';
+          this.options.code.iconShapes = null;
+        }
       }
 
       try {
