@@ -170,7 +170,7 @@ class BaseTag3D {
           const tempTextGeometry = new TextGeometry(text, {
             font: fonts[emphLevel],
             size: this.options.base.textSize,
-            height: this.options.base.textDepth,
+            depth: this.options.base.textDepth,
           });
           subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
           textSize = getBoundingBoxSize(subtitleMesh);
@@ -231,7 +231,7 @@ class BaseTag3D {
         const tempTextGeometry = new TextGeometry(text, {
           font: fonts[emphLevel],
           size: this.options.base.textSize,
-          height: this.options.base.textDepth,
+          depth: this.options.base.textDepth,
         });
         subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
         textSize = getBoundingBoxSize(subtitleMesh);
@@ -267,14 +267,14 @@ class BaseTag3D {
       // Convert BufferGeometry merge operation
       const tempGeometry = subtitleMesh.geometry.clone();
       tempGeometry.applyMatrix4(subtitleMesh.matrix);
-      
+
       if (!textGeometry.attributes.position) {
         textGeometry.copy(tempGeometry);
       } else {
         // Ensure both geometries are non-indexed for compatibility
         const geo1 = textGeometry.index !== null ? textGeometry.toNonIndexed() : textGeometry;
         const geo2 = tempGeometry.index !== null ? tempGeometry.toNonIndexed() : tempGeometry;
-        
+
         // Use BufferGeometryUtils to merge instead of deprecated merge method
         const mergedGeometry = BufferGeometryUtils.mergeGeometries([geo1, geo2]);
         textGeometry.copy(mergedGeometry);
@@ -509,7 +509,7 @@ class BaseTag3D {
       const tempTextGeometry = new TextGeometry(text, {
         font: new Font(fontInterSemiBold),
         size: this.options.base.textSize,
-        height: this.options.base.textDepth,
+        depth: this.options.base.textDepth,
       });
       subtitleMesh = new THREE.Mesh(tempTextGeometry, this.materialDetail);
       textSize = getBoundingBoxSize(subtitleMesh);
@@ -552,7 +552,7 @@ class BaseTag3D {
    */
   getCombinedMesh() {
     const geometries = [];
-    
+
     // Collect base mesh
     const baseGeo = this.baseMesh.geometry.clone();
     baseGeo.applyMatrix4(this.baseMesh.matrix);
@@ -586,7 +586,7 @@ class BaseTag3D {
 
     // Use BufferGeometryUtils to merge geometries
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
-    
+
     const combinedMesh = new THREE.Mesh(mergedGeometry, this.materialBase);
     return combinedMesh;
   }
