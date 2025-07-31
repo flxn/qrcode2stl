@@ -198,30 +198,30 @@ export default {
       try {
         const loader = new SVGLoader();
         const spotifyPreview = document.querySelector('#spotify-code-preview');
-        
+
         if (!spotifyPreview || !spotifyPreview.contentDocument) {
           throw new Error('Spotify code preview not loaded');
         }
-        
+
         const svgElement = spotifyPreview.contentDocument.querySelector('svg');
         if (!svgElement) {
           throw new Error('SVG element not found in Spotify code preview');
         }
-        
+
         let svg = svgElement.outerHTML;
         svg = svg.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
-        
+
         const pathedSvg = await pathThatSvg(svg);
         const svgData = loader.parse(pathedSvg);
-        
+
         // Use SVGLoader.createShapes for proper hole handling (r127+)
         const processedShapes = [];
-        
+
         svgData.paths.forEach(path => {
           try {
             // Use the modern createShapes method
             const shapes = SVGLoader.createShapes(path);
-            
+
             shapes.forEach(shape => {
               processedShapes.push({
                 shape: shape.toJSON(),
@@ -232,16 +232,14 @@ export default {
             console.warn('Error processing SVG path:', pathError);
           }
         });
-        
-        shapes = processedShapes;
 
-        if (shapes.length === 0) {
+        if (processedShapes.length === 0) {
           throw new Error('No valid shapes found in Spotify code');
         }
 
         modelWorker.send({
           mode: 'Spotify',
-          spotifyCodeShapes: shapes,
+          spotifyCodeShapes: processedShapes,
           options: this.options,
         });
       } catch (error) {
