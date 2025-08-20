@@ -584,6 +584,9 @@
                       This is a beta feature.<br/>
                       Error Correction will be set to high if you use icons.
                     </p>
+                    <p class="has-text-info" v-if="showIconCompatibilityWarning">
+                      <i class="fas fa-info-circle"></i> {{ iconCompatibilityMessage }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -697,6 +700,7 @@ export default {
   props: {
     options: Object,
     unit: String,
+    iconCompatibilityStatus: Object,
   },
   data() {
     return {
@@ -744,6 +748,31 @@ export default {
         'moon',
       ],
     };
+  },
+  computed: {
+    showIconCompatibilityWarning() {
+      // Show warning whenever compatibility mode is active with icons
+      return this.iconCompatibilityStatus &&
+             this.iconCompatibilityStatus.hasIcon &&
+             this.iconCompatibilityStatus.isCompatibilityMode;
+    },
+    iconCompatibilityMessage() {
+      if (!this.showIconCompatibilityWarning) return '';
+
+      const messages = [];
+
+      // Always mention compatibility mode is active
+      messages.push(this.$t('iconCompatibleProcessing'));
+
+      if (this.iconCompatibilityStatus.wasSimplified) {
+        messages.push(this.$t('iconShapesSimplified'));
+      }
+      if (this.iconCompatibilityStatus.holesRemoved) {
+        messages.push(this.$t('iconHolesRemoved'));
+      }
+
+      return `${this.$t('iconCompatibilityWarning')}: ${messages.join(', ')}.`;
+    }
   },
   methods: {
     iconSelected(icon) {

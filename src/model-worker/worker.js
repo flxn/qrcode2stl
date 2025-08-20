@@ -27,9 +27,16 @@ addEventListener('message', async (event) => {
     count += 1;
   });
 
+  // Get icon compatibility status if available
+  let iconCompatibilityStatus = null;
+  if (generator.getIconCompatibilityStatus) {
+    iconCompatibilityStatus = generator.getIconCompatibilityStatus();
+  }
+
   postMessage({
     type: 'result',
     meshCount: count,
     meshes: parts,
+    iconCompatibilityStatus: iconCompatibilityStatus,
   });
 });

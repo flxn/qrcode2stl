@@ -15,7 +15,7 @@
     <QRCodeOptionsPanel :options="options" />
 
     <!-- 3D Options -->
-    <QRCodeModelOptionsPanel :options="options" :unit="unit" />
+    <QRCodeModelOptionsPanel :options="options" :unit="unit" :iconCompatibilityStatus="iconCompatibilityStatus" />
 
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
@@ -178,6 +178,7 @@ export default {
       isGenerating: false,
       generateError: null,
       scannerModalVisible: false,
+      iconCompatibilityStatus: null,
     };
   },
 
@@ -206,6 +207,7 @@ export default {
               this.iconMesh = meshes.icon;
               this.subtitleMesh = meshes.subtitle;
               this.keychainAttachmentMesh = meshes.keychainAttachment;
+              this.iconCompatibilityStatus = event.data.iconCompatibilityStatus;
               this.isGenerating = false;
             }
           });
@@ -238,13 +240,13 @@ export default {
         try {
           const svgLoader = new SVGLoader();
           const iconPreview = document.querySelector('#icon-preview');
-          
+
           // Wait for SVG to load if needed
           if (!iconPreview || !iconPreview.contentDocument) {
             console.warn('Icon preview not loaded yet, retrying...');
             await new Promise(resolve => setTimeout(resolve, 100));
           }
-          
+
           let svgMarkup;
           if (iconPreview && iconPreview.contentDocument) {
             const svgElement = iconPreview.contentDocument.querySelector('svg');
@@ -260,17 +262,17 @@ export default {
             const response = await fetch(`icons/${this.options.code.iconName}.svg`);
             svgMarkup = await response.text();
           }
-          
+
           const svgData = svgLoader.parse(svgMarkup);
-          
+
           // Use SVGLoader.createShapes for proper hole handling (r127+)
           const processedShapes = [];
-          
+
           svgData.paths.forEach(path => {
             try {
               // Use the modern createShapes method
               const shapes = SVGLoader.createShapes(path);
-              
+
               shapes.forEach(shape => {
                 processedShapes.push({
                   shape: shape.toJSON(),
@@ -281,7 +283,7 @@ export default {
               console.warn('Error processing SVG path:', pathError);
             }
           });
-          
+
           this.options.code.iconShapes = processedShapes;
         } catch (error) {
           console.error(`Error processing ${this.options.code.iconName} icon:`, error);
@@ -530,6 +532,17 @@ export default {
       console.log('QR Code String:', ret);
       return ret;
     },
+  },
+  watch: {
+    'options.code.compatibilityMode': {
+      handler(newValue, oldValue) {
+        // Only regenerate if the value actually changed and we have a mesh
+        if (newValue !== oldValue && this.mesh !== null) {
+          console.log('Compatibility mode changed, regenerating model...');
+          this.generate3dModel();
+        }
+      }
+    }
   },
   async mounted() {
     this.initWorker();
