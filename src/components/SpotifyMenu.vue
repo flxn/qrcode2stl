@@ -85,7 +85,7 @@
 
 <script>
 import * as THREE from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import pathThatSvg from 'path-that-svg';
 import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
@@ -195,23 +195,63 @@ export default {
       };
     },
     async setup3dObject() {
-      const loader = new SVGLoader();
-      let svg = document.querySelector('#spotify-code-preview').contentDocument.querySelector('svg').outerHTML;
-      svg = svg.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
-      const pathedSvg = await pathThatSvg(svg);
-      const svgData = loader.parse(pathedSvg);
-      let shapes = svgData.paths.map((p) => p.toShapes(true, false)).flat();
-      shapes = shapes.map((s) => s.toJSON());
+      try {
+        const loader = new SVGLoader();
+        const spotifyPreview = document.querySelector('#spotify-code-preview');
 
-      modelWorker.send({
-        mode: 'Spotify',
-        spotifyCodeShapes: shapes,
-        options: this.options,
-      });
+        if (!spotifyPreview || !spotifyPreview.contentDocument) {
+          throw new Error('Spotify code preview not loaded');
+        }
+
+        const svgElement = spotifyPreview.contentDocument.querySelector('svg');
+        if (!svgElement) {
+          throw new Error('SVG element not found in Spotify code preview');
+        }
+
+        let svg = svgElement.outerHTML;
+        svg = svg.replace('<rect x="0" y="0" width="400" height="100" fill="#000000"/>', '');
+
+        const pathedSvg = await pathThatSvg(svg);
+        const svgData = loader.parse(pathedSvg);
+
+        // Use SVGLoader.createShapes for proper hole handling (r127+)
+        const processedShapes = [];
+
+        svgData.paths.forEach(path => {
+          try {
+            // Use the modern createShapes method
+            const shapes = SVGLoader.createShapes(path);
+
+            shapes.forEach(shape => {
+              processedShapes.push({
+                shape: shape.toJSON(),
+                holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+              });
+            });
+          } catch (pathError) {
+            console.warn('Error processing SVG path:', pathError);
+          }
+        });
+
+        if (processedShapes.length === 0) {
+          throw new Error('No valid shapes found in Spotify code');
+        }
+
+        modelWorker.send({
+          mode: 'Spotify',
+          spotifyCodeShapes: processedShapes,
+          options: this.options,
+        });
+      } catch (error) {
+        console.error('Error processing Spotify code:', error);
+        this.generateError = `Failed to process Spotify code: ${error.message}`;
+        this.isGenerating = false;
+      }
     },
     async generate3dModel() {
       this.$emit('generating');
       this.isGenerating = true;
+      this.generateError = null; // Clear any previous errors
 
       nextTick(() => {
         // this.init3d();
