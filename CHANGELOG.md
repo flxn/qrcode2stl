@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.15.0] - 2025-08-29
+
+### Added
+- New icons.
+- Translated message for the Compatibility Mode setting.
+
+### Changed
+- Upgraded THREE.js from 0.118.3 to r178 and three-csg-ts from 2.3.0 to 3.2.0 for compatibility.
+- Migrated deprecated APIs: replaced `THREE.Geometry` with `BufferGeometry`, removed `fromGeometry()` calls, switched imports to the `/addons/` structure, and updated `BufferGeometryUtils.mergeGeometries` usage.
+- Updated text extrusion parameter: old `TextGeometry` height option migrated to `depth`.
+
+### Fixed
+- SVG icons with holes now render correctly (e.g., snapchat, spotify, youtube, key, whatsapp, marker) by using proper `SVGLoader.createShapes()` handling for compound shapes with holes.
+- Corrected rendering of shapes-within-shapes (overlapping positive/negative areas).
+- Fixed icons appearing off-center.
+- Fixed the Compatibility Mode switch behavior and icon handling when enabled.
+- Resolved an `undefined` variable `shapes` error.
+
+### Contributors
+- Thank you [Thibault](https://github.com/clawfire) for the PR!
+
 ## [1.14.0] - 2025-06-20
 
 - There seems to be a problem with the faster 3D model generation step when importing the STL into certain CAD software like TinkerCAD. I added a new "compatibility mode" option that uses the old 3D model generation step which should fix the problem. You can enable it in the settings.
