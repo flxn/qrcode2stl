@@ -36,6 +36,9 @@ export default {
   corner: 'roh',
   isGenerating: 'Vytváření 3D Modelu',
   headerShareNotice: 'Sdílejte Váš kód s pomocí této URL adresy',
+  copyExistingQRCode: 'Zkopírovat již existující QR kód',
+  holdQRCodeInView: 'Přidržte QR kód před kamerou',
+  decodedQRCodeData: 'QR kód naskenován',
 
   //
   // QR Code Options Panel
@@ -121,16 +124,16 @@ export default {
   size: 'Velikost',
   blockSizeHelp: `
   Upravuje velikost jednotlivých částí QR kódu.
-  Pohrajte si s tímto nastavením, můžete docílit unikátního vzhledu, ovšem mějte na paměti, že můžete zhoršit čitelnost kódu.\\
-  Vždy po úpravě hodnoty zkontrolujte, zda je kód čitelný, abyste předešli zbytečnému tisku. Ke kontrole můžete použít aplikaci na mobilním telefonu.
-  Pokud si nejte jisti, nechte hodnotu na 100 %.
+  Pohrajte si s tímto nastavením. Můžete docílit unikátního vzhledu, ovšem mějte na paměti, že můžete zhoršit čitelnost kódu.\\
+  Po úpravě hodnoty vždy zkontrolujte, zda je kód čitelný, abyste předešli zbytečnému tisku. Ke kontrole můžete použít aplikaci na mobilním telefonu.
+  Pokud si nejte jisti, ponechte hodnotu na 100 %.
   Při změně hodnoty nad 100 % (například na 120 %) bude tisk jednodušší, jelikož jednotivé body kódu budou propojeny.`,
   icon: 'Ikona',
   noIcon: 'Žádná ikona',
   iconSizeHelp: `
   Velikost ikony je relativní k šířce QR kódu.
   Ikona využívá opravu chyb QR kódu. V případě, že by byla ikona příliš velká a/nebo míra opravy chyb příliš malá, kód by nemusel být čitelný.
-  If you want to have a big icon but your phone can't read the QR code you can try to increase the Error Correction Level.`,
+  Pokud chcete, aby byla ikona velká, ale nedaří se Vám kód přečist, zkuste zvýšit míru opravy chyb.`,
   text: 'Text',
   textOnEdge: 'Přidat vlastní nadpis QR kódu',
   placement: 'Umístění',
@@ -166,7 +169,7 @@ export default {
   //
   printGuideTitle: 'Průvodce 3D Tiskem',
   printGuideSubtitle: 'Jak vytisknout dvoubarevný QR kód s pomocí jednobarevné tiskárny? (S jedním extruderem.)',
-  printGuideWIPInfo: 'This guide is a work in progress.',
+  printGuideWIPInfo: 'Na průvoci se stále pracuje.',
   printGuideIntro: `
   Pokud máte tiskárnu s jedním extruderem, je také možno tisknout více barvami. Bude potřeba vyměnit filament po dokončení požadované vrstvy.<br/>
   Tímto způsobem můžeme vytisknout základnu jednou barvou a samotný QR kód barvou druhou.<br/>
