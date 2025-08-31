@@ -2,9 +2,10 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue2';
 import { resolve } from 'path';
 import tailwindcss from '@tailwindcss/vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [vue(), tailwindcss(), nodePolyfills()],
   base: '/',
   resolve: {
     alias: {
