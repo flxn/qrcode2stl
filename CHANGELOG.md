@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.16.0] - 2025-08-31
+
+- Fixed multi-part ASCII STL export producing empty files in ZIP.
+
 ## [1.15.0] - 2025-08-29
 
 ### Added

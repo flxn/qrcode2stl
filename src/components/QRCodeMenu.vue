@@ -334,29 +334,41 @@ export default {
         const filenameIcon = `icon-${timestamp}.stl`;
         const filenameText = `text-${timestamp}.stl`;
         const filenameKeychain = `attachment-${timestamp}.stl`;
+
+        const put = (name, data) => {
+          if (exportAsBinary) {
+            // data may be ArrayBuffer, DataView, or a typed array
+            const content = (data && data.buffer) ? data.buffer : data;
+            zip.file(name, content, { binary: true });
+          } else {
+            // ASCII export returns a string
+            zip.file(name, data);
+          }
+        };
+
         const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
         const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
-        zip.file(filenameBase, baseSTL.buffer);
-        zip.file(filenameQrcode, qrcodeSTL.buffer);
+        put(filenameBase, baseSTL);
+        put(filenameQrcode, qrcodeSTL);
 
         if (this.borderMesh) {
           const borderSTL = this.exporter.parse(this.borderMesh, { binary: exportAsBinary });
-          zip.file(filenameBorder, borderSTL.buffer);
+          put(filenameBorder, borderSTL);
         }
 
         if (this.iconMesh) {
           const iconSTL = this.exporter.parse(this.iconMesh, { binary: exportAsBinary });
-          zip.file(filenameIcon, iconSTL.buffer);
+          put(filenameIcon, iconSTL);
         }
 
         if (this.subtitleMesh) {
           const textSTL = this.exporter.parse(this.subtitleMesh, { binary: exportAsBinary });
-          zip.file(filenameText, textSTL.buffer);
+          put(filenameText, textSTL);
         }
 
         if (this.keychainAttachmentMesh) {
           const kcaSTL = this.exporter.parse(this.keychainAttachmentMesh, { binary: exportAsBinary });
-          zip.file(filenameKeychain, kcaSTL.buffer);
+          put(filenameKeychain, kcaSTL);
         }
 
         zip.generateAsync({ type: 'blob' })

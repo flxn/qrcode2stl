@@ -630,30 +630,40 @@ export default {
         const filenameBorder = `border-${timestamp}.stl`;
         const filenameText = `text-${timestamp}.stl`;
         const filenameKeychain = `attachment-${timestamp}.stl`;
+
+        const put = (name, data) => {
+          if (exportAsBinary) {
+            const content = (data && data.buffer) ? data.buffer : data;
+            zip.file(name, content, { binary: true });
+          } else {
+            zip.file(name, data);
+          }
+        };
+
         const baseSTL = this.exporter.parse(this.baseMesh, {
           binary: exportAsBinary,
         });
-        zip.file(filenameBase, baseSTL.buffer);
+        put(filenameBase, baseSTL);
 
         if (this.borderMesh) {
           const borderSTL = this.exporter.parse(this.borderMesh, {
             binary: exportAsBinary,
           });
-          zip.file(filenameBorder, borderSTL.buffer);
+          put(filenameBorder, borderSTL);
         }
 
         if (this.subtitleMesh) {
           const textSTL = this.exporter.parse(this.subtitleMesh, {
             binary: exportAsBinary,
           });
-          zip.file(filenameText, textSTL.buffer);
+          put(filenameText, textSTL);
         }
 
         if (this.keychainAttachmentMesh) {
           const kcaSTL = this.exporter.parse(this.keychainAttachmentMesh, {
             binary: exportAsBinary,
           });
-          zip.file(filenameKeychain, kcaSTL.buffer);
+          put(filenameKeychain, kcaSTL);
         }
 
         zip.generateAsync({ type: 'blob' }).then((content) => {
