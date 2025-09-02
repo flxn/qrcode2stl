@@ -917,10 +917,9 @@ class QRCode3D extends BaseTag3D {
       return new THREE.Mesh(qrcodeGeometry, this.materialDetail);
     }
 
-    // slow path for inverted QR codes
-    const qrcodeGeometry = new THREE.BufferGeometry();
-    const baseQRMesh = new THREE.Mesh(qrcodeGeometry, this.materialDetail);
-    let bspQRMesh = CSG.fromMesh(baseQRMesh);
+  // slow path for inverted QR codes
+  // Initialize CSG only when we have the first valid block to avoid empty geometry issues
+  let bspQRMesh = null;
     // iterate through pixels in QR Code Bitmask
     for (let y = 0; y < this.maskWidth; y += 1) {
       for (let x = 0; x < this.maskWidth; x += 1) {
@@ -967,13 +966,55 @@ class QRCode3D extends BaseTag3D {
           // add qr code blocks to qrcode and combined model
           qrBlockMesh.updateMatrix();
           const bspBlockMesh = CSG.fromMesh(qrBlockMesh);
-          bspQRMesh = bspQRMesh.union(bspBlockMesh);
+          if (bspQRMesh) {
+            bspQRMesh = bspQRMesh.union(bspBlockMesh);
+          } else {
+            // First block initializes the CSG tree
+            bspQRMesh = bspBlockMesh;
+          }
           // qrcodeGeometry.merge(qrBlockMesh.geometry, qrBlockMesh.matrix);
         }
       }
     }
+    // If no blocks were added (edge case), build and return just the inner area mesh
+    if (!bspQRMesh) {
+      const cornerRadius = this.getCornerRadius();
+      const textBaseOffset = this.getTextBaseOffset();
+      const topOffset = this.getTextTopOffset();
+      const leftOffset = this.getTextLeftOffset();
+      const isOffsetTopBottom = this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center';
+      const isOffsetLeftRight = this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right';
 
-    const finalBlockMesh = CSG.toMesh(bspQRMesh, baseQRMesh.matrix);
+      let innerAreaShape;
+      if (isOffsetTopBottom) {
+        innerAreaShape = getRoundedRectShape(
+          -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
+          -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
+          this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
+          this.options.base.width - this.options.base.borderWidth * 2,
+          Math.max(0, cornerRadius - this.options.base.borderWidth),
+        );
+      } else if (isOffsetLeftRight) {
+        innerAreaShape = getRoundedRectShape(
+          -(this.options.base.height - this.options.base.borderWidth * 2) / 2,
+          -(this.options.base.width + leftOffset - this.options.base.borderWidth * 2) / 2,
+          this.options.base.height - this.options.base.borderWidth * 2,
+          this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
+          Math.max(0, cornerRadius - this.options.base.borderWidth),
+        );
+      }
+
+      const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(innerAreaShape, {
+        steps: 1,
+        depth: this.options.code.depth,
+        bevelEnabled: false,
+      }), this.materialDetail);
+      innerAreaMesh.position.z = this.options.base.depth;
+      innerAreaMesh.updateMatrix();
+      return innerAreaMesh;
+    }
+
+    const finalBlockMesh = CSG.toMesh(bspQRMesh, new THREE.Matrix4());
     finalBlockMesh.material = this.materialDetail;
 
     if (this.options.code.invert) {

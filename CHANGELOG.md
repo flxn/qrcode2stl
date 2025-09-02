@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.17.0] - 2025-09-02
+
+- Fixed the invert option.
+
 ## [1.16.0] - 2025-08-31
 
 - Fixed multi-part ASCII STL export producing empty files in ZIP.
