@@ -149,6 +149,8 @@ export default {
   mirrorHoles: 'Löcher spiegeln',
   mirrorHolesHelp: 'Spiegelt die Löcher auf die gegenüberliegende Seite (z.B. zur Befestigung mit Schrauben).',
   keychainHoleDiameter: 'Durchmesser des Lochs',
+  keychainMaterialThickness: 'Materialstärke',
+  keychainOffset: 'Überstand',
   nfcIndentation: 'NFC/RFID',
   nfcIndentationHelp: 'Fügt der Basis eine Einkerbung auf der Unterseite hinzu in der NFC/RFID tags platziert werden können.',
   indentation: 'Einkerbung',

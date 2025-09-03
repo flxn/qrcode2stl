@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.18.0] - 2025-09-03
+
+### Added
+- Keychain: configurable material thickness around the hole for stronger attachments. Previously, only the hole diameter could be set; now you can adjust how much material surrounds the hole to better suit your printer and use case.
+- Keychain: new protrusion offset option to control how far the attachment tab extends outward from the base (decoupled from material thickness).
+
 ## [1.17.0] - 2025-09-02
 
 - Fixed the invert option.

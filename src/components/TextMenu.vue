@@ -347,6 +347,48 @@
               </div>
               <div class="field is-horizontal">
                 <div class="field-label is-small">
+                  <label class="label">{{ $t("keychainMaterialThickness") }}</label>
+                </div>
+                <div class="field-body">
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input
+                        class="input is-small"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        v-model.number="options.base.keychainMaterialThickness"
+                      />
+                    </div>
+                    <p class="control">
+                      <a class="button is-static is-small">{{ unit }}</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-small">
+                  <label class="label">{{ $t("keychainOffset") }}</label>
+                </div>
+                <div class="field-body">
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input
+                        class="input is-small"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        v-model.number="options.base.keychainOffset"
+                      />
+                    </div>
+                    <p class="control">
+                      <a class="button is-static is-small">{{ unit }}</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="field is-horizontal">
+                <div class="field-label is-small">
                   <label class="label">{{ $t("mirrorHoles") }}</label>
                 </div>
                 <div class="field-body">
@@ -538,6 +580,8 @@ const defaultOptions = {
     hasKeychainAttachment: false,
     keychainPlacement: 'left',
     keychainHoleDiameter: 6,
+  keychainMaterialThickness: 1.5,
+  keychainOffset: 3,
     mirrorHoles: false,
     hasNfcIndentation: false,
     nfcIndentationShape: 'square',

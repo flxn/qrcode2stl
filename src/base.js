@@ -378,8 +378,12 @@ class BaseTag3D {
     // const textBaseOffset = this.getTextBaseOffset();
     // const textTopOffset = this.getTextTopOffset();
     const holeRadius = this.options.base.keychainHoleDiameter / 2;
-    const cornerPlacementOffset = holeRadius * 2;
-    const height = this.options.base.keychainHoleDiameter + 3;
+    const materialThickness = Math.max(0, this.options.base.keychainMaterialThickness || 1.5);
+    const height = this.options.base.keychainHoleDiameter + 2 * materialThickness;
+    const desiredProtrusion = this.options.base.keychainOffset !== undefined ? this.options.base.keychainOffset : (2 * materialThickness);
+    // ensure the tab overlaps the base by a small amount to keep it connected
+    const minOverlap = 0.2;
+    const cornerPlacementOffset = Math.max(minOverlap, height - desiredProtrusion);
     const width = height + cornerPlacementOffset;
 
     const attachmentShape = getCustomRoundedRectShape(
@@ -402,7 +406,7 @@ class BaseTag3D {
     attachmentShapeMesh.position.z = 0;
     attachmentShapeMesh.updateMatrix();
 
-    const holeMesh = new THREE.Mesh(new THREE.CylinderGeometry(holeRadius, holeRadius, this.options.base.depth, 32), this.materialBase);
+  const holeMesh = new THREE.Mesh(new THREE.CylinderGeometry(holeRadius, holeRadius, this.options.base.depth, 32), this.materialBase);
     holeMesh.rotation.x = -Math.PI / 2;
     holeMesh.position.z = this.options.base.depth / 2;
     holeMesh.position.y = -cornerPlacementOffset / 2;

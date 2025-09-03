@@ -150,6 +150,8 @@ export default {
   mirrorHoles: 'Mirror Holes',
   mirrorHolesHelp: 'Mirror the holes to the opposite side (e.g. to fix it with screws).',
   keychainHoleDiameter: 'Hole Diameter',
+  keychainMaterialThickness: 'Material Thickness',
+  keychainOffset: 'Protrusion Offset',
   nfcIndentation: 'NFC/RFID',
   nfcIndentationHelp: 'Adds an indentation on the bottom side of the base where one can insert an NFC/RFID tag.',
   indentation: 'Indentation',

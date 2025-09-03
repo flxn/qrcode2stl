@@ -126,6 +126,8 @@ const defaultOptions = {
     hasKeychainAttachment: false,
     keychainPlacement: 'left',
     keychainHoleDiameter: 6,
+    keychainMaterialThickness: 1.5,
+    keychainOffset: 3,
     mirrorHoles: false,
     hasNfcIndentation: false,
     nfcIndentationShape: 'square',
