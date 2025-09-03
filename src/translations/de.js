@@ -47,6 +47,9 @@ export default {
   qrCodeTextPlaceholder: 'Der text deines QR codes z.B.: Hallo Welt oder https://flxn.de',
   errorCorrection: 'Fehlerkorrektur',
   errorCorrectionHelp: 'Je höher der Grad der Fehlerkorrektur, desto dichter der QR code.',
+  useEscapeSequences: 'Escape-Sequenzen',
+  useEscapeSequencesToggle: 'Escape-Sequenzen interpretieren',
+  useEscapeSequencesHelp: 'Beispiele: \\n (neue Zeile), \\t (Tabulator), \\r (Wagenrücklauf)',
   optionalFieldsHint: 'Es müssen nicht alle Felder befüllt werden.',
   // Wifi
   ssidPlaceholder: 'Der Name des Wifi-Netzwerks',

@@ -65,6 +65,7 @@ import { nextTick } from 'vue';
 const defaultOptions = {
   activeTabIndex: 0,
   errorCorrectionLevel: 'M',
+  useEscapeSequences: true,
   text: '',
   wifi: {
     ssid: '',
@@ -185,6 +186,26 @@ export default {
   },
 
   methods: {
+    interpretEscapeSequences(str) {
+      if (typeof str !== 'string') return str;
+      try {
+        // Handle unicode (\uXXXX) and hex (\xXX) sequences first
+        let out = str
+          .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+          .replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+
+        // Then handle common single-character escapes
+        const map = {
+          n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v',
+          "'": "'", '"': '"', '\\': '\\',
+        };
+        out = out.replace(/\\([nrtbfv'"\\])/g, (m, ch) => map[ch] ?? m);
+        return out;
+      } catch (e) {
+        // Fallback: return original if anything goes wrong
+        return str;
+      }
+    },
     initWorker() {
       modelWorker.worker.onmessage = (event) => {
         if (event.data.type !== 'result') {
@@ -482,6 +503,9 @@ export default {
       switch (this.options.activeTabIndex) {
         case 0: // Text
           ret = this.options.text;
+          if (this.options.useEscapeSequences) {
+            ret = this.interpretEscapeSequences(ret);
+          }
           break;
         case 1: // Wifi
           if (this.options.wifi.password === '') {

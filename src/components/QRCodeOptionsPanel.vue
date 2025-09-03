@@ -1,6 +1,6 @@
 <template>
   <nav class="panel">
-    <p class="panel-heading">{{ $t("qrCodeOptionsTitle") }}</p>
+    <p class="panel-heading">{{ $t('qrCodeOptionsTitle') }}</p>
     <!-- QR Code settings tabs -->
     <QRCodeOptionsTabs :active-tab-index="options.activeTabIndex" @tabChanged="setActiveTab" />
 
@@ -39,9 +39,9 @@
       <CalendarForm :calendar="options.calendar" />
     </div>
 
-    <!-- Error Correction -->
-    <div class="option-pane">
-      <div class="field is-horizontal">
+    <!-- Error Correction + Escape Sequences -->
+    <div class="columns option-pane">
+      <div class="column field is-horizontal">
         <div class="field-label is-small">
           <label class="label">{{$t('errorCorrection')}}</label>
         </div>
@@ -61,8 +61,25 @@
           </div>
         </div>
       </div>
+      <div class="column field is-horizontal">
+        <div class="field-label is-small">
+          <label class="label">{{$t('useEscapeSequences')}}</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" v-model="options.useEscapeSequences" />
+                <span class="is-size-7" style="margin-left:6px">{{$t('useEscapeSequencesToggle')}}</span>
+              </label>
+              <p class="help">{{$t('useEscapeSequencesHelp')}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
+
 </template>
 
 <script>
