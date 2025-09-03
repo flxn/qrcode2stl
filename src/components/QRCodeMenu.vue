@@ -65,7 +65,7 @@ import { nextTick } from 'vue';
 const defaultOptions = {
   activeTabIndex: 0,
   errorCorrectionLevel: 'M',
-  useEscapeSequences: true,
+  useEscapeSequences: false,
   text: '',
   wifi: {
     ssid: '',
