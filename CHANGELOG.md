@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Keychain: configurable material thickness around the hole for stronger attachments. Previously, only the hole diameter could be set; now you can adjust how much material surrounds the hole to better suit your printer and use case.
 - Keychain: new protrusion offset option to control how far the attachment tab extends outward from the base (decoupled from material thickness).
+- Escape Sequences: added support for common escape sequences like newline (`\n`), tab (`\t`), and carriage return (`\r`) in QR code text input. This allows for formatted text within the QR code, such as multi-line messages or tabbed content.
 
 ## [1.17.0] - 2025-09-02
 
