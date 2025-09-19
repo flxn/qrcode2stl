@@ -458,11 +458,16 @@ class QRCode3D extends BaseTag3D {
       iconMesh.scale.x /= scaleRatio;
       iconMesh.scale.y /= scaleRatio;
 
-      // Move icon to center
+      // Recalculate size after scaling
       iconSize = getBoundingBoxSize(iconMesh);
 
-      iconMesh.position.x = -iconSize.x / 2;
-      iconMesh.position.y = -iconSize.y / 2;
+      // Calculate the visual center of the mesh for better positioning
+      const boundingBox = new THREE.Box3().setFromObject(iconMesh);
+      const center = boundingBox.getCenter(new THREE.Vector3());
+      
+      // Position the icon so its visual center aligns with the QR code center
+      iconMesh.position.x = -center.x;
+      iconMesh.position.y = -center.y;
       iconMesh.position.z = this.options.base.depth + this.options.code.depth;
       iconMesh.updateMatrix();
 
