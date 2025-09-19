@@ -595,12 +595,41 @@
                     </div>
                     <div class="dropdown-menu" id="dropdown-menu2" role="menu">
                       <div class="dropdown-content" id="dropdown-content2">
+                        <!-- Custom Icon Upload Section -->
+                        <div class="custom-icon-section">
+                          <div class="field">
+                            <label class="label is-size-7">{{$t('uploadCustomIcon')}}</label>
+                            <div class="file is-small">
+                              <label class="file-label">
+                                <input 
+                                  class="file-input" 
+                                  type="file" 
+                                  accept=".svg" 
+                                  @change="handleCustomIconUpload"
+                                  ref="customIconInput"
+                                />
+                                <span class="file-cta">
+                                  <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                  </span>
+                                  <span class="file-label is-size-7">
+                                    {{$t('selectSvgFile')}}
+                                  </span>
+                                </span>
+                              </label>
+                            </div>
+                          </div>
+                          <hr class="dropdown-divider">
+                        </div>
+                        
+                        <!-- Icon Grid -->
                         <div class="columns is-multiline">
                           <div class="column is-4">
                             <div class="no-icon icon-item dropdown-item is-vcentered" @click="iconSelected('none')">
                               <span class="title is-size-7">{{$t('noIcon')}}</span>
                             </div>
                           </div>
+                          <!-- Default icons -->
                           <div class="column is-4" v-for="icon in icons" :key="icon">
                             <div class="icon-item dropdown-item is-vcentered" @click="iconSelected(icon)">
                               <img width="18" height="18" :src="'icons/' + icon + '.svg'" loading="lazy" />
@@ -615,12 +644,17 @@
                     id="icon-preview"
                     width="32"
                     height="32"
-                    :data="'icons/' + options.code.iconName + '.svg'"
+                    :data="getIconPreviewUrl()"
                     v-if="options.code.iconName !== 'none'"
                   />
                   <div class="is-size-7" v-if="options.code.iconName !== 'none'">
-                    Icons by Fontawesome
-                    <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
+                    <span v-if="!options.code.iconName.startsWith('custom-')">
+                      Icons by Fontawesome
+                      <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
+                    </span>
+                    <span v-else>
+                      Custom uploaded icon
+                    </span>
                     <br/>
                     <p class="has-text-danger">
                       This is a beta feature.<br/>
@@ -656,6 +690,18 @@
                 >
                   <i class="fas fa-info-circle"></i>
                 </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monochrome Logo Info -->
+          <div class="field is-horizontal" v-if="options.code.iconName.startsWith('custom-')">
+            <div class="field-body">
+              <div class="field">
+                <div class="notification is-info is-light">
+                  <i class="fas fa-info-circle"></i>
+                  {{$t('monochromeLogoInfo')}}
+                </div>
               </div>
             </div>
           </div>
@@ -789,6 +835,7 @@ export default {
         'bolt',
         'moon',
       ],
+      customIcons: [],
     };
   },
   computed: {
@@ -820,6 +867,278 @@ export default {
     iconSelected(icon) {
       this.options.code.iconName = icon;
     },
+    handleCustomIconUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file type
+      if (!file.type.includes('svg') && !file.name.toLowerCase().endsWith('.svg')) {
+        this.$toast.open({
+          message: this.$t('invalidSvgFile'),
+          type: 'is-danger',
+          duration: 3000,
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const svgContent = e.target.result;
+          
+          // Basic SVG validation
+          if (!svgContent.includes('<svg') || !svgContent.includes('</svg>')) {
+            this.$toast.open({
+              message: this.$t('invalidSvgFile'),
+              type: 'is-danger',
+              duration: 3000,
+            });
+            return;
+          }
+
+          // Additional SVG validation - check for proper XML structure
+          try {
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+            const parseError = svgDoc.querySelector('parsererror');
+            if (parseError) {
+              throw new Error('Invalid SVG structure');
+            }
+          } catch (error) {
+            this.$toast.open({
+              message: this.$t('invalidSvgFile'),
+              type: 'is-danger',
+              duration: 3000,
+            });
+            return;
+          }
+
+          // Create a centered version for preview
+          const centeredSvgContent = this.centerSvgForPreview(svgContent);
+          const dataUrl = `data:image/svg+xml;base64,${btoa(centeredSvgContent)}`;
+          
+          // Store custom icon (use original content for 3D processing, centered for preview)
+          const customIcon = {
+            name: file.name,
+            content: svgContent, // Original for 3D processing
+            previewContent: centeredSvgContent, // Centered for preview
+            dataUrl: dataUrl,
+          };
+          
+          // Limit to 10 custom icons to prevent memory issues
+          if (this.customIcons.length >= 10) {
+            this.customIcons.shift(); // Remove oldest icon
+          }
+          
+          this.customIcons.push(customIcon);
+          
+          // Auto-select the uploaded icon
+          const iconIndex = this.customIcons.length - 1;
+          this.iconSelected(`custom-${iconIndex}`);
+          
+          this.$toast.open({
+            message: this.$t('customIconUploaded'),
+            type: 'is-success',
+            duration: 3000,
+          });
+          
+          // Clear the file input
+          this.$refs.customIconInput.value = '';
+          
+        } catch (error) {
+          console.error('Error processing SVG file:', error);
+          this.$toast.open({
+            message: this.$t('iconUploadError'),
+            type: 'is-danger',
+            duration: 3000,
+          });
+        }
+      };
+      
+      reader.onerror = () => {
+        this.$toast.open({
+          message: this.$t('iconUploadError'),
+          type: 'is-danger',
+          duration: 3000,
+        });
+      };
+      
+      reader.readAsText(file);
+    },
+    getIconPreviewUrl() {
+      if (this.options.code.iconName.startsWith('custom-')) {
+        const index = parseInt(this.options.code.iconName.replace('custom-', ''));
+        if (this.customIcons[index]) {
+          return this.customIcons[index].dataUrl;
+        }
+      }
+      return `icons/${this.options.code.iconName}.svg`;
+    },
+    getCustomIconContent(iconName) {
+      if (iconName.startsWith('custom-')) {
+        const index = parseInt(iconName.replace('custom-', ''));
+        if (this.customIcons[index]) {
+          return this.customIcons[index].content;
+        }
+      }
+      return null;
+    },
+    centerSvgForPreview(svgContent) {
+      try {
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+        const svgElement = svgDoc.querySelector('svg');
+        
+        if (!svgElement) return svgContent;
+        
+        // Get original viewBox
+        const viewBox = svgElement.getAttribute('viewBox');
+        if (!viewBox) return svgContent;
+        
+        const [x, y, width, height] = viewBox.split(' ').map(Number);
+        
+        // Calculate actual content bounds for better centering
+        const contentBounds = this.calculateSvgContentBounds(svgElement);
+        
+        // Use standard FontAwesome viewBox format (512x512)
+        const standardSize = 512;
+        const newViewBox = `0 0 ${standardSize} ${standardSize}`;
+        
+        // Calculate scaling based on actual content bounds, not viewBox
+        const contentWidth = contentBounds.maxX - contentBounds.minX;
+        const contentHeight = contentBounds.maxY - contentBounds.minY;
+        
+        if (contentWidth === 0 || contentHeight === 0) {
+          // Fallback to viewBox-based scaling
+          const scaleX = standardSize / width;
+          const scaleY = standardSize / height;
+          const scale = Math.min(scaleX, scaleY) * 0.7;
+          
+          const scaledWidth = width * scale;
+          const scaledHeight = height * scale;
+          const offsetX = (standardSize - scaledWidth) / 2;
+          const offsetY = (standardSize - scaledHeight) / 2;
+          
+          return this.createCenteredSvg(svgDoc, svgContent, scale, offsetX, offsetY, newViewBox);
+        }
+        
+        // Use content-based scaling for better positioning
+        const scaleX = (standardSize * 0.7) / contentWidth;
+        const scaleY = (standardSize * 0.7) / contentHeight;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Calculate centering offset based on content bounds
+        const scaledContentWidth = contentWidth * scale;
+        const scaledContentHeight = contentHeight * scale;
+        const offsetX = (standardSize - scaledContentWidth) / 2 - (contentBounds.minX * scale);
+        const offsetY = (standardSize - scaledContentHeight) / 2 - (contentBounds.minY * scale);
+        
+        
+        return this.createCenteredSvg(svgDoc, svgContent, scale, offsetX, offsetY, newViewBox);
+      } catch (error) {
+        console.warn('Error formatting SVG to standard format:', error);
+        return svgContent; // Return original if processing fails
+      }
+    },
+    calculateSvgContentBounds(svgElement) {
+      const tempSvg = svgElement.cloneNode(true);
+      tempSvg.style.position = 'absolute';
+      tempSvg.style.visibility = 'hidden';
+      tempSvg.style.pointerEvents = 'none';
+      document.body.appendChild(tempSvg);
+      
+      try {
+        const visualElements = tempSvg.querySelectorAll('path, rect, circle, ellipse, polygon, polyline, g, text');
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        
+        visualElements.forEach(element => {
+          try {
+            const bbox = element.getBBox();
+            if (bbox && bbox.width > 0 && bbox.height > 0) {
+              minX = Math.min(minX, bbox.x);
+              minY = Math.min(minY, bbox.y);
+              maxX = Math.max(maxX, bbox.x + bbox.width);
+              maxY = Math.max(maxY, bbox.y + bbox.height);
+            }
+          } catch (e) {
+            // Skip elements that don't support getBBox
+          }
+        });
+        
+        if (minX === Infinity) {
+          const rect = tempSvg.getBoundingClientRect();
+          minX = 0;
+          minY = 0;
+          maxX = rect.width;
+          maxY = rect.height;
+        }
+        
+        return { minX, minY, maxX, maxY };
+      } finally {
+        document.body.removeChild(tempSvg);
+      }
+    },
+    createCenteredSvg(svgDoc, originalSvgContent, scale, offsetX, offsetY, newViewBox) {
+      try {
+        const newSvg = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        newSvg.setAttribute('viewBox', newViewBox);
+        newSvg.setAttribute('role', 'img');
+        newSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        newSvg.setAttribute('aria-hidden', 'true');
+        newSvg.setAttribute('focusable', 'false');
+        
+        const group = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('transform', `translate(${offsetX}, ${offsetY}) scale(${scale})`);
+        
+        const parser = new DOMParser();
+        const originalSvgDoc = parser.parseFromString(originalSvgContent, 'image/svg+xml');
+        const originalSvg = originalSvgDoc.querySelector('svg');
+        if (originalSvg) {
+          const allElements = originalSvg.querySelectorAll('path, rect, circle, ellipse, polygon, polyline, g, defs, style, linearGradient, radialGradient, stop');
+          
+          allElements.forEach(element => {
+            if (element.tagName === 'path') {
+              const newPath = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
+              newPath.setAttribute('d', element.getAttribute('d'));
+              
+              const originalFill = element.getAttribute('fill');
+              if (originalFill && originalFill !== 'none') {
+                newPath.setAttribute('fill', originalFill);
+              } else {
+                newPath.setAttribute('fill', 'currentColor');
+              }
+              
+              if (element.getAttribute('stroke')) {
+                newPath.setAttribute('stroke', element.getAttribute('stroke'));
+                newPath.setAttribute('stroke-width', element.getAttribute('stroke-width') || '1');
+              }
+              
+              group.appendChild(newPath);
+            } else if (element.tagName === 'g') {
+              const clonedGroup = element.cloneNode(true);
+              group.appendChild(clonedGroup);
+            } else if (['defs', 'style', 'linearGradient', 'radialGradient', 'stop'].includes(element.tagName)) {
+              const clonedElement = element.cloneNode(true);
+              newSvg.appendChild(clonedElement);
+            } else {
+              const clonedElement = element.cloneNode(true);
+              if (!clonedElement.getAttribute('fill') || clonedElement.getAttribute('fill') === 'none') {
+                clonedElement.setAttribute('fill', 'currentColor');
+              }
+              group.appendChild(clonedElement);
+            }
+          });
+        }
+        
+        newSvg.appendChild(group);
+        
+        const result = new XMLSerializer().serializeToString(newSvg);
+        return result;
+      } catch (error) {
+        console.warn('Error creating centered SVG:', error);
+        return originalSvgContent;
+      }
+    },
   },
 };
 </script>
@@ -840,6 +1159,7 @@ export default {
   margin-left: 15px;
 }
 
+
 .icon-item {
   border-radius: 10px;
 }
@@ -859,7 +1179,24 @@ export default {
 }
 
 #dropdown-content2 {
-  width: 240px;
+  width: 280px;
   padding: 20px;
+}
+
+.custom-icon-section {
+  margin-bottom: 15px;
+}
+
+.custom-icon-section .file {
+  margin-bottom: 0;
+}
+
+.custom-icon-section .file-label {
+  width: 100%;
+}
+
+.custom-icon-section .file-cta {
+  width: 100%;
+  justify-content: center;
 }
 </style>
