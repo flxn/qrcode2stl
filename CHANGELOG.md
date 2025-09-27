@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.19.0] - 2025-09-27
+
+### Added
+- Custom SVG icon upload: You can now upload your own SVG files to be used as the center icon in the QR code. This allows for greater personalization and branding options. Thank you [@CodeBy-Tom](https://github.com/CodeBy-Tom) for the PR.
+
 ## [1.18.0] - 2025-09-03
 
 ### Added
