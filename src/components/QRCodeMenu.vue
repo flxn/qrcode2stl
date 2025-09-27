@@ -15,7 +15,7 @@
     <QRCodeOptionsPanel :options="options" />
 
     <!-- 3D Options -->
-    <QRCodeModelOptionsPanel :options="options" :unit="unit" :iconCompatibilityStatus="iconCompatibilityStatus" />
+    <QRCodeModelOptionsPanel ref="modelOptionsPanel" :options="options" :unit="unit" :iconCompatibilityStatus="iconCompatibilityStatus" />
 
     <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
       {{generateError}}
@@ -271,19 +271,32 @@ export default {
           }
 
           let svgMarkup;
-          if (iconPreview && iconPreview.contentDocument) {
-            const svgElement = iconPreview.contentDocument.querySelector('svg');
-            if (svgElement) {
-              svgMarkup = svgElement.outerHTML;
+          
+          // Check if it's a custom icon
+          if (this.options.code.iconName.startsWith('custom-')) {
+            // Get custom icon content from the options panel
+            const customIconContent = this.getCustomIconContent(this.options.code.iconName);
+            if (customIconContent) {
+              svgMarkup = customIconContent;
+            } else {
+              throw new Error('Custom icon content not found');
+            }
+          } else {
+            // Handle default icons
+            if (iconPreview && iconPreview.contentDocument) {
+              const svgElement = iconPreview.contentDocument.querySelector('svg');
+              if (svgElement) {
+                svgMarkup = svgElement.outerHTML;
+              } else {
+                // Fallback: load SVG directly from file
+                const response = await fetch(`icons/${this.options.code.iconName}.svg`);
+                svgMarkup = await response.text();
+              }
             } else {
               // Fallback: load SVG directly from file
               const response = await fetch(`icons/${this.options.code.iconName}.svg`);
               svgMarkup = await response.text();
             }
-          } else {
-            // Fallback: load SVG directly from file
-            const response = await fetch(`icons/${this.options.code.iconName}.svg`);
-            svgMarkup = await response.text();
           }
 
           const svgData = svgLoader.parse(svgMarkup);
@@ -569,6 +582,15 @@ export default {
 
       console.log('QR Code String:', ret);
       return ret;
+    },
+    getCustomIconContent(iconName) {
+      // This method will be called by the QRCodeModelOptionsPanel component
+      // We need to access the custom icons from the child component
+      const modelOptionsPanel = this.$refs.modelOptionsPanel;
+      if (modelOptionsPanel && modelOptionsPanel.getCustomIconContent) {
+        return modelOptionsPanel.getCustomIconContent(iconName);
+      }
+      return null;
     },
   },
   watch: {

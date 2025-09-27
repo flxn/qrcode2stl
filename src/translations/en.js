@@ -133,6 +133,12 @@ export default {
   If you increase this value above 100% (e.g. 120%) the blocks will form connected islands that make the QR code easier to print.`,
   icon: 'Icon',
   noIcon: 'No icon',
+  customIcon: 'Custom Icon',
+  uploadCustomIcon: 'Upload Custom Icon',
+  selectSvgFile: 'Select SVG file',
+  customIconUploaded: 'Custom icon uploaded successfully',
+  invalidSvgFile: 'Invalid SVG file. Please select a valid SVG file.',
+  iconUploadError: 'Error uploading icon. Please try again.',
   iconSizeHelp: `
   The size of the icon relative to the total width of the QR Code.
   The icon abuses the inbuilt error correction of the qr code. If it is too big the code may not be readable.
@@ -166,6 +172,7 @@ export default {
   iconShapesSimplified: 'icon shapes have been simplified',
   iconHolesRemoved: 'icon holes have been removed',
   iconCompatibleProcessing: 'using TinkerCAD-compatible processing might result in icon simplification. Disable if icon rendering isn\'t what you expected',
+  monochromeLogoInfo: 'For best results, please upload monochrome (black and white) logos. Multi-color logos may not work properly with QR code generation.',
 
   //
   // Export Settings
