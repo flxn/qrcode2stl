@@ -36,6 +36,9 @@ export default {
   corner: 'roh',
   isGenerating: 'Vytváření 3D Modelu',
   headerShareNotice: 'Sdílejte Váš kód s pomocí této URL adresy',
+  copyExistingQRCode: 'Naskenovat již existující QR kód',
+  holdQRCodeInView: 'Umístěte QR kód do zorného pole kamery',
+  decodedQRCodeData: 'QR kód úspěšně načten!',
 
   //
   // QR Code Options Panel
