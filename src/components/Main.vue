@@ -26,9 +26,9 @@
         </nav>
         <hr />
         <!-- Menus for modes -->
-        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
-        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
-        <TextMenu v-if="mode === 'Text'" ref="text" :scene="scene" :exporter="exporter" :initData="shareData" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
+        <QRCodeMenu v-if="mode === 'QR'" ref="qrcode" :scene="scene" :exporter="exporter" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
+        <SpotifyMenu v-if="mode === 'Spotify'" ref="spotifycode" :scene="scene" :exporter="exporter" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
+        <TextMenu v-if="mode === 'Text'" ref="text" :scene="scene" :exporter="exporter" @generating="isGenerating = true" @exportReady="exportReady" @resetScene="resetScene"/>
 
       </div>
       <div class="column is-7-widescreen is-7-fullhd is-12">
@@ -140,8 +140,6 @@ import { bus } from '../main';
 import { getRandomBanner, saveAsArrayBuffer, trimCanvas } from '../utils';
 import ChangelogModal from './ChangelogModal.vue';
 
-const shareHashMarker = '#share';
-
 export default {
   name: 'Main',
   props: {
@@ -166,7 +164,6 @@ export default {
       changelogModalVisible: false,
       changelog: changelog.split('\n').slice(3).join('\n'),
       exportModalVisible: false,
-      shareData: null,
       isGenerating: false,
       modelAd: '',
       exporter: null,
@@ -185,7 +182,14 @@ export default {
     bus.$on('openExportModal', () => { this.exportModalVisible = true; });
     bus.$on('closeExportModal', () => { this.exportModalVisible = false; });
 
-    this.parseUrlShareHash();
+    // Settings import/export handlers
+    bus.$on('requestExportSettings', () => {
+      const settings = this.getActiveMenuOptions();
+      bus.$emit('settingsExported', settings);
+    });
+    bus.$on('importSettings', (data) => {
+      this.setActiveMenuOptions(data);
+    });
   },
   mounted() {
     // eslint-disable-next-line camelcase
@@ -201,8 +205,6 @@ export default {
   },
   methods: {
     changeMode(mode) {
-      window.location.hash = '';
-      this.shareData = null;
       this.mode = mode;
     },
     initLights() {
@@ -352,34 +354,32 @@ export default {
         });
       }, 1000);
     },
-    parseUrlShareHash() {
-      if (window.location.hash.startsWith(shareHashMarker)) {
-        const rawShareData = window.location.hash.substring(shareHashMarker.length).split('-');
-        // eslint-disable-next-line prefer-destructuring
-        const mode = rawShareData[0];
-        if (mode !== 'Spotify' && mode !== 'QR' && mode !== 'Text') {
-          return;
-        }
-        this.mode = mode;
-        try {
-          this.shareData = Object.assign(JSON.parse(atob(rawShareData[1])), { mode });
-        } catch (error) {
-          this.shareData = null;
-          console.error('Invalid Sharing URL');
-          window.location.hash = '';
-        }
-      }
-    },
     exportReady(options) {
       this.showExport = true;
-      try {
-        window.location.hash = `${shareHashMarker}${this.mode}-${btoa(JSON.stringify(options))}`;
-      } catch (error) {
-        console.error(error);
-      } finally {
-        this.isGenerating = false;
+      this.isGenerating = false;
+    },
+    getActiveMenuOptions() {
+      const refMap = { QR: 'qrcode', Spotify: 'spotifycode', Text: 'text' };
+      const ref = this.$refs[refMap[this.mode]];
+      return ref ? { mode: this.mode, options: ref.getExportableOptions() } : null;
+    },
+    setActiveMenuOptions(data) {
+      if (data.mode && data.mode !== this.mode) {
+        this.mode = data.mode;
+        this.$nextTick(() => {
+          const refMap = { QR: 'qrcode', Spotify: 'spotifycode', Text: 'text' };
+          const ref = this.$refs[refMap[this.mode]];
+          if (ref && data.options) {
+            ref.importOptions(data.options);
+          }
+        });
+      } else {
+        const refMap = { QR: 'qrcode', Spotify: 'spotifycode', Text: 'text' };
+        const ref = this.$refs[refMap[this.mode]];
+        if (ref && data.options) {
+          ref.importOptions(data.options);
+        }
       }
-      bus.$emit('exportReady');
     },
   },
 

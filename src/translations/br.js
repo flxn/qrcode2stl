@@ -35,7 +35,6 @@ export default {
   promotionSubtitle: 'Aqui estão algumas impressoras 3D recomendadas e acessórios',
   corner: 'canto',
   isGenerating: 'Gerando modelo 3D...',
-  headerShareNotice: 'Compartilhe seu código com esta URL',
 
   //
   // QR Code Options Panel
@@ -270,4 +269,21 @@ export default {
   cancel: 'Cancelar',
   close: 'Fechar',
   or: 'ou',
+
+  //
+  // Importar/Exportar Configurações
+  //
+  importExportSettings: 'Importar/Exportar Configurações',
+  exportSettings: 'Exportar Configurações',
+  exportSettingsDescription: 'Copie ou baixe suas configurações atuais como JSON para compartilhar ou fazer backup.',
+  importSettings: 'Importar Configurações',
+  importSettingsDescription: 'Cole ou carregue um arquivo JSON de configurações para aplicar configurações salvas.',
+  copyToClipboard: 'Copiar para Área de Transferência',
+  downloadAsFile: 'Baixar como Arquivo',
+  loadFromFile: 'Carregar de Arquivo',
+  applySettings: 'Aplicar Configurações',
+  pasteJsonHere: 'Cole as configurações JSON aqui...',
+  copiedToClipboard: 'Copiado para a área de transferência!',
+  settingsApplied: 'Configurações aplicadas com sucesso!',
+  invalidJsonError: 'Formato JSON inválido',
 };

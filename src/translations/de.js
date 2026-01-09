@@ -35,7 +35,6 @@ export default {
   promotionSubtitle: 'Hier sind ein paar meiner Vorschläge für 3D-Drucker und Zubehörteile. Wenn du die Entwicklung dieses Tools unterstützen möchtest, würde ich mich freuen wenn du einen der unten stehenden Links benutzt um auf AliExpress zu bestellen.',
   corner: 'Ecke',
   isGenerating: 'Generiere 3D Modell...',
-  headerShareNotice: 'Teile deinen Code mit dieser URL',
   copyExistingQRCode: 'Kopiere einen existierenden QR Code',
   holdQRCodeInView: 'Halte den QR Code in die Kamera',
   decodedQRCodeData: 'QR Code ausgelesen',
@@ -293,4 +292,21 @@ export default {
   cancel: 'Abbrechen',
   close: 'Schließen',
   or: 'oder',
+
+  //
+  // Import/Export Einstellungen
+  //
+  importExportSettings: 'Einstellungen Im-/Exportieren',
+  exportSettings: 'Einstellungen exportieren',
+  exportSettingsDescription: 'Kopiere oder lade deine aktuellen Einstellungen als JSON zum Teilen oder Sichern herunter.',
+  importSettings: 'Einstellungen importieren',
+  importSettingsDescription: 'Füge eine JSON-Einstellungsdatei ein oder lade sie, um gespeicherte Einstellungen anzuwenden.',
+  copyToClipboard: 'In Zwischenablage kopieren',
+  downloadAsFile: 'Als Datei herunterladen',
+  loadFromFile: 'Aus Datei laden',
+  applySettings: 'Einstellungen anwenden',
+  pasteJsonHere: 'JSON-Einstellungen hier einfügen...',
+  copiedToClipboard: 'In Zwischenablage kopiert!',
+  settingsApplied: 'Einstellungen erfolgreich angewendet!',
+  invalidJsonError: 'Ungültiges JSON-Format',
 };

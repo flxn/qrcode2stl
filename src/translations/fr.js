@@ -239,4 +239,21 @@ export default {
   cancel: 'Annuler',
   close: 'Fermer',
   or: 'ou',
+
+  //
+  // Import/Export Paramètres
+  //
+  importExportSettings: 'Importer/Exporter les paramètres',
+  exportSettings: 'Exporter les paramètres',
+  exportSettingsDescription: 'Copiez ou téléchargez vos paramètres actuels au format JSON pour les partager ou les sauvegarder.',
+  importSettings: 'Importer les paramètres',
+  importSettingsDescription: 'Collez ou chargez un fichier JSON de paramètres pour appliquer les paramètres enregistrés.',
+  copyToClipboard: 'Copier dans le presse-papiers',
+  downloadAsFile: 'Télécharger comme fichier',
+  loadFromFile: 'Charger depuis un fichier',
+  applySettings: 'Appliquer les paramètres',
+  pasteJsonHere: 'Collez les paramètres JSON ici...',
+  copiedToClipboard: 'Copié dans le presse-papiers!',
+  settingsApplied: 'Paramètres appliqués avec succès!',
+  invalidJsonError: 'Format JSON invalide',
 };

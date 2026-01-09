@@ -35,7 +35,6 @@ export default {
   promotionSubtitle: 'Aquí hai varias impresoras 3D e accesorios. Se queres aopoiar o desarrollo de esta ferramenta por favor, considera utilizar estas ligazóns para mercar en AliExpress.',
   corner: 'esquina',
   isGenerating: 'Xerando modelo 3D...',
-  headerShareNotice: 'Comparte o teu código con esta URL',
   copyExistingQRCode: 'Copia un código QR existente',
   holdQRCodeInView: 'Coloca o código QR no visor da cámara',
   decodedQRCodeData: 'Os datos do QR foron decodificados',
@@ -278,4 +277,21 @@ export default {
   cancel: 'Cancelar',
   close: 'Pechar',
   or: 'ou',
+
+  //
+  // Importar/Exportar Configuración
+  //
+  importExportSettings: 'Importar/Exportar Configuración',
+  exportSettings: 'Exportar Configuración',
+  exportSettingsDescription: 'Copia ou descarga a túa configuración actual como JSON para compartir ou facer copia de seguridade.',
+  importSettings: 'Importar Configuración',
+  importSettingsDescription: 'Pega ou carga un ficheiro JSON de configuración para aplicar a configuración gardada.',
+  copyToClipboard: 'Copiar ao portapapeis',
+  downloadAsFile: 'Descargar como ficheiro',
+  loadFromFile: 'Cargar dende ficheiro',
+  applySettings: 'Aplicar Configuración',
+  pasteJsonHere: 'Pega a configuración JSON aquí...',
+  copiedToClipboard: 'Copiado ao portapapeis!',
+  settingsApplied: 'Configuración aplicada con éxito!',
+  invalidJsonError: 'Formato JSON inválido',
 };

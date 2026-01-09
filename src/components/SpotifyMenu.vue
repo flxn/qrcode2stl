@@ -136,7 +136,6 @@ const defaultOptions = {
 export default {
   name: 'SpotifyMenu',
   props: {
-    initData: Object,
     scene: Object,
     exporter: Object,
   },
@@ -163,6 +162,12 @@ export default {
   },
 
   methods: {
+    getExportableOptions() {
+      return JSON.parse(JSON.stringify(this.options));
+    },
+    importOptions(newOptions) {
+      this.options = merge(this.options, newOptions);
+    },
     initWorker() {
       modelWorker.worker.onmessage = (event) => {
         if (event.data.type !== 'result') {
@@ -338,12 +343,6 @@ export default {
   },
   async mounted() {
     this.initWorker();
-    if (this.initData && this.initData.mode === 'Spotify') {
-      delete this.initData.mode;
-      this.options = merge(this.options, this.initData);
-      await this.downloadSpotifyCode();
-      this.generate3dModel();
-    }
   },
 };
 </script>

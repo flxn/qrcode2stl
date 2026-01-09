@@ -173,7 +173,6 @@ const defaultOptions = {
 export default {
   name: 'QRCodeMenu',
   props: {
-    initData: Object,
     scene: Object,
     exporter: Object,
   },
@@ -208,6 +207,12 @@ export default {
   },
 
   methods: {
+    getExportableOptions() {
+      return JSON.parse(JSON.stringify(this.options));
+    },
+    importOptions(newOptions) {
+      this.options = merge(this.options, newOptions);
+    },
     interpretEscapeSequences(str) {
       if (typeof str !== 'string') return str;
       try {
@@ -631,11 +636,6 @@ export default {
   },
   async mounted() {
     this.initWorker();
-    if (this.initData && this.initData.mode === 'QR') {
-      delete this.initData.mode;
-      this.options = merge(this.options, this.initData);
-      this.generate3dModel();
-    }
     bus.$on('openScannerModal', () => { this.scannerModalVisible = true; });
     bus.$on('closeScannerModal', () => { this.scannerModalVisible = false; });
   },

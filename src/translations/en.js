@@ -35,7 +35,6 @@ export default {
   promotionSubtitle: 'Here are some recommended 3d printers and 3d printer accessories to get you covered. If you want to support the development of this tool please consider using the links below to buy on AliExpress.',
   corner: 'corner',
   isGenerating: 'Generating 3D Model...',
-  headerShareNotice: 'Share your code with this URL',
   copyExistingQRCode: 'Copy an existing QR Code',
   holdQRCodeInView: 'Hold the QR Code into view of the camera',
   decodedQRCodeData: 'Decoded QR Code data',
@@ -297,4 +296,21 @@ export default {
   cancel: 'Cancel',
   close: 'Close',
   or: 'or',
+
+  //
+  // Import/Export Settings
+  //
+  importExportSettings: 'Import/Export Settings',
+  exportSettings: 'Export Settings',
+  exportSettingsDescription: 'Copy or download your current settings as JSON to share or backup.',
+  importSettings: 'Import Settings',
+  importSettingsDescription: 'Paste or load a JSON settings file to apply saved settings.',
+  copyToClipboard: 'Copy to Clipboard',
+  downloadAsFile: 'Download as File',
+  loadFromFile: 'Load from File',
+  applySettings: 'Apply Settings',
+  pasteJsonHere: 'Paste JSON settings here...',
+  copiedToClipboard: 'Copied to clipboard!',
+  settingsApplied: 'Settings applied successfully!',
+  invalidJsonError: 'Invalid JSON format',
 };

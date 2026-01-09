@@ -5,12 +5,6 @@
         <img src="../assets/logo.png" />
       </a>
 
-      <p class="is-hidden-mobile navbar-item" v-if="showShareNotice">
-        <i class="fa fa-arrow-up shake-vertical"></i>
-        <span style="margin: 0 10px;">{{$t('headerShareNotice')}}</span>
-        <i class="fa fa-arrow-up shake-vertical"></i>
-      </p>
-
       <a
         role="button"
         class="navbar-burger burger"
@@ -32,6 +26,16 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <LanguageSelector />
+        </div>
+        <div class="navbar-item">
+          <div class="buttons">
+            <button class="button is-info" @click="openSettingsModal">
+              <span class="icon">
+                <i class="fa fa-cog"></i>
+              </span>
+              <span>{{$t('importExportSettings')}}</span>
+            </button>
+          </div>
         </div>
         <div class="navbar-item">
           <ShareButtons />
@@ -78,12 +82,14 @@
         </div>
       </div>
     </div>
+    <SettingsModal v-if="settingsModalVisible" />
   </nav>
 </template>
 
 <script>
 import ShareButtons from './ShareButtons.vue';
 import LanguageSelector from './LanguageSelector.vue';
+import SettingsModal from './SettingsModal.vue';
 import packageJson from '../../package.json';
 import { bus } from '../main';
 
@@ -92,6 +98,7 @@ export default {
   components: {
     ShareButtons,
     LanguageSelector,
+    SettingsModal,
   },
   data() {
     return {
@@ -99,8 +106,8 @@ export default {
       showThankYou: false,
       appVersion: packageJson.version,
       newVersion: false,
-      showShareNotice: false,
       headerAd: '',
+      settingsModalVisible: false,
     };
   },
   methods: {
@@ -115,6 +122,9 @@ export default {
       window.localStorage.setItem('lastViewedVersion', this.appVersion);
       this.newVersion = false;
     },
+    openSettingsModal() {
+      this.settingsModalVisible = true;
+    },
   },
   mounted() {
     this.headerAd = document.getElementById('adsenseloader-header').innerHTML;
@@ -124,7 +134,7 @@ export default {
     if (lastViewedVersion !== this.appVersion) {
       this.newVersion = true;
     }
-    bus.$on('exportReady', () => { this.showShareNotice = true; });
+    bus.$on('closeSettingsModal', () => { this.settingsModalVisible = false; });
   },
 };
 </script>
@@ -136,10 +146,6 @@ export default {
 
 .unread {
   animation: shake-horizontal 1s cubic-bezier(.645,.045,.355,1.000) 1.5s 4;
-}
-
-.shake-vertical {
-  animation: shake-vertical 2s linear infinite;
 }
 
 @keyframes shake-horizontal {
@@ -168,21 +174,6 @@ export default {
   45% {
     -webkit-transform: translateX(-2px);
             transform: translateX(-2px);
-  }
-}
-
-@keyframes shake-vertical {
-  0%, 40%{
-    -webkit-transform: translateY(0);
-            transform: translateY(0);
-  }
-  10%{
-    -webkit-transform: translateY(2px);
-            transform: translateY(2px);
-  }
-  30%{
-    -webkit-transform: translateY(-5px);
-            transform: translateY(-5px);
   }
 }
 </style>

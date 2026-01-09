@@ -35,7 +35,6 @@ export default {
   promotionSubtitle: 'Zde je pár doporučení na 3D tiskárny a doplňky. Pokud byste chtěli podpořit tento projekt, zvažte použití odkazů na AliExpress.',
   corner: 'roh',
   isGenerating: 'Vytváření 3D Modelu',
-  headerShareNotice: 'Sdílejte Váš kód s pomocí této URL adresy',
 
   //
   // QR Code Options Panel
@@ -274,4 +273,21 @@ export default {
   cancel: 'Zrušit',
   close: 'Zavřít',
   or: 'nebo',
+
+  //
+  // Import/Export Nastavení
+  //
+  importExportSettings: 'Import/Export nastavení',
+  exportSettings: 'Exportovat nastavení',
+  exportSettingsDescription: 'Zkopírujte nebo stáhněte aktuální nastavení jako JSON pro sdílení nebo zálohu.',
+  importSettings: 'Importovat nastavení',
+  importSettingsDescription: 'Vložte nebo nahrajte JSON soubor s nastavením pro použití uložených nastavení.',
+  copyToClipboard: 'Zkopírovat do schránky',
+  downloadAsFile: 'Stáhnout jako soubor',
+  loadFromFile: 'Načíst ze souboru',
+  applySettings: 'Použít nastavení',
+  pasteJsonHere: 'Vložte JSON nastavení zde...',
+  copiedToClipboard: 'Zkopírováno do schránky!',
+  settingsApplied: 'Nastavení úspěšně použito!',
+  invalidJsonError: 'Neplatný formát JSON',
 };
