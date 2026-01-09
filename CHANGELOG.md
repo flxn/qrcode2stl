@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.20.0] - 2026-01-09
+
+### Added
+- Batch Mode: You can now generate multiple QR codes in one go using a CSV file upload! This was a highly requested feature. Click the new "Batch Mode" button to get started.
+- Settings export/import: You can now export your current settings to a JSON file and import them later. This makes it easy to share configurations or switch between different setups.
+
+### Removed
+- Removed the "Share URL" feature, because it was rarely used and made the codebase more complex. If you need to share your QR code settings, consider using screenshots or saving the configuration with the new settings export/import feature.
+
+
 ## [1.19.0] - 2025-09-27
 
 ### Added
