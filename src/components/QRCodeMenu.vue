@@ -39,6 +39,16 @@
       <span>{{$t('generateButton')}}</span>
     </button>
 
+    <button
+      class="button is-info is-large ml-4"
+      @click="openBatchMode"
+    >
+      <span class="icon">
+        <i class="fa fa-layer-group"></i>
+      </span>
+      <span>{{$t('batchMode')}}</span>
+    </button>
+
     <div class="box mt-3" v-bind:class="{'is-hidden': mesh === null}" style="width: fit-content">
       <figure class="image is-128x128" title="A QR Code in 2D? How lame ;)">
         <img id="qr-image"/>
@@ -46,6 +56,16 @@
     </div>
 
     <ScannerModal v-if="scannerModalVisible" @decode="onDecode"/>
+
+    <BatchModeModal
+      v-if="batchModalVisible"
+      :options="options"
+      :activeTabIndex="options.activeTabIndex"
+      :exporter="exporter"
+      :stlType="stlType"
+      :multipleParts="dualExtrusion"
+      @close="batchModalVisible = false"
+    />
   </div>
 </template>
 
@@ -161,6 +181,7 @@ export default {
     QRCodeOptionsPanel: () => import('./QRCodeOptionsPanel.vue'),
     QRCodeModelOptionsPanel: () => import('./QRCodeModelOptionsPanel.vue'),
     ScannerModal: () => import('./ScannerModal.vue'),
+    BatchModeModal: () => import('./BatchModeModal.vue'),
   },
   data() {
     return {
@@ -181,6 +202,7 @@ export default {
       isGenerating: false,
       generateError: null,
       scannerModalVisible: false,
+      batchModalVisible: false,
       iconCompatibilityStatus: null,
     };
   },
@@ -271,7 +293,7 @@ export default {
           }
 
           let svgMarkup;
-          
+
           // Check if it's a custom icon
           if (this.options.code.iconName.startsWith('custom-')) {
             // Get custom icon content from the options panel
@@ -423,6 +445,9 @@ export default {
     },
     openQRScanner() {
       this.scannerModalVisible = true;
+    },
+    openBatchMode() {
+      this.batchModalVisible = true;
     },
     onDecode(decodedText) {
       this.options.text = decodedText;

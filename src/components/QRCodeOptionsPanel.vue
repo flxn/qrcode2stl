@@ -11,6 +11,7 @@
         :placeholder="$t('qrCodeTextPlaceholder')"
         v-model="options.text"
         style="width: 100%"
+        :title="'text — ' + $t('text')"
       ></textarea>
     </div>
 
@@ -43,13 +44,13 @@
     <div class="columns option-pane">
       <div class="column field is-horizontal">
         <div class="field-label is-small">
-          <label class="label">{{$t('errorCorrection')}}</label>
+          <label class="label" :title="'errorCorrectionLevel — ' + $t('errorCorrection')">{{$t('errorCorrection')}}</label>
         </div>
         <div class="field-body">
           <div class="field">
             <div class="control">
               <div class="select is-small">
-                <select v-model="options.errorCorrectionLevel">
+                <select v-model="options.errorCorrectionLevel" :title="'errorCorrectionLevel — ' + $t('errorCorrection')">
                   <option value="L">L (Low, 7% redundant)</option>
                   <option value="M">M (Medium, 15% redundant)</option>
                   <option value="Q">Q (Quartile, 25% redundant)</option>
@@ -63,13 +64,13 @@
       </div>
       <div class="column field is-horizontal">
         <div class="field-label is-small">
-          <label class="label">{{$t('useEscapeSequences')}}</label>
+          <label class="label" :title="'useEscapeSequences — ' + $t('useEscapeSequences')">{{$t('useEscapeSequences')}}</label>
         </div>
         <div class="field-body">
           <div class="field">
             <div class="control">
               <label class="checkbox">
-                <input type="checkbox" v-model="options.useEscapeSequences" />
+                <input type="checkbox" v-model="options.useEscapeSequences" :title="'useEscapeSequences — ' + $t('useEscapeSequences')" />
                 <span class="is-size-7" style="margin-left:6px">{{$t('useEscapeSequencesToggle')}}</span>
               </label>
               <p class="help">{{$t('useEscapeSequencesHelp')}}</p>

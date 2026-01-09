@@ -2,7 +2,7 @@
   <div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">SSID</label>
+        <label class="label" :title="'wifi.ssid — SSID'">SSID</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -12,6 +12,7 @@
               type="text"
               :placeholder="$t('ssidPlaceholder')"
               v-model="wifi.ssid"
+              title="wifi.ssid — SSID"
             />
           </div>
         </div>
@@ -19,7 +20,7 @@
     </div>
     <div class="field is-horizontal" v-if="wifi.security !== 'nopass'">
       <div class="field-label is-normal">
-        <label class="label">{{$t('password')}}</label>
+        <label class="label" :title="'wifi.password — ' + $t('password')">{{$t('password')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -29,6 +30,7 @@
               type="text"
               :placeholder="$t('passwordPlaceholder')"
               v-model="wifi.password"
+              :title="'wifi.password — ' + $t('password')"
             />
           </div>
         </div>
@@ -36,13 +38,13 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('security')}}</label>
+        <label class="label" :title="'wifi.security — ' + $t('security')">{{$t('security')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
           <div class="control">
             <div class="select">
-              <select v-model="wifi.security">
+              <select v-model="wifi.security" :title="'wifi.security — ' + $t('security')">
                 <option value="WPA">WPA</option>
                 <option value="WEP">WEP</option>
                 <option value="nopass">No password</option>
@@ -54,13 +56,13 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('hidden')}}?</label>
+        <label class="label" :title="'wifi.hidden — ' + $t('hidden')">{{$t('hidden')}}?</label>
       </div>
       <div class="field-body">
         <div class="field">
           <div class="control">
             <label class="checkbox">
-              <input type="checkbox" v-model="wifi.hidden" />
+              <input type="checkbox" v-model="wifi.hidden" :title="'wifi.hidden — ' + $t('hidden')" />
               {{$t('hiddenText')}}
             </label>
           </div>

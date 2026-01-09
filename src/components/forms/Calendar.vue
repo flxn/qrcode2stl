@@ -5,7 +5,7 @@
     <!-- Event Name -->
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('eventName')}}</label>
+        <label class="label" :title="'calendar.eventName — ' + $t('eventName')">{{$t('eventName')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -15,6 +15,7 @@
               type="text"
               :placeholder="$t('eventNamePlaceholder')"
               v-model="calendar.eventName"
+              :title="'calendar.eventName — ' + $t('eventName')"
             />
           </div>
         </div>
@@ -24,7 +25,7 @@
     <!-- Start Date -->
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('startDate')}}</label>
+        <label class="label" :title="'calendar.startDate — ' + $t('startDate')">{{$t('startDate')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -33,6 +34,7 @@
               class="input"
               type="date"
               v-model="calendar.startDate"
+              :title="'calendar.startDate — ' + $t('startDate')"
             />
           </div>
         </div>
@@ -42,7 +44,7 @@
     <!-- Start Time -->
     <div class="field is-horizontal" v-if="!calendar.allDay">
       <div class="field-label is-normal">
-        <label class="label">{{$t('startTime')}}</label>
+        <label class="label" :title="'calendar.startTime — ' + $t('startTime')">{{$t('startTime')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -51,6 +53,7 @@
               class="input"
               type="time"
               v-model="calendar.startTime"
+              :title="'calendar.startTime — ' + $t('startTime')"
             />
           </div>
         </div>
@@ -60,7 +63,7 @@
     <!-- End Date -->
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('endDate')}}</label>
+        <label class="label" :title="'calendar.endDate — ' + $t('endDate')">{{$t('endDate')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -69,6 +72,7 @@
               class="input"
               type="date"
               v-model="calendar.endDate"
+              :title="'calendar.endDate — ' + $t('endDate')"
             />
           </div>
         </div>
@@ -78,7 +82,7 @@
     <!-- End Time -->
     <div class="field is-horizontal" v-if="!calendar.allDay">
       <div class="field-label is-normal">
-        <label class="label">{{$t('endTime')}}</label>
+        <label class="label" :title="'calendar.endTime — ' + $t('endTime')">{{$t('endTime')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -87,6 +91,7 @@
               class="input"
               type="time"
               v-model="calendar.endTime"
+              :title="'calendar.endTime — ' + $t('endTime')"
             />
           </div>
         </div>
@@ -96,13 +101,13 @@
     <!-- All Day Toggle -->
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('allDay')}}</label>
+        <label class="label" :title="'calendar.allDay — ' + $t('allDay')">{{$t('allDay')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
           <div class="control">
             <label class="checkbox">
-              <input type="checkbox" v-model="calendar.allDay" />
+              <input type="checkbox" v-model="calendar.allDay" :title="'calendar.allDay — ' + $t('allDay')" />
               {{$t('allDayEvent')}}
             </label>
           </div>
@@ -113,7 +118,7 @@
     <!-- Location (optional) -->
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('location')}}</label>
+        <label class="label" :title="'calendar.location — ' + $t('location')">{{$t('location')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -123,6 +128,7 @@
               type="text"
               :placeholder="$t('locationPlaceholder')"
               v-model="calendar.location"
+              :title="'calendar.location — ' + $t('location')"
             />
           </div>
         </div>
@@ -132,7 +138,7 @@
     <!-- Description (optional) -->
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('description')}}</label>
+        <label class="label" :title="'calendar.description — ' + $t('description')">{{$t('description')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -142,6 +148,7 @@
               :placeholder="$t('descriptionPlaceholder')"
               v-model="calendar.description"
               style="width: 100%"
+              :title="'calendar.description — ' + $t('description')"
             ></textarea>
           </div>
         </div>

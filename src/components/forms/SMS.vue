@@ -3,7 +3,7 @@
     <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('phone')}}</label>
+        <label class="label" :title="'sms.recipient — ' + $t('phone')">{{$t('phone')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -13,6 +13,7 @@
               type="text"
               :placeholder="$t('phonePlaceholder')"
               v-model="sms.recipient"
+              :title="'sms.recipient — ' + $t('phone')"
             />
           </div>
         </div>
@@ -20,7 +21,7 @@
     </div>
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">{{$t('smsMessage')}}</label>
+        <label class="label" :title="'sms.message — ' + $t('smsMessage')">{{$t('smsMessage')}}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -30,6 +31,7 @@
               :placeholder="$t('smsMessagePlaceholder')"
               v-model="sms.message"
               style="width: 100%"
+              :title="'sms.message — ' + $t('smsMessage')"
             ></textarea>
           </div>
         </div>

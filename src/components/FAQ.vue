@@ -81,6 +81,11 @@ export default {
           answerKey: 'faqAnswer5',
           isOpen: false,
         },
+        {
+          questionKey: 'faqQuestion6',
+          answerKey: 'faqAnswer6',
+          isOpen: false,
+        },
       ],
     };
   },
