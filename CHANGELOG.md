@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.21.0] - 2026-01-10
+
+### Added
+- New Simple Batch Mode: Simply enter QR code data line by line, all settings from the main interface will be applied to all generated QR codes.
+
 ## [1.20.0] - 2026-01-09
 
 ### Added

@@ -9,108 +9,186 @@
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
-        <!-- Instructions -->
+        <!-- Mode Selector and Options (visible before processing and results) -->
         <div class="content" v-if="!isProcessing && !showResults">
           <p>{{ $t('batchModeDescription') }}</p>
 
-          <div class="notification is-info is-light">
-            <p class="mb-2"><strong>{{ $t('batchHowToTitle') }}</strong></p>
-            <ol class="mt-0">
-              <li>{{ $t('batchStep1') }}</li>
-              <li>{{ $t('batchStep2') }}</li>
-              <li>{{ $t('batchStep3') }}</li>
-              <li>{{ $t('batchStep4') }}</li>
-            </ol>
-            <p class="mb-1"><strong>{{ $t('batchTips') }}</strong></p>
-            <ul class="mt-0">
-              <li>{{ $t('batchTip1') }}</li>
-              <li>{{ $t('batchTip2') }}</li>
-              <li>{{ $t('batchTip3') }}</li>
-            </ul>
+          <!-- Mode Toggle -->
+          <div class="field">
+            <label class="label">{{ $t('batchModeType') }}</label>
+            <div class="control">
+              <div class="buttons has-addons">
+                <button
+                  class="button"
+                  :class="{ 'is-primary is-selected': batchModeType === 'simple' }"
+                  @click="batchModeType = 'simple'"
+                >
+                  <span class="icon"><i class="fas fa-list"></i></span>
+                  <span>{{ $t('batchModeSimple') }}</span>
+                </button>
+                <button
+                  class="button"
+                  :class="{ 'is-primary is-selected': batchModeType === 'advanced' }"
+                  @click="batchModeType = 'advanced'"
+                >
+                  <span class="icon"><i class="fas fa-file-csv"></i></span>
+                  <span>{{ $t('batchModeAdvanced') }}</span>
+                </button>
+              </div>
+            </div>
+            <p class="help">{{ batchModeType === 'simple' ? $t('batchModeSimpleHelp') : $t('batchModeAdvancedHelp') }}</p>
           </div>
 
-          <!-- Template Download -->
+          <!-- Separate Parts Toggle -->
           <div class="field">
-            <label class="label">{{ $t('batchTemplateDownload') }}</label>
-            <p class="help mb-2">{{ $t('batchTemplateHelp') }}</p>
-            <button class="button is-info is-small" @click="downloadTemplate">
-              <span class="icon"><i class="fas fa-download"></i></span>
-              <span>{{ $t('downloadCsvTemplate') }}</span>
-            </button>
+            <label class="label">{{ $t('separateParts') }}</label>
+            <div class="control">
+              <label class="radio">
+                <input type="radio" name="separateParts" :value="false" v-model="localMultipleParts" />
+                {{ $t('no') }}
+              </label>
+              <label class="radio">
+                <input type="radio" name="separateParts" :value="true" v-model="localMultipleParts" />
+                {{ $t('yes') }}
+              </label>
+            </div>
+            <p class="help">{{ $t('exportSeparatePartsHelp') }}</p>
           </div>
 
           <hr />
 
-          <!-- CSV Upload -->
-          <div class="field">
-            <label class="label">{{ $t('uploadCsvFile') }}</label>
-            <div class="file has-name is-fullwidth">
-              <label class="file-label">
-                <input
-                  class="file-input"
-                  type="file"
-                  accept=".csv"
-                  @change="handleFileUpload"
-                  ref="fileInput"
-                />
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
+          <!-- Simple Mode: Textarea for text entries -->
+          <div v-if="batchModeType === 'simple'">
+            <div class="notification is-info is-light">
+              <p class="mb-2"><strong>{{ $t('batchSimpleHowToTitle') }}</strong></p>
+              <ol class="mt-0">
+                <li>{{ $t('batchSimpleStep1') }}</li>
+                <li>{{ $t('batchSimpleStep2') }}</li>
+                <li>{{ $t('batchSimpleStep3') }}</li>
+              </ol>
+            </div>
+
+            <div class="field">
+              <label class="label">{{ $t('batchSimpleTextareaLabel') }}</label>
+              <div class="control">
+                <textarea
+                  class="textarea"
+                  :placeholder="$t('batchSimpleTextareaPlaceholder')"
+                  v-model="simpleTextInput"
+                  rows="10"
+                ></textarea>
+              </div>
+              <p class="help">{{ $t('batchSimpleTextareaHelp', { count: simpleTextLines.length }) }}</p>
+            </div>
+
+            <!-- Warning for large batches -->
+            <div class="notification is-warning" v-if="simpleTextLines.length > 50">
+              <i class="fas fa-exclamation-triangle"></i>
+              {{ $t('batchLargeWarning', { count: simpleTextLines.length }) }}
+            </div>
+          </div>
+
+          <!-- Advanced Mode: CSV approach (existing) -->
+          <div v-if="batchModeType === 'advanced'">
+            <div class="notification is-info is-light">
+              <p class="mb-2"><strong>{{ $t('batchHowToTitle') }}</strong></p>
+              <ol class="mt-0">
+                <li>{{ $t('batchStep1') }}</li>
+                <li>{{ $t('batchStep2') }}</li>
+                <li>{{ $t('batchStep3') }}</li>
+                <li>{{ $t('batchStep4') }}</li>
+              </ol>
+              <p class="mb-1"><strong>{{ $t('batchTips') }}</strong></p>
+              <ul class="mt-0">
+                <li>{{ $t('batchTip1') }}</li>
+                <li>{{ $t('batchTip2') }}</li>
+                <li>{{ $t('batchTip3') }}</li>
+              </ul>
+            </div>
+
+            <!-- Template Download -->
+            <div class="field">
+              <label class="label">{{ $t('batchTemplateDownload') }}</label>
+              <p class="help mb-2">{{ $t('batchTemplateHelp') }}</p>
+              <button class="button is-info is-small" @click="downloadTemplate">
+                <span class="icon"><i class="fas fa-download"></i></span>
+                <span>{{ $t('downloadCsvTemplate') }}</span>
+              </button>
+            </div>
+
+            <hr />
+
+            <!-- CSV Upload -->
+            <div class="field">
+              <label class="label">{{ $t('uploadCsvFile') }}</label>
+              <div class="file has-name is-fullwidth">
+                <label class="file-label">
+                  <input
+                    class="file-input"
+                    type="file"
+                    accept=".csv"
+                    @change="handleFileUpload"
+                    ref="fileInput"
+                  />
+                  <span class="file-cta">
+                    <span class="file-icon">
+                      <i class="fas fa-upload"></i>
+                    </span>
+                    <span class="file-label">{{ $t('chooseFile') }}</span>
                   </span>
-                  <span class="file-label">{{ $t('chooseFile') }}</span>
-                </span>
-                <span class="file-name">
-                  {{ fileName || $t('noFileSelected') }}
-                </span>
-              </label>
+                  <span class="file-name">
+                    {{ fileName || $t('noFileSelected') }}
+                  </span>
+                </label>
+              </div>
             </div>
-          </div>
 
-          <!-- Warning for large batches -->
-          <div class="notification is-warning" v-if="parsedRows.length > 50">
-            <i class="fas fa-exclamation-triangle"></i>
-            {{ $t('batchLargeWarning', { count: parsedRows.length }) }}
-          </div>
-
-          <!-- Parse Errors -->
-          <div class="notification is-danger" v-if="parseError">
-            <i class="fas fa-times-circle"></i>
-            {{ parseError }}
-          </div>
-
-          <!-- Preview Table -->
-          <div v-if="parsedRows.length > 0 && !parseError">
-            <label class="label">{{ $t('batchPreview') }} ({{ $t('batchShowingRows', { shown: Math.min(5, parsedRows.length), total: parsedRows.length }) }})</label>
-            <div class="table-container">
-              <table class="table is-striped is-narrow is-hoverable is-fullwidth">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th v-for="col in csvColumns" :key="col">{{ col }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(row, index) in parsedRows.slice(0, 5)" :key="index">
-                    <td>{{ index + 1 }}</td>
-                    <td v-for="col in csvColumns" :key="col">
-                      <span class="has-text-grey" v-if="!row[col]">—</span>
-                      <span v-else>{{ truncateValue(row[col]) }}</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <!-- Warning for large batches -->
+            <div class="notification is-warning" v-if="parsedRows.length > 50">
+              <i class="fas fa-exclamation-triangle"></i>
+              {{ $t('batchLargeWarning', { count: parsedRows.length }) }}
             </div>
-            <p class="help" v-if="parsedRows.length > 5">
-              {{ $t('batchMoreRows', { count: parsedRows.length - 5 }) }}
-            </p>
 
-            <!-- Validation Summary -->
-            <div class="notification is-info is-light mt-3" v-if="validationSummary">
-              <p><strong>{{ $t('batchValidation') }}:</strong></p>
-              <p>{{ $t('batchValidRows') }}: {{ validationSummary.valid }}</p>
-              <p v-if="validationSummary.invalid > 0" class="has-text-danger">
-                {{ $t('batchInvalidRows') }}: {{ validationSummary.invalid }}
+            <!-- Parse Errors -->
+            <div class="notification is-danger" v-if="parseError">
+              <i class="fas fa-times-circle"></i>
+              {{ parseError }}
+            </div>
+
+            <!-- Preview Table -->
+            <div v-if="parsedRows.length > 0 && !parseError">
+              <label class="label">{{ $t('batchPreview') }} ({{ $t('batchShowingRows', { shown: Math.min(5, parsedRows.length), total: parsedRows.length }) }})</label>
+              <div class="table-container">
+                <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th v-for="col in csvColumns" :key="col">{{ col }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(row, index) in parsedRows.slice(0, 5)" :key="index">
+                      <td>{{ index + 1 }}</td>
+                      <td v-for="col in csvColumns" :key="col">
+                        <span class="has-text-grey" v-if="!row[col]">—</span>
+                        <span v-else>{{ truncateValue(row[col]) }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="help" v-if="parsedRows.length > 5">
+                {{ $t('batchMoreRows', { count: parsedRows.length - 5 }) }}
               </p>
+
+              <!-- Validation Summary -->
+              <div class="notification is-info is-light mt-3" v-if="validationSummary">
+                <p><strong>{{ $t('batchValidation') }}:</strong></p>
+                <p>{{ $t('batchValidRows') }}: {{ validationSummary.valid }}</p>
+                <p v-if="validationSummary.invalid > 0" class="has-text-danger">
+                  {{ $t('batchInvalidRows') }}: {{ validationSummary.invalid }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -129,22 +207,62 @@
           </p>
         </div>
 
-        <!-- Results Summary -->
+        <!-- Results Summary with Thank You and Countdown -->
         <div v-if="showResults">
-          <div class="notification is-success" v-if="successCount > 0">
-            <i class="fas fa-check-circle"></i>
-            {{ $t('batchSuccessCount', { count: successCount }) }}
-          </div>
-          <div class="notification is-danger" v-if="errorResults.length > 0">
-            <p><strong><i class="fas fa-times-circle"></i> {{ $t('batchErrorCount', { count: errorResults.length }) }}</strong></p>
-            <ul>
-              <li v-for="(err, index) in errorResults.slice(0, 10)" :key="index">
-                {{ $t('batchRowError', { row: err.row, error: err.error }) }}
-              </li>
-              <li v-if="errorResults.length > 10">
-                {{ $t('batchMoreErrors', { count: errorResults.length - 10 }) }}
-              </li>
-            </ul>
+          <div class="columns">
+            <div class="column" v-if="!adblockEnabled">
+              <div v-html="exportAd"></div>
+            </div>
+            <div class="column content">
+              <div class="notification is-success" v-if="successCount > 0">
+                <i class="fas fa-check-circle"></i>
+                {{ $t('batchSuccessCount', { count: successCount }) }}
+              </div>
+              <div class="notification is-danger" v-if="errorResults.length > 0">
+                <p><strong><i class="fas fa-times-circle"></i> {{ $t('batchErrorCount', { count: errorResults.length }) }}</strong></p>
+                <ul>
+                  <li v-for="(err, index) in errorResults.slice(0, 10)" :key="index">
+                    {{ $t('batchRowError', { row: err.row, error: err.error }) }}
+                  </li>
+                  <li v-if="errorResults.length > 10">
+                    {{ $t('batchMoreErrors', { count: errorResults.length - 10 }) }}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Countdown and Thank You Message -->
+              <div v-if="successCount > 0" class="mt-4">
+                <p class="is-size-4">
+                  <progress class="progress is-small is-primary" max="100" v-if="countdownSeconds !== 0"></progress>
+                  <progress class="progress is-small is-primary" max="100" v-if="countdownSeconds === 0" value="100"></progress>
+                  <span v-if="countdownSeconds > 0">{{ $t('batchDownloadCountdown', { seconds: countdownSeconds }) }}</span>
+                  <span v-if="countdownSeconds === 0">{{ $t('batchDownloadStarting') }}</span>
+                </p>
+                <p v-if="!adblockEnabled">
+                  <br/>{{ $t('batchThankYou') }}
+                </p>
+                <p v-if="adblockEnabled">
+                  {{ $t('batchAdblockMessage') }}
+                  <br/>
+                  <br/>
+                  <a class="button" href="https://paypal.me/fstein42" target="_blank" v-if="!showingThankYou" @click="showThanks">
+                    <span class="icon">
+                      <i class="fab fa-paypal"></i>
+                    </span>
+                    <span>Support qrcode2stl</span>
+                  </a>
+                  <a class="button is-danger" href="https://paypal.me/fstein42" target="_blank" v-if="showingThankYou">
+                    <span class="icon">
+                      <i class="fa fa-heart"></i>
+                    </span>
+                    <span>{{ $t('thankYou') }}</span>
+                  </a>
+                  <br/>
+                  <br/>
+                  {{ $t('batchThankYou') }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -152,11 +270,11 @@
         <div class="buttons" v-if="!isProcessing && !showResults">
           <button
             class="button is-success"
-            :disabled="parsedRows.length === 0 || parseError || (validationSummary && validationSummary.valid === 0)"
+            :disabled="!canGenerate"
             @click="startBatchGeneration"
           >
             <span class="icon"><i class="fas fa-play"></i></span>
-            <span>{{ $t('batchGenerate') }} ({{ validationSummary ? validationSummary.valid : 0 }})</span>
+            <span>{{ $t('batchGenerate') }} ({{ totalItemCount }})</span>
           </button>
           <button class="button" @click="close">{{ $t('cancel') }}</button>
         </div>
@@ -186,7 +304,7 @@ import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
-import { save } from '../utils';
+import { save, getRandomBanner } from '../utils';
 
 export default {
   name: 'BatchModeModal',
@@ -200,12 +318,19 @@ export default {
   emits: ['close', 'generateSingle'],
   data() {
     return {
+      // Mode selection
+      batchModeType: 'simple', // 'simple' or 'advanced'
+      localMultipleParts: this.multipleParts,
+      // Simple mode
+      simpleTextInput: '',
+      // Advanced mode (CSV)
       fileName: '',
       csvContent: '',
       csvColumns: [],
       csvDelimiter: ',',
       parsedRows: [],
       parseError: null,
+      // Processing
       isProcessing: false,
       aborted: false,
       processedCount: 0,
@@ -215,9 +340,35 @@ export default {
       errorResults: [],
       showResults: false,
       generatedFiles: [],
+      // Countdown and ad
+      countdownSeconds: 5,
+      countdownInterval: null,
+      adblockEnabled: false,
+      exportAd: '',
+      showingThankYou: false,
+      hasAutoDownloaded: false,
     };
   },
   computed: {
+    simpleTextLines() {
+      if (!this.simpleTextInput.trim()) return [];
+      return this.simpleTextInput
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    },
+    totalItemCount() {
+      if (this.batchModeType === 'simple') {
+        return this.simpleTextLines.length;
+      }
+      return this.validationSummary ? this.validationSummary.valid : 0;
+    },
+    canGenerate() {
+      if (this.batchModeType === 'simple') {
+        return this.simpleTextLines.length > 0;
+      }
+      return this.parsedRows.length > 0 && !this.parseError && this.validationSummary && this.validationSummary.valid > 0;
+    },
     validationSummary() {
       if (this.parsedRows.length === 0) return null;
 
@@ -246,9 +397,49 @@ export default {
       };
     },
   },
+  watch: {
+    countdownSeconds(newVal) {
+      if (newVal === 0 && this.successCount > 0 && !this.hasAutoDownloaded) {
+        this.hasAutoDownloaded = true;
+        this.downloadZip();
+      }
+    },
+  },
   methods: {
     close() {
+      this.stopCountdown();
       this.$emit('close');
+    },
+
+    showThanks() {
+      this.showingThankYou = true;
+    },
+
+    startCountdown() {
+      this.countdownSeconds = 5;
+      this.hasAutoDownloaded = false;
+
+      // Check for adblock
+      // eslint-disable-next-line camelcase
+      if (typeof __google_ad_urls === 'undefined') {
+        this.exportAd = getRandomBanner('300x250');
+      } else {
+        const adElement = document.getElementById('adsenseloader-export');
+        this.exportAd = adElement ? adElement.innerHTML : '';
+      }
+
+      this.countdownInterval = setInterval(() => {
+        if (this.countdownSeconds > 0) {
+          this.countdownSeconds -= 1;
+        }
+      }, 1000);
+    },
+
+    stopCountdown() {
+      if (this.countdownInterval) {
+        clearInterval(this.countdownInterval);
+        this.countdownInterval = null;
+      }
     },
 
     truncateValue(value) {
@@ -645,97 +836,183 @@ export default {
       this.generatedFiles = [];
       this.showResults = false;
 
-      // Filter valid rows
-      const validRows = this.parsedRows.filter(row => this.validateRow(row));
-      this.totalCount = validRows.length;
-
       // Import model worker
       const modelWorker = (await import('@/model-worker')).default;
 
-      for (let i = 0; i < validRows.length; i++) {
-        if (this.aborted) break;
+      if (this.batchModeType === 'simple') {
+        // Simple mode: process text lines
+        const lines = this.simpleTextLines;
+        this.totalCount = lines.length;
 
-        const row = validRows[i];
-        const rowIndex = this.parsedRows.indexOf(row) + 1;
+        for (let i = 0; i < lines.length; i++) {
+          if (this.aborted) break;
 
-        try {
-          // Build options from row
-          const rowOptions = this.buildOptionsFromRow(row);
-          console.log(`[Batch] Row ${rowIndex} options:`, rowOptions);
+          const textValue = lines[i];
+          const rowIndex = i + 1;
 
-          // Get QR text
-          const qrText = this.getQRText(rowOptions);
-          console.log(`[Batch] Row ${rowIndex} QR text:`, qrText);
-          this.currentItemLabel = this.truncateValue(qrText);
+          try {
+            // Build options from current settings, only changing text
+            const rowOptions = JSON.parse(JSON.stringify(this.options));
+            rowOptions.text = textValue;
+            console.log(`[Batch Simple] Row ${rowIndex} text:`, textValue);
 
-          if (!qrText) {
-            throw new Error(this.$t('batchEmptyQRText'));
-          }
+            this.currentItemLabel = this.truncateValue(textValue);
 
-          // Handle icon if present
-          if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
-            rowOptions.errorCorrectionLevel = 'H';
-            try {
-              const svgLoader = new SVGLoader();
-              const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);
-              const svgMarkup = await response.text();
-              const svgData = svgLoader.parse(svgMarkup);
+            // Handle icon if present
+            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
+              rowOptions.errorCorrectionLevel = 'H';
+              try {
+                const svgLoader = new SVGLoader();
+                const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);
+                const svgMarkup = await response.text();
+                const svgData = svgLoader.parse(svgMarkup);
 
-              const processedShapes = [];
-              svgData.paths.forEach(path => {
-                try {
-                  const shapes = SVGLoader.createShapes(path);
-                  shapes.forEach(shape => {
-                    processedShapes.push({
-                      shape: shape.toJSON(),
-                      holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+                const processedShapes = [];
+                svgData.paths.forEach(path => {
+                  try {
+                    const shapes = SVGLoader.createShapes(path);
+                    shapes.forEach(shape => {
+                      processedShapes.push({
+                        shape: shape.toJSON(),
+                        holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+                      });
                     });
-                  });
-                } catch (pathError) {
-                  console.warn('Error processing SVG path:', pathError);
-                }
-              });
-              rowOptions.code.iconShapes = processedShapes;
-            } catch (iconError) {
-              console.warn('Error loading icon:', iconError);
-              rowOptions.code.iconName = 'none';
-              rowOptions.code.iconShapes = null;
+                  } catch (pathError) {
+                    console.warn('Error processing SVG path:', pathError);
+                  }
+                });
+                rowOptions.code.iconShapes = processedShapes;
+              } catch (iconError) {
+                console.warn('Error loading icon:', iconError);
+                rowOptions.code.iconName = 'none';
+                rowOptions.code.iconShapes = null;
+              }
             }
+
+            // Generate QR code bitmap
+            console.log(`[Batch Simple] Row ${rowIndex} generating QR bitmap with error correction:`, rowOptions.errorCorrectionLevel);
+            const qrCodeObject = await qrcode.create(textValue, {
+              errorCorrectionLevel: rowOptions.errorCorrectionLevel,
+            });
+            const qrCodeBitMask = qrCodeObject.modules.data;
+            console.log(`[Batch Simple] Row ${rowIndex} QR bitmap generated, size:`, qrCodeBitMask.length);
+
+            // Generate 3D model via worker
+            console.log(`[Batch Simple] Row ${rowIndex} sending to model worker...`);
+            const meshes = await this.generateModelAsync(modelWorker, qrCodeBitMask, rowOptions);
+            console.log(`[Batch Simple] Row ${rowIndex} meshes received:`, Object.keys(meshes));
+
+            // Export to STL
+            const filename = `qrcode_${String(i + 1).padStart(3, '0')}`;
+            console.log(`[Batch Simple] Row ${rowIndex} exporting as:`, filename);
+            await this.exportToBuffer(meshes, filename);
+
+            this.successCount++;
+            console.log(`[Batch Simple] Row ${rowIndex} completed successfully`);
+          } catch (error) {
+            console.error(`[Batch Simple] Error processing row ${rowIndex}:`, error);
+            this.errorResults.push({
+              row: rowIndex,
+              error: error.message || String(error),
+            });
           }
 
-          // Generate QR code bitmap
-          console.log(`[Batch] Row ${rowIndex} generating QR bitmap with error correction:`, rowOptions.errorCorrectionLevel);
-          const qrCodeObject = await qrcode.create(qrText, {
-            errorCorrectionLevel: rowOptions.errorCorrectionLevel,
-          });
-          const qrCodeBitMask = qrCodeObject.modules.data;
-          console.log(`[Batch] Row ${rowIndex} QR bitmap generated, size:`, qrCodeBitMask.length);
-
-          // Generate 3D model via worker
-          console.log(`[Batch] Row ${rowIndex} sending to model worker...`);
-          const meshes = await this.generateModelAsync(modelWorker, qrCodeBitMask, rowOptions);
-          console.log(`[Batch] Row ${rowIndex} meshes received:`, Object.keys(meshes));
-
-          // Export to STL
-          const filename = row.filename || `qrcode_${String(i + 1).padStart(3, '0')}`;
-          console.log(`[Batch] Row ${rowIndex} exporting as:`, filename);
-          await this.exportToBuffer(meshes, filename);
-
-          this.successCount++;
-          console.log(`[Batch] Row ${rowIndex} completed successfully`);
-        } catch (error) {
-          console.error(`[Batch] Error processing row ${rowIndex}:`, error);
-          this.errorResults.push({
-            row: rowIndex,
-            error: error.message || String(error),
-          });
+          this.processedCount++;
         }
+      } else {
+        // Advanced mode: process CSV rows
+        const validRows = this.parsedRows.filter(row => this.validateRow(row));
+        this.totalCount = validRows.length;
 
-        this.processedCount++;
+        for (let i = 0; i < validRows.length; i++) {
+          if (this.aborted) break;
+
+          const row = validRows[i];
+          const rowIndex = this.parsedRows.indexOf(row) + 1;
+
+          try {
+            // Build options from row
+            const rowOptions = this.buildOptionsFromRow(row);
+            console.log(`[Batch] Row ${rowIndex} options:`, rowOptions);
+
+            // Get QR text
+            const qrText = this.getQRText(rowOptions);
+            console.log(`[Batch] Row ${rowIndex} QR text:`, qrText);
+            this.currentItemLabel = this.truncateValue(qrText);
+
+            if (!qrText) {
+              throw new Error(this.$t('batchEmptyQRText'));
+            }
+
+            // Handle icon if present
+            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
+              rowOptions.errorCorrectionLevel = 'H';
+              try {
+                const svgLoader = new SVGLoader();
+                const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);
+                const svgMarkup = await response.text();
+                const svgData = svgLoader.parse(svgMarkup);
+
+                const processedShapes = [];
+                svgData.paths.forEach(path => {
+                  try {
+                    const shapes = SVGLoader.createShapes(path);
+                    shapes.forEach(shape => {
+                      processedShapes.push({
+                        shape: shape.toJSON(),
+                        holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+                      });
+                    });
+                  } catch (pathError) {
+                    console.warn('Error processing SVG path:', pathError);
+                  }
+                });
+                rowOptions.code.iconShapes = processedShapes;
+              } catch (iconError) {
+                console.warn('Error loading icon:', iconError);
+                rowOptions.code.iconName = 'none';
+                rowOptions.code.iconShapes = null;
+              }
+            }
+
+            // Generate QR code bitmap
+            console.log(`[Batch] Row ${rowIndex} generating QR bitmap with error correction:`, rowOptions.errorCorrectionLevel);
+            const qrCodeObject = await qrcode.create(qrText, {
+              errorCorrectionLevel: rowOptions.errorCorrectionLevel,
+            });
+            const qrCodeBitMask = qrCodeObject.modules.data;
+            console.log(`[Batch] Row ${rowIndex} QR bitmap generated, size:`, qrCodeBitMask.length);
+
+            // Generate 3D model via worker
+            console.log(`[Batch] Row ${rowIndex} sending to model worker...`);
+            const meshes = await this.generateModelAsync(modelWorker, qrCodeBitMask, rowOptions);
+            console.log(`[Batch] Row ${rowIndex} meshes received:`, Object.keys(meshes));
+
+            // Export to STL
+            const filename = row.filename || `qrcode_${String(i + 1).padStart(3, '0')}`;
+            console.log(`[Batch] Row ${rowIndex} exporting as:`, filename);
+            await this.exportToBuffer(meshes, filename);
+
+            this.successCount++;
+            console.log(`[Batch] Row ${rowIndex} completed successfully`);
+          } catch (error) {
+            console.error(`[Batch] Error processing row ${rowIndex}:`, error);
+            this.errorResults.push({
+              row: rowIndex,
+              error: error.message || String(error),
+            });
+          }
+
+          this.processedCount++;
+        }
       }
 
       this.isProcessing = false;
       this.showResults = true;
+      // Start countdown for auto-download
+      if (this.successCount > 0) {
+        this.startCountdown();
+      }
     },
 
     generateModelAsync(modelWorker, qrCodeBitMask, options) {
@@ -820,7 +1097,7 @@ export default {
     async exportToBuffer(meshes, filename) {
       const exportAsBinary = this.stlType === 'binary';
 
-      if (this.multipleParts) {
+      if (this.localMultipleParts) {
         // Export as multiple parts in a sub-zip
         const subZip = new JSZip();
 
@@ -886,6 +1163,9 @@ export default {
     },
 
     reset() {
+      this.stopCountdown();
+      this.batchModeType = 'simple';
+      this.simpleTextInput = '';
       this.fileName = '';
       this.csvContent = '';
       this.csvColumns = [];
@@ -901,6 +1181,9 @@ export default {
       this.errorResults = [];
       this.showResults = false;
       this.generatedFiles = [];
+      this.countdownSeconds = 5;
+      this.hasAutoDownloaded = false;
+      this.showingThankYou = false;
       if (this.$refs.fileInput) {
         this.$refs.fileInput.value = '';
       }
