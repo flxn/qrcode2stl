@@ -409,6 +409,31 @@ class QRCode3D extends BaseTag3D {
   }
 
   /**
+   * Applies rotation, scaling and centering to an icon mesh.
+   * @param {THREE.Mesh} iconMesh
+   * @return {THREE.Mesh}
+   */
+  _positionIconMesh(iconMesh) {
+    iconMesh.rotation.set(Math.PI, 0, -Math.PI / 2);
+
+    let iconSize = getBoundingBoxSize(iconMesh);
+    const iconSizeRatio = this.options.code.iconSizeRatio / 100;
+    const scaleRatioY = iconSize.y / (this.availableWidth * iconSizeRatio);
+    const scaleRatioX = iconSize.x / (this.availableWidth * iconSizeRatio);
+    const scaleRatio = scaleRatioX > scaleRatioY ? scaleRatioX : scaleRatioY;
+    iconMesh.scale.x /= scaleRatio;
+    iconMesh.scale.y /= scaleRatio;
+
+    const boundingBox = new THREE.Box3().setFromObject(iconMesh);
+    const center = boundingBox.getCenter(new THREE.Vector3());
+    iconMesh.position.x = -center.x;
+    iconMesh.position.y = -center.y;
+    iconMesh.position.z = this.options.base.depth + this.options.code.depth;
+    iconMesh.updateMatrix();
+    return iconMesh;
+  }
+
+  /**
    * Creates the final icon mesh from processed geometries
    * @param {THREE.BufferGeometry[]} geometries - Array of processed geometries
    * @return {THREE.Mesh|null} - The final icon mesh
@@ -442,36 +467,31 @@ class QRCode3D extends BaseTag3D {
         ? validGeometries[0]
         : BufferGeometryUtils.mergeGeometries(validGeometries);
 
+      if (!iconGeometry) {
+        console.warn('mergeGeometries returned null (attribute mismatch), retrying with normalized geometries');
+        // Normalize all geometries to have the same attribute set before retrying
+        const attributeKeys = new Set();
+        validGeometries.forEach(geo => Object.keys(geo.attributes).forEach(k => attributeKeys.add(k)));
+        validGeometries.forEach(geo => {
+          attributeKeys.forEach(key => {
+            if (!geo.attributes[key] && geo.attributes.position) {
+              const count = geo.attributes.position.count;
+              const itemSize = key === 'uv' ? 2 : 3;
+              geo.setAttribute(key, new THREE.BufferAttribute(new Float32Array(count * itemSize), itemSize));
+            }
+          });
+        });
+        const retried = BufferGeometryUtils.mergeGeometries(validGeometries);
+        if (!retried) {
+          console.warn('createFinalIconMesh: mergeGeometries failed even after normalization');
+          return null;
+        }
+        // Fall through with retried geometry
+        return this._positionIconMesh(new THREE.Mesh(retried, this.materialDetail));
+      }
+
       const iconMesh = new THREE.Mesh(iconGeometry, this.materialDetail);
-
-      // Apply the correct rotation for icon orientation
-      iconMesh.rotation.set(Math.PI, 0, -Math.PI / 2);
-
-      // Apply scaling and positioning
-      let iconSize = getBoundingBoxSize(iconMesh);
-
-      const iconSizeRatio = this.options.code.iconSizeRatio / 100;
-      const scaleRatioY = iconSize.y / (this.availableWidth * iconSizeRatio);
-      const scaleRatioX = iconSize.x / (this.availableWidth * iconSizeRatio);
-
-      const scaleRatio = scaleRatioX > scaleRatioY ? scaleRatioX : scaleRatioY;
-      iconMesh.scale.x /= scaleRatio;
-      iconMesh.scale.y /= scaleRatio;
-
-      // Recalculate size after scaling
-      iconSize = getBoundingBoxSize(iconMesh);
-
-      // Calculate the visual center of the mesh for better positioning
-      const boundingBox = new THREE.Box3().setFromObject(iconMesh);
-      const center = boundingBox.getCenter(new THREE.Vector3());
-      
-      // Position the icon so its visual center aligns with the QR code center
-      iconMesh.position.x = -center.x;
-      iconMesh.position.y = -center.y;
-      iconMesh.position.z = this.options.base.depth + this.options.code.depth;
-      iconMesh.updateMatrix();
-
-      return iconMesh;
+      return this._positionIconMesh(iconMesh);
     } catch (error) {
       console.error('Error creating final icon mesh:', error);
       return null;
@@ -1103,7 +1123,26 @@ class QRCode3D extends BaseTag3D {
       return geo;
     });
 
-    const combinedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
+    let combinedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
+    if (!combinedGeometry) {
+      // Attribute mismatch: normalize all geometries to the same attribute set and retry
+      console.warn('getCombinedMesh: mergeGeometries returned null, normalizing attributes and retrying');
+      const attributeKeys = new Set();
+      compatibleGeometries.forEach(geo => Object.keys(geo.attributes).forEach(k => attributeKeys.add(k)));
+      compatibleGeometries.forEach(geo => {
+        attributeKeys.forEach(key => {
+          if (!geo.attributes[key] && geo.attributes.position) {
+            const count = geo.attributes.position.count;
+            const itemSize = key === 'uv' ? 2 : 3;
+            geo.setAttribute(key, new THREE.BufferAttribute(new Float32Array(count * itemSize), itemSize));
+          }
+        });
+      });
+      combinedGeometry = BufferGeometryUtils.mergeGeometries(compatibleGeometries);
+    }
+    if (!combinedGeometry) {
+      throw new Error('getCombinedMesh: mergeGeometries failed even after attribute normalization');
+    }
     this.combinedMesh = new THREE.Mesh(combinedGeometry, this.materialBase);
     return this.combinedMesh;
   }

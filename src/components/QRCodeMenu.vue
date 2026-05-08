@@ -79,7 +79,7 @@ import merge from 'deepmerge';
 import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
 import { bus } from '../main';
-import { save, saveAsString, saveAsArrayBuffer } from '../utils';
+import { save, saveAsString, saveAsArrayBuffer, trimIconShapesBounds } from '../utils';
 import { nextTick } from 'vue';
 
 const defaultOptions = {
@@ -347,7 +347,7 @@ export default {
             }
           });
 
-          this.options.code.iconShapes = processedShapes;
+          this.options.code.iconShapes = trimIconShapesBounds(processedShapes);
         } catch (error) {
           console.error(`Error processing ${this.options.code.iconName} icon:`, error);
           // Reset to no icon on error

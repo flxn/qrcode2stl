@@ -304,7 +304,7 @@ import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
-import { save, getRandomBanner } from '../utils';
+import { save, getRandomBanner, trimIconShapesBounds } from '../utils';
 
 export default {
   name: 'BatchModeModal',
@@ -881,7 +881,7 @@ export default {
                     console.warn('Error processing SVG path:', pathError);
                   }
                 });
-                rowOptions.code.iconShapes = processedShapes;
+                rowOptions.code.iconShapes = trimIconShapesBounds(processedShapes);
               } catch (iconError) {
                 console.warn('Error loading icon:', iconError);
                 rowOptions.code.iconName = 'none';
@@ -967,7 +967,7 @@ export default {
                     console.warn('Error processing SVG path:', pathError);
                   }
                 });
-                rowOptions.code.iconShapes = processedShapes;
+                rowOptions.code.iconShapes = trimIconShapesBounds(processedShapes);
               } catch (iconError) {
                 console.warn('Error loading icon:', iconError);
                 rowOptions.code.iconName = 'none';

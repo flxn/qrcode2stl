@@ -632,6 +632,9 @@
                               </label>
                             </div>
                           </div>
+                          <div v-if="uploadNotification" :class="['notification', uploadNotification.type, 'is-light', 'is-size-7']" style="margin: 4px 0 0; padding: 6px 10px;">
+                            {{ uploadNotification.message }}
+                          </div>
                           <hr class="dropdown-divider">
                         </div>
 
@@ -669,9 +672,8 @@
                       Custom uploaded icon
                     </span>
                     <br/>
-                    <p class="has-text-danger">
-                      This is a beta feature.<br/>
-                      Error Correction will be set to high if you use icons.
+                    <p class="has-text-danger has-text-weight-bold">
+                      Error Correction will be set to high if you use icons. Please make sure to test the scannability of your QR code before printing!
                     </p>
                     <p class="has-text-info" v-if="showIconCompatibilityWarning">
                       <i class="fas fa-info-circle"></i> {{ iconCompatibilityMessage }}
@@ -850,6 +852,7 @@ export default {
         'moon',
       ],
       customIcons: [],
+      uploadNotification: null, // { type: 'is-success'|'is-danger', message: '' }
     };
   },
   computed: {
@@ -878,6 +881,10 @@ export default {
     }
   },
   methods: {
+    showUploadNotification(type, message) {
+      this.uploadNotification = { type, message };
+      setTimeout(() => { this.uploadNotification = null; }, 4000);
+    },
     iconSelected(icon) {
       this.options.code.iconName = icon;
     },
@@ -887,11 +894,7 @@ export default {
 
       // Validate file type
       if (!file.type.includes('svg') && !file.name.toLowerCase().endsWith('.svg')) {
-        this.$toast.open({
-          message: this.$t('invalidSvgFile'),
-          type: 'is-danger',
-          duration: 3000,
-        });
+        this.showUploadNotification('is-danger', this.$t('invalidSvgFile'));
         return;
       }
 
@@ -902,11 +905,7 @@ export default {
 
           // Basic SVG validation
           if (!svgContent.includes('<svg') || !svgContent.includes('</svg>')) {
-            this.$toast.open({
-              message: this.$t('invalidSvgFile'),
-              type: 'is-danger',
-              duration: 3000,
-            });
+            this.showUploadNotification('is-danger', this.$t('invalidSvgFile'));
             return;
           }
 
@@ -919,17 +918,14 @@ export default {
               throw new Error('Invalid SVG structure');
             }
           } catch (error) {
-            this.$toast.open({
-              message: this.$t('invalidSvgFile'),
-              type: 'is-danger',
-              duration: 3000,
-            });
+            this.showUploadNotification('is-danger', this.$t('invalidSvgFile'));
             return;
           }
 
           // Create a centered version for preview
+          // Use encodeURIComponent to safely handle non-latin1 characters in SVG
           const centeredSvgContent = this.centerSvgForPreview(svgContent);
-          const dataUrl = `data:image/svg+xml;base64,${btoa(centeredSvgContent)}`;
+          const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(centeredSvgContent)}`;
 
           // Store custom icon (use original content for 3D processing, centered for preview)
           const customIcon = {
@@ -950,31 +946,19 @@ export default {
           const iconIndex = this.customIcons.length - 1;
           this.iconSelected(`custom-${iconIndex}`);
 
-          this.$toast.open({
-            message: this.$t('customIconUploaded'),
-            type: 'is-success',
-            duration: 3000,
-          });
+          this.showUploadNotification('is-success', this.$t('customIconUploaded'));
 
           // Clear the file input
           this.$refs.customIconInput.value = '';
 
         } catch (error) {
           console.error('Error processing SVG file:', error);
-          this.$toast.open({
-            message: this.$t('iconUploadError'),
-            type: 'is-danger',
-            duration: 3000,
-          });
+          this.showUploadNotification('is-danger', this.$t('iconUploadError'));
         }
       };
 
       reader.onerror = () => {
-        this.$toast.open({
-          message: this.$t('iconUploadError'),
-          type: 'is-danger',
-          duration: 3000,
-        });
+        this.showUploadNotification('is-danger', this.$t('iconUploadError'));
       };
 
       reader.readAsText(file);

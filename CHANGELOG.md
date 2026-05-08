@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.22.0] - 2026-05-08
+
+### Fixed
+- Custom SVG icon upload no longer crashes with a silent error when the SVG contains non-ASCII characters (e.g. copyright symbols or Unicode text). Notifications now show correctly on upload success and failure.
+- SVG icons with empty space around the content are now automatically trimmed before 3D processing, so the icon fills the available space as expected instead of appearing shrunken or off-center.
+- Fixed a crash during 3D model generation when a custom SVG icon produced geometries with mismatched vertex attributes, which caused `mergeGeometries` to return `null` and subsequently crash with `Cannot read properties of null (reading 'morphAttributes')`.
+
 ## [1.21.0] - 2026-01-10
 
 ### Added

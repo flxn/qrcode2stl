@@ -128,4 +128,109 @@ export const trimCanvas = (function () {
   };
 }());
 
+/**
+ * Trims empty space from a set of processed icon shapes by translating all
+ * shape and hole points so that the bounding box of the content starts at (0, 0).
+ *
+ * SVG files often have a larger viewBox than their actual content, which causes
+ * the icon to appear off-center or scaled down unnecessarily. This function
+ * removes that padding while preserving the relative positions of all shapes.
+ *
+ * @param {Array<{shape: object, holes: object[]}>} processedShapes - Serialized shape data
+ * @return {Array<{shape: object, holes: object[]}>} - Trimmed shape data
+ */
+export const trimIconShapesBounds = (processedShapes) => {
+  if (!processedShapes || processedShapes.length === 0) return processedShapes;
+
+  // Collect all 2D control points from a serialized curve's JSON
+  const curvePoints = (curve) => {
+    switch (curve.type) {
+      case 'LineCurve':
+        return [curve.v1, curve.v2];
+      case 'QuadraticBezierCurve':
+        return [curve.v0, curve.v1, curve.v2];
+      case 'CubicBezierCurve':
+        return [curve.v0, curve.v1, curve.v2, curve.v3];
+      case 'SplineCurve':
+        return curve.points || [];
+      case 'EllipseCurve':
+      case 'ArcCurve':
+        // aX, aY is the center; include it for a rough bound
+        return [[curve.aX, curve.aY]];
+      default:
+        return [];
+    }
+  };
+
+  // Collect all control points across all shapes and holes
+  const allPoints = [];
+  const collectFromCurves = (curves) => {
+    (curves || []).forEach(curve => {
+      curvePoints(curve).forEach(pt => {
+        if (Array.isArray(pt)) allPoints.push(pt);
+      });
+    });
+  };
+
+  processedShapes.forEach(({ shape, holes }) => {
+    collectFromCurves(shape.curves);
+    (holes || []).forEach(hole => collectFromCurves(hole.curves));
+  });
+
+  if (allPoints.length === 0) return processedShapes;
+
+  const minX = Math.min(...allPoints.map(p => p[0]));
+  const minY = Math.min(...allPoints.map(p => p[1]));
+
+  if (minX === 0 && minY === 0) return processedShapes; // nothing to trim
+
+  // Translate all control points in all curves by (-minX, -minY)
+  const translatePt = (pt) => [pt[0] - minX, pt[1] - minY];
+
+  const translateCurve = (curve) => {
+    const c = { ...curve };
+    switch (c.type) {
+      case 'LineCurve':
+        c.v1 = translatePt(c.v1);
+        c.v2 = translatePt(c.v2);
+        break;
+      case 'QuadraticBezierCurve':
+        c.v0 = translatePt(c.v0);
+        c.v1 = translatePt(c.v1);
+        c.v2 = translatePt(c.v2);
+        break;
+      case 'CubicBezierCurve':
+        c.v0 = translatePt(c.v0);
+        c.v1 = translatePt(c.v1);
+        c.v2 = translatePt(c.v2);
+        c.v3 = translatePt(c.v3);
+        break;
+      case 'SplineCurve':
+        c.points = (c.points || []).map(translatePt);
+        break;
+      case 'EllipseCurve':
+      case 'ArcCurve':
+        c.aX = c.aX - minX;
+        c.aY = c.aY - minY;
+        break;
+      default:
+        break;
+    }
+    return c;
+  };
+
+  const translatePathJSON = (pathJSON) => ({
+    ...pathJSON,
+    currentPoint: pathJSON.currentPoint
+      ? translatePt(pathJSON.currentPoint)
+      : pathJSON.currentPoint,
+    curves: (pathJSON.curves || []).map(translateCurve),
+  });
+
+  return processedShapes.map(({ shape, holes }) => ({
+    shape: translatePathJSON(shape),
+    holes: (holes || []).map(translatePathJSON),
+  }));
+};
+
 export const getRandomBanner = () => '';
