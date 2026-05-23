@@ -1,18 +1,25 @@
-FROM node:lts-buster-slim
+FROM node:iron-trixie-slim AS build
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get -y install \
-	git-core \
-	autotools-dev \
-	automake \
-	&& apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN set -ex \
+  && apt-get update \
+  && apt-get -y install \
+    autotools-dev \
+  	automake \
+	&& apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --single-branch --depth 1 https://github.com/flxn/qrcode2stl.git .
+COPY . .
 
-RUN npm install && npm install -g http-server && npm run build
+RUN npm install && npm install http-server && npm run build
 
-RUN mkdir www && mv dist/ www/qrcode2stl/
+FROM node:iron-trixie-slim AS runtime
+
+WORKDIR /usr/app
+
+RUN npm install -g http-server
+COPY --from=build /usr/src/app/dist/ www/
 
 EXPOSE 8080
 CMD [ "http-server", "www" ]
