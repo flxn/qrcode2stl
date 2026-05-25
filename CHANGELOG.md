@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.23.0] - 2026-05-25
+
+### Added
+- New "Magnet pockets" feature: You can now add pockets to the back of the QR code for embedding small magnets, which is perfect for fridge magnets or attaching to metal surfaces. You can configure the size, depth, and offset of the magnet pockets in the settings.
+
+### Changed
+- Updated the 3D visuals
+
 ## [1.22.0] - 2026-05-08
 
 ### Fixed

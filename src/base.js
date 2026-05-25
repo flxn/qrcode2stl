@@ -15,8 +15,8 @@ const LINE_HEIGHT = 1.5;
 class BaseTag3D {
   constructor(options) {
     const defaultOptions = {
-      baseColor: 0xffffff,
-      qrcodeColor: 0x000000,
+      baseColor: 0xfafafa,
+      qrcodeColor: 0x111111,
     };
 
     this.options = { ...defaultOptions, ...options };
@@ -129,6 +129,45 @@ class BaseTag3D {
 
       baseMesh = subtractMesh(baseMesh, holeMesh);
       baseMesh.updateMatrix();
+    }
+
+    if (this.options.base.hasMagnetPockets) {
+      const pocketSize = Math.max(0, this.options.base.magnetPocketSize || 0);
+      const pocketRadius = pocketSize / 2;
+      const pocketDepth = Math.min(this.options.base.depth, Math.max(0, this.options.base.magnetPocketDepth || 0));
+      const pocketOffset = Math.max(0, this.options.base.magnetPocketOffset || 0);
+
+      if (pocketRadius > 0 && pocketDepth > 0) {
+        const baseBounds = new THREE.Box3().setFromObject(baseMesh);
+        const minX = baseBounds.min.x + pocketRadius;
+        const maxX = baseBounds.max.x - pocketRadius;
+        const minY = baseBounds.min.y + pocketRadius;
+        const maxY = baseBounds.max.y - pocketRadius;
+
+        const leftX = THREE.MathUtils.clamp(baseBounds.min.x + pocketOffset + pocketRadius, minX, maxX);
+        const rightX = THREE.MathUtils.clamp(baseBounds.max.x - pocketOffset - pocketRadius, minX, maxX);
+        const topY = THREE.MathUtils.clamp(baseBounds.min.y + pocketOffset + pocketRadius, minY, maxY);
+        const bottomY = THREE.MathUtils.clamp(baseBounds.max.y - pocketOffset - pocketRadius, minY, maxY);
+
+        [
+          [leftX, topY],
+          [rightX, topY],
+          [leftX, bottomY],
+          [rightX, bottomY],
+        ].forEach(([x, y]) => {
+          const holeMesh = new THREE.Mesh(new THREE.CylinderGeometry(
+            pocketRadius,
+            pocketRadius,
+            pocketDepth,
+            32,
+          ), this.materialBase);
+          holeMesh.rotation.x = -Math.PI / 2;
+          holeMesh.position.set(x, y, pocketDepth / 2);
+          holeMesh.updateMatrix();
+          baseMesh = subtractMesh(baseMesh, holeMesh);
+          baseMesh.updateMatrix();
+        });
+      }
     }
 
     return baseMesh;

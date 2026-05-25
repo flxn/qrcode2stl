@@ -553,7 +553,9 @@ import merge from 'deepmerge';
 import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
 
-import { save, saveAsString, saveAsArrayBuffer } from '../utils';
+import {
+  save, saveAsString, saveAsArrayBuffer, applyPreviewMaterial,
+} from '../utils';
 import { nextTick } from 'vue';
 
 const defaultOptions = {
@@ -633,7 +635,7 @@ export default {
         let i = 0;
         Object.keys(meshes).forEach((key) => {
           jsonLoader.parse(meshes[key], (parsed) => {
-            meshes[key] = parsed;
+            meshes[key] = applyPreviewMaterial(parsed, key);
             i += 1;
             if (key !== 'combined') {
               this.scene.add(meshes[key]);

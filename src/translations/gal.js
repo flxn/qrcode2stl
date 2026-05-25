@@ -153,6 +153,10 @@ export default {
   nfcIndentationHelp: 'Engade unha cavidade na parte inferior da base onde se pode inserir unha etiqueta NFC/RFID.',
   indentation: 'Cavidade',
   nfcIndentationHiddenHelp: 'Crea unha cavidade no interior da base cunha compensación de 1 mm desde a parte inferior da base. Isto permítelle inserir firmemente a etiqueta NFC dentro da propia impresión 3D. Deteña a impresión antes da capa de peche, insira a etiqueta e, a continuación, retome a impresión. Asegúrese de que a profundidade da sangría sexa lixeiramente maior que a propia etiqueta e axuste a profundidade da base en consecuencia.',
+  magnetPockets: 'Ocoss para imans',
+  magnetPocketsHelp: 'Engade 4 ocos redondos para pegar imans na parte inferior da base, un preto de cada esquina.',
+  holeSize: 'Tamano do oco',
+  offsetFromOuterEdge: 'Distancia desde o bordo exterior',
 
   //
   // Axustes de exportación

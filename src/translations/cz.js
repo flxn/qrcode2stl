@@ -150,6 +150,10 @@ export default {
   nfcIndentationHelp: 'Přidá zespodu prohlubeň pro vložení NFC/RFID tagu.',
   indentation: 'Prohlubeň',
   nfcIndentationHiddenHelp: 'Vytvoří prostor uvnitř objektu, který bude minimálně jeden milimetr zespodu. Díky tomu je možno vložit tag přímo do objektu. Před vrstvou, která uzavírá prostor uvnitř objektu pozastavte tisk a poté opět tisk spusťte. Vždy vytvořte prostor lehce větší, než je samotný tag. Mějte na paměti, že velikost základny musí být vždy větší, než velikost samotného prostoru.',
+  magnetPockets: 'Magneticke kapsy',
+  magnetPocketsHelp: 'Prida 4 kulate kapsy na lepeni magnetu na spodni stranu zakladny, jednu do kazdeho rohu.',
+  holeSize: 'Velikost otvoru',
+  offsetFromOuterEdge: 'Odsazeni od vnejsi hrany',
 
   //
   // Export Settings

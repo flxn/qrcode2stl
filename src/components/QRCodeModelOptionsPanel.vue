@@ -508,6 +508,90 @@
             </div>
           </div>
 
+          <div class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label" :title="'base.hasMagnetPockets — ' + $t('magnetPockets')">{{$t('magnetPockets')}}</label>
+            </div>
+            <div class="field-body">
+              <div class="control">
+                <label class="checkbox">
+                  <div class="field">
+                    <input type="checkbox" v-model="options.base.hasMagnetPockets" :title="'base.hasMagnetPockets — ' + $t('magnetPockets')" />
+                    <span class="is-size-7"><i class="fa fa-magnet"></i> {{$t('magnetPocketsHelp')}}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="subsection" v-if="options.base.hasMagnetPockets">
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label" :title="'base.magnetPocketSize — ' + $t('holeSize')">{{$t('holeSize')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      v-model.number="options.base.magnetPocketSize"
+                      :title="'base.magnetPocketSize — ' + $t('holeSize')"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label" :title="'base.magnetPocketDepth — ' + $t('depth')">{{$t('depth')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      v-model.number="options.base.magnetPocketDepth"
+                      :title="'base.magnetPocketDepth — ' + $t('depth')"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label" :title="'base.magnetPocketOffset — ' + $t('offsetFromOuterEdge')">{{$t('offsetFromOuterEdge')}}</label>
+              </div>
+              <div class="field-body">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input
+                      class="input is-small"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      v-model.number="options.base.magnetPocketOffset"
+                      :title="'base.magnetPocketOffset — ' + $t('offsetFromOuterEdge')"
+                    />
+                  </div>
+                  <p class="control">
+                    <a class="button is-static is-small">{{unit}}</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Right Column -->

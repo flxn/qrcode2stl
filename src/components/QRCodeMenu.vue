@@ -79,7 +79,9 @@ import merge from 'deepmerge';
 import JSZip from 'jszip';
 import modelWorker from '@/model-worker';
 import { bus } from '../main';
-import { save, saveAsString, saveAsArrayBuffer, trimIconShapesBounds } from '../utils';
+import {
+  save, saveAsString, saveAsArrayBuffer, trimIconShapesBounds, applyPreviewMaterial,
+} from '../utils';
 import { nextTick } from 'vue';
 
 const defaultOptions = {
@@ -155,6 +157,10 @@ const defaultOptions = {
     nfcIndentationSize: 30,
     nfcIndentationDepth: 1,
     nfcIndentationHidden: false,
+    hasMagnetPockets: false,
+    magnetPocketSize: 8.2,
+    magnetPocketDepth: 2.2,
+    magnetPocketOffset: 10,
   },
   code: {
     depth: 1,
@@ -244,7 +250,7 @@ export default {
         let i = 0;
         Object.keys(meshes).forEach((key) => {
           jsonLoader.parse(meshes[key], (parsed) => {
-            meshes[key] = parsed;
+            meshes[key] = applyPreviewMaterial(parsed, key);
             i += 1;
             if (key !== 'combined') {
               this.scene.add(meshes[key]);

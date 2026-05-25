@@ -134,6 +134,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import changelog from '../../CHANGELOG.md?raw';
 import { bus } from '../main';
@@ -171,6 +172,8 @@ export default {
       scene: null,
       renderer: null,
       grid: null,
+      shadowPlane: null,
+      environmentMap: null,
       animationFrameId: null,
       animationTimer: null,
       adblockEnabled: false,
@@ -209,20 +212,44 @@ export default {
     },
     initLights() {
       // LIGHTS
-      const ambientLight = new THREE.AmbientLight(0x333333);
-      this.scene.add(ambientLight);
+      const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0xaeb7c4, 0.5);
+      this.scene.add(hemisphereLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1.0);
-      directionalLight.position.x = -1;
-      directionalLight.position.y = 0;
-      directionalLight.position.z = 1;
-      this.scene.add(directionalLight);
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.9);
+      keyLight.position.set(-3.2, -2.1, 2.2);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 2048;
+      keyLight.shadow.mapSize.height = 2048;
+      keyLight.shadow.camera.near = 0.5;
+      keyLight.shadow.camera.far = 800;
+      keyLight.shadow.camera.left = -180;
+      keyLight.shadow.camera.right = 180;
+      keyLight.shadow.camera.top = 180;
+      keyLight.shadow.camera.bottom = -180;
+      keyLight.shadow.bias = -0.0002;
+      keyLight.shadow.normalBias = 0.02;
+      this.scene.add(keyLight);
 
-      const directionalLightBack = new THREE.DirectionalLight(0xaaaaaa, 0.3);
-      directionalLightBack.position.x = -0.6;
-      directionalLightBack.position.y = 0;
-      directionalLightBack.position.z = -1;
-      this.scene.add(directionalLightBack);
+      const fillLight = new THREE.DirectionalLight(0xffffff, 0.28);
+      fillLight.position.set(1.7, 1.6, 1.1);
+      this.scene.add(fillLight);
+
+      const rimLight = new THREE.DirectionalLight(0xdde4ef, 0.45);
+      rimLight.position.set(1.3, -2.2, -1.3);
+      this.scene.add(rimLight);
+
+      const grazingLight = new THREE.DirectionalLight(0xfff7ef, 0.6);
+      grazingLight.position.set(3.4, -3.2, 0.45);
+      this.scene.add(grazingLight);
+    },
+    createGroundPlane() {
+      this.shadowPlane = new THREE.Mesh(
+        new THREE.PlaneGeometry(800, 800),
+        new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.2 }),
+      );
+      this.shadowPlane.position.z = -0.8;
+      this.shadowPlane.receiveShadow = true;
+      this.scene.add(this.shadowPlane);
     },
     initScene() {
       clearTimeout(this.animationTimer);
@@ -239,16 +266,8 @@ export default {
       const container = document.getElementById('container3d');
 
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0xa0a0a0);
+      this.scene.background = new THREE.Color(0xc6ccd4);
       this.scene.rotation.z = -Math.PI / 2;
-
-      this.initLights();
-
-      this.grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
-      this.grid.material.opacity = 0.2;
-      this.grid.material.transparent = true;
-      this.grid.rotation.x = Math.PI / 2;
-      this.scene.add(this.grid);
 
       this.camera = new THREE.PerspectiveCamera(
         50,
@@ -260,8 +279,28 @@ export default {
 
       this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
       this.renderer.setPixelRatio(window.devicePixelRatio);
+      this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+      this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      this.renderer.toneMappingExposure = 0.92;
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       this.renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(this.renderer.domElement);
+
+      const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+      this.environmentMap = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+      pmremGenerator.dispose();
+      this.scene.environment = this.environmentMap;
+
+      this.initLights();
+      this.createGroundPlane();
+
+      this.grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
+      this.grid.material.opacity = 0.08;
+      this.grid.material.transparent = true;
+      this.grid.rotation.x = Math.PI / 2;
+      this.scene.add(this.grid);
+
       const controls = new OrbitControls(this.camera, this.renderer.domElement);
       controls.target.set(0, 0, 0);
       controls.update();
@@ -272,13 +311,15 @@ export default {
       }
 
       this.initLights();
-      this.scene.background = new THREE.Color(0xa0a0a0);
+      this.createGroundPlane();
+      this.scene.background = new THREE.Color(0xc6ccd4);
+      this.scene.environment = this.environmentMap;
       // reset transparency
-      this.renderer.setClearColor(0xa0a0a0, 1);
+      this.renderer.setClearColor(0xc6ccd4, 1);
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.renderer.setSize(document.getElementById('container3d').clientWidth, document.getElementById('container3d').clientHeight);
       this.grid = new THREE.GridHelper(1000, 100, 0x000000, 0x000000);
-      this.grid.material.opacity = 0.2;
+      this.grid.material.opacity = 0.08;
       this.grid.material.transparent = true;
       this.grid.rotation.x = Math.PI / 2;
       this.scene.add(this.grid);

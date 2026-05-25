@@ -67,6 +67,124 @@ export const unionMesh = (targetMesh, toolMesh) => {
   return resultMesh;
 };
 
+let previewNoiseTexture = null;
+
+const getPreviewNoiseTexture = () => {
+  if (previewNoiseTexture) {
+    return previewNoiseTexture;
+  }
+
+  const size = 64;
+  const data = new Uint8Array(size * size * 4);
+
+  for (let i = 0; i < size * size; i += 1) {
+    const value = 55 + Math.floor(Math.random() * 200);
+    const offset = i * 4;
+    data[offset] = value;
+    data[offset + 1] = value;
+    data[offset + 2] = value;
+    data[offset + 3] = 255;
+  }
+
+  previewNoiseTexture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  previewNoiseTexture.wrapS = THREE.RepeatWrapping;
+  previewNoiseTexture.wrapT = THREE.RepeatWrapping;
+  previewNoiseTexture.repeat.set(6, 6);
+  previewNoiseTexture.colorSpace = THREE.NoColorSpace;
+  previewNoiseTexture.needsUpdate = true;
+
+  return previewNoiseTexture;
+};
+
+const addFdmPreviewShader = (material, type) => {
+  const sideStrength = type === 'base' ? 0.12 : 0.07;
+  const topStrength = type === 'base' ? 0.08 : 0.04;
+  const layerFrequency = 31.4; // roughly 0.2mm visual layer height
+  const extrusionFrequency = 14.0; // roughly 0.45mm visual extrusion width
+
+  material.onBeforeCompile = (shader) => {
+    const vertexVaryings = [
+      '#include <common>',
+      'varying vec3 vFdmPosition;',
+      'varying vec3 vFdmNormal;',
+    ].join('\n');
+    const normalVarying = [
+      '#include <beginnormal_vertex>',
+      'vFdmNormal = normalize(objectNormal);',
+    ].join('\n');
+    const positionVarying = [
+      '#include <begin_vertex>',
+      'vFdmPosition = transformed;',
+    ].join('\n');
+    const fragmentVaryings = [
+      '#include <common>',
+      'varying vec3 vFdmPosition;',
+      'varying vec3 vFdmNormal;',
+    ].join('\n');
+    const fdmLayerShader = [
+      '#include <color_fragment>',
+      'vec3 fdmNormal = normalize(vFdmNormal);',
+      'float fdmSideMask = pow(1.0 - abs(fdmNormal.z), 1.35);',
+      'float fdmFlatMask = pow(abs(fdmNormal.z), 2.0);',
+      'float fdmJitter = sin(vFdmPosition.x * 0.27 + vFdmPosition.y * 0.19) * 0.035;',
+      `float fdmLayerWave = 0.5 + 0.5 * sin((vFdmPosition.z + fdmJitter) * ${layerFrequency.toFixed(3)});`,
+      'float fdmLayerLine = pow(fdmLayerWave, 8.0) - 0.38;',
+      'float fdmPathWobble = sin(vFdmPosition.y * 0.21 + vFdmPosition.z * 0.43) * 0.06;',
+      `float fdmPathWave = 0.5 + 0.5 * sin((vFdmPosition.x + fdmPathWobble) * ${extrusionFrequency.toFixed(3)});`,
+      'float fdmPathLine = pow(fdmPathWave, 3.0) - 0.42;',
+      `float fdmShade = (fdmLayerLine * fdmSideMask * ${sideStrength.toFixed(3)}) + (fdmPathLine * fdmFlatMask * ${topStrength.toFixed(3)});`,
+      'diffuseColor.rgb *= clamp(1.0 + fdmShade, 0.78, 1.18);',
+    ].join('\n');
+
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', vertexVaryings)
+      .replace('#include <beginnormal_vertex>', normalVarying)
+      .replace('#include <begin_vertex>', positionVarying);
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', fragmentVaryings)
+      .replace('#include <color_fragment>', fdmLayerShader);
+  };
+
+  material.customProgramCacheKey = () => `fdm-preview-${type}`;
+};
+
+const createPreviewPlasticMaterial = (color, type) => {
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    metalness: 0,
+    roughness: type === 'base' ? 0.86 : 0.58,
+    envMapIntensity: type === 'base' ? 0.1 : 0.2,
+    bumpMap: getPreviewNoiseTexture(),
+    bumpScale: type === 'base' ? 0.04 : 0.02,
+  });
+
+  addFdmPreviewShader(material, type);
+  return material;
+};
+
+export const applyPreviewMaterial = (object, role) => {
+  const isBaseLike = role === 'base' || role === 'keychainAttachment';
+  const fallbackColor = isBaseLike ? 0xfafafa : 0x111111;
+
+  object.traverse((child) => {
+    if (!child.isMesh) {
+      return;
+    }
+
+    child.geometry.computeVertexNormals();
+    child.geometry.normalizeNormals();
+
+    const sourceMaterial = Array.isArray(child.material) ? child.material[0] : child.material;
+    const color = sourceMaterial?.color?.getHex?.() ?? fallbackColor;
+    child.material = createPreviewPlasticMaterial(color, isBaseLike ? 'base' : 'detail');
+    child.castShadow = true;
+    child.receiveShadow = true;
+  });
+
+  return object;
+};
+
 export const save = (blob, filename) => {
   const link = document.createElement('a');
   link.style.display = 'none';

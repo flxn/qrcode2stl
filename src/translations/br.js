@@ -143,6 +143,10 @@ export default {
   mirrorHoles: 'Espelhar Buracos',
   mirrorHolesHelp: 'Espelha os buracos para o lado oposto (ex: para pendurar com parafusos).',
   keychainHoleDiameter: 'Diâmetro do furo',
+  magnetPockets: 'Cavidades para iman',
+  magnetPocketsHelp: 'Adiciona 4 cavidades redondas para colar imas na parte inferior da base, uma perto de cada canto.',
+  holeSize: 'Tamanho do furo',
+  offsetFromOuterEdge: 'Distancia da borda externa',
 
   //
   // Export Settings
