@@ -1,6 +1,6 @@
 {
   "name": "qrcode2stl",
-  "version": "1.23.0",
+  "version": "2.0.0",
   "type": "module",
   "private": true,
   "scripts": {

@@ -1,74 +1,47 @@
 <template>
-  <div id="option-tabs" class="panel-tabs tabs">
-    <ul>
-      <li v-bind:class="{ 'is-active': activeTabIndex === 0 }" @click="$emit('tabChanged', 0)">
-        <a>
-          <span class="icon is-small">
-            <i class="fas fa-font" aria-hidden="true"></i>
-          </span>
-          <span>Text/URL</span>
-        </a>
-      </li>
-      <li v-bind:class="{ 'is-active': activeTabIndex === 1 }" @click="$emit('tabChanged', 1)">
-        <a>
-          <span class="icon is-small">
-            <i class="fas fa-wifi" aria-hidden="true"></i>
-          </span>
-          <span>Wifi</span>
-        </a>
-      </li>
-      <li v-bind:class="{ 'is-active': activeTabIndex === 2 }" @click="$emit('tabChanged', 2)">
-        <a>
-          <span class="icon is-small">
-            <i class="far fa-envelope" aria-hidden="true"></i>
-          </span>
-          <span>E-Mail</span>
-        </a>
-      </li>
-      <li v-bind:class="{ 'is-active': activeTabIndex === 3 }" @click="$emit('tabChanged', 3)">
-        <a>
-          <span class="icon is-small">
-            <i class="far fa-address-card" aria-hidden="true"></i>
-          </span>
-          <span>{{$t('contact')}} (vCard)</span>
-        </a>
-      </li>
-      <li v-bind:class="{ 'is-active': activeTabIndex === 4 }" @click="$emit('tabChanged', 4) ">
-        <a>
-          <span class="icon is-small">
-            <i class="far fa-comment" aria-hidden="true"></i>
-          </span>
-          <span>SMS</span>
-        </a>
-      </li>
-      <li v-bind:class="{ 'is-active': activeTabIndex === 5 }" @click="$emit('tabChanged', 5)">
-        <a>
-          <span class="icon is-small">
-            <i class="far fa-calendar" aria-hidden="true"></i>
-          </span>
-          <span>{{$t('calendar')}}</span>
-        </a>
-      </li>
-    </ul>
-  </div>
+  <UiSegmented
+    id="option-tabs"
+    class="content-type-picker"
+    :value="activeTabIndex"
+    :options="types"
+    icons-only
+    tip-pos="bottom"
+    :aria-label="$t('contentType')"
+    @input="$emit('tabChanged', $event)"
+  />
 </template>
 
 <script>
+import UiSegmented from './ui/UiSegmented.vue';
+
 export default {
   name: 'QRCodeOptionsTabs',
+  components: { UiSegmented },
   props: {
     activeTabIndex: Number,
   },
-  data() {
-    return {
-
-    };
-  },
-  methods: {
-
+  computed: {
+    types() {
+      return [
+        { value: 0, icon: 'letter-a', tip: 'Text/URL' },
+        { value: 1, icon: 'wifi', tip: 'Wifi' },
+        { value: 2, icon: 'mail', tip: 'E-Mail' },
+        { value: 3, icon: 'contact', tip: `${this.$t('contact')} (vCard)` },
+        { value: 4, icon: 'message', tip: 'SMS' },
+        { value: 5, icon: 'calendar', tip: this.$t('calendar') },
+      ];
+    },
   },
 };
 </script>
 
 <style>
+.content-type-picker.segmented {
+  padding: 2px;
+}
+
+.content-type-picker .segmented__item {
+  width: 32px;
+  height: 30px;
+}
 </style>

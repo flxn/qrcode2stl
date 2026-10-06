@@ -1,170 +1,84 @@
 <template>
-  <div>
-    <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
+  <div class="form-stack">
+    <p class="field-hint">{{ $t('optionalFieldsHint') }}</p>
 
-    <!-- Event Name -->
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.eventName — ' + $t('eventName')">{{$t('eventName')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="$t('eventNamePlaceholder')"
-              v-model="calendar.eventName"
-              :title="'calendar.eventName — ' + $t('eventName')"
-            />
-          </div>
-        </div>
-      </div>
+    <label class="field-stack" :title="'calendar.eventName — ' + $t('eventName')">
+      <span class="field-label">{{ $t('eventName') }}</span>
+      <input
+        v-model="calendar.eventName"
+        class="input"
+        type="text"
+        :placeholder="$t('eventNamePlaceholder')"
+        :title="'calendar.eventName — ' + $t('eventName')"
+      />
+    </label>
+
+    <div class="field-grid">
+      <label class="field-stack" :title="'calendar.startDate — ' + $t('startDate')">
+        <span class="field-label">{{ $t('startDate') }}</span>
+        <input v-model="calendar.startDate" class="input" type="date" :title="'calendar.startDate — ' + $t('startDate')" />
+      </label>
+      <label class="field-stack" :title="'calendar.endDate — ' + $t('endDate')">
+        <span class="field-label">{{ $t('endDate') }}</span>
+        <input v-model="calendar.endDate" class="input" type="date" :title="'calendar.endDate — ' + $t('endDate')" />
+      </label>
     </div>
 
-    <!-- Start Date -->
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.startDate — ' + $t('startDate')">{{$t('startDate')}}</label>
+    <UiCollapse :open="!calendar.allDay">
+      <div class="field-grid">
+        <label class="field-stack" :title="'calendar.startTime — ' + $t('startTime')">
+          <span class="field-label">{{ $t('startTime') }}</span>
+          <input v-model="calendar.startTime" class="input" type="time" :title="'calendar.startTime — ' + $t('startTime')" />
+        </label>
+        <label class="field-stack" :title="'calendar.endTime — ' + $t('endTime')">
+          <span class="field-label">{{ $t('endTime') }}</span>
+          <input v-model="calendar.endTime" class="input" type="time" :title="'calendar.endTime — ' + $t('endTime')" />
+        </label>
       </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="date"
-              v-model="calendar.startDate"
-              :title="'calendar.startDate — ' + $t('startDate')"
-            />
-          </div>
-        </div>
-      </div>
+    </UiCollapse>
+
+    <div class="form-inline-row">
+      <UiToggle
+        v-model="calendar.allDay"
+        :label="$t('allDayEvent')"
+        :title="'calendar.allDay — ' + $t('allDay')"
+      />
     </div>
 
-    <!-- Start Time -->
-    <div class="field is-horizontal" v-if="!calendar.allDay">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.startTime — ' + $t('startTime')">{{$t('startTime')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="time"
-              v-model="calendar.startTime"
-              :title="'calendar.startTime — ' + $t('startTime')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <label class="field-stack" :title="'calendar.location — ' + $t('location')">
+      <span class="field-label">{{ $t('location') }}</span>
+      <input
+        v-model="calendar.location"
+        class="input"
+        type="text"
+        :placeholder="$t('locationPlaceholder')"
+        :title="'calendar.location — ' + $t('location')"
+      />
+    </label>
 
-    <!-- End Date -->
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.endDate — ' + $t('endDate')">{{$t('endDate')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="date"
-              v-model="calendar.endDate"
-              :title="'calendar.endDate — ' + $t('endDate')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- End Time -->
-    <div class="field is-horizontal" v-if="!calendar.allDay">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.endTime — ' + $t('endTime')">{{$t('endTime')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="time"
-              v-model="calendar.endTime"
-              :title="'calendar.endTime — ' + $t('endTime')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- All Day Toggle -->
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.allDay — ' + $t('allDay')">{{$t('allDay')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <label class="checkbox">
-              <input type="checkbox" v-model="calendar.allDay" :title="'calendar.allDay — ' + $t('allDay')" />
-              {{$t('allDayEvent')}}
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Location (optional) -->
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.location — ' + $t('location')">{{$t('location')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="$t('locationPlaceholder')"
-              v-model="calendar.location"
-              :title="'calendar.location — ' + $t('location')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Description (optional) -->
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'calendar.description — ' + $t('description')">{{$t('description')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <textarea
-              class="textarea"
-              :placeholder="$t('descriptionPlaceholder')"
-              v-model="calendar.description"
-              style="width: 100%"
-              :title="'calendar.description — ' + $t('description')"
-            ></textarea>
-          </div>
-        </div>
-      </div>
-    </div>
+    <label class="field-stack" :title="'calendar.description — ' + $t('description')">
+      <span class="field-label">{{ $t('description') }}</span>
+      <textarea
+        v-model="calendar.description"
+        v-autosize
+        class="textarea form-textarea"
+        rows="2"
+        :placeholder="$t('descriptionPlaceholder')"
+        :title="'calendar.description — ' + $t('description')"
+      ></textarea>
+    </label>
   </div>
 </template>
 
 <script>
+import UiToggle from '../ui/UiToggle.vue';
+import UiCollapse from '../ui/UiCollapse.vue';
+
 export default {
   name: 'CalendarForm',
+  components: { UiToggle, UiCollapse },
   props: {
     calendar: Object,
   },
 };
 </script>
-
-<style>
-</style>

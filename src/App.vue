@@ -1,26 +1,22 @@
 <template>
   <div id="app">
-    <Header />
     <Main />
     <Footer />
+    <ToastHost />
   </div>
 </template>
 
 <script>
-import Header from './components/Header.vue';
 import Main from './components/Main.vue';
 import Footer from './components/Footer.vue';
+import ToastHost from './components/ToastHost.vue';
 
 export default {
   name: 'app',
   components: {
-    Header,
     Main,
     Footer,
+    ToastHost,
   },
 };
 </script>
-
-<style>
-
-</style>

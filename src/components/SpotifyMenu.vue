@@ -1,102 +1,92 @@
 <template>
-  <div id="spotifyMenu">
-    <p class="help content" title="Plz don't sue me Spotify">
-      I am not affiliated with Spotify and this tool is not endorsed by Spotify AB. Please follow the <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes.pdf" target="_blank" rel="nofollow noopener noreferrer">Terms and Conditions</a> for Spotify Codes.
-    </p>
-    <!-- Spotify Options -->
-    <nav class="panel">
-      <p class="panel-heading">{{ $t("spotifyOptions") }}</p>
-
-      <!-- Text -->
-      <div class="option-pane">
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">{{$t('spotifyUri')}}</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <div class="control">
-                <input
-                  class="input"
-                  type="text"
-                  placeholder="spotify:track:4uLU6hMCjMI75M1A2tKUQC"
-                  v-model="options.spotifyUri"
-                  @change="downloadSpotifyCode"
-                />
-              </div>
-            </div>
-          </div>
+  <div id="spotifyMenu" class="mode-panel">
+    <section class="content-card" :aria-label="$t('spotifyUri')">
+      <div class="content-card__head">
+        <span class="content-card__title">
+          <i class="fab fa-spotify content-card__fa" aria-hidden="true"></i>
+          {{ $t('spotifyUri') }}
+        </span>
+        <transition name="fade" mode="out-in">
+          <span v-if="spotifyStatus === 'valid'" key="valid" class="status-pill status-pill--ok">
+            <UiIcon name="circle-check" /> Valid Spotify URI
+          </span>
+          <span v-else-if="spotifyStatus === 'invalid'" key="invalid" class="status-pill status-pill--error">
+            <UiIcon name="alert" /> Invalid Spotify URI
+          </span>
+          <span v-else-if="spotifyStatus === 'loading'" key="loading" class="status-pill">
+            <UiIcon name="loader" class="spin" />
+          </span>
+        </transition>
+      </div>
+      <input
+        v-model="options.spotifyUri"
+        class="input input--lg"
+        type="text"
+        spellcheck="false"
+        autocomplete="off"
+        placeholder="spotify:track:4uLU6hMCjMI75M1A2tKUQC"
+        :aria-label="$t('spotifyUri')"
+        title="spotifyUri"
+        @input="scheduleDownload"
+        @change="downloadSpotifyCode"
+      />
+      <transition name="rise">
+        <figure v-if="spotifyCodeUrl && validSpotifyCode" class="spotify-preview">
+          <object
+            id="spotify-code-preview"
+            type="image/svg+xml"
+            :data="spotifyCodeUrl"
+            @load="onPreviewLoad"
+            @error="onPreviewError"
+          ></object>
+        </figure>
+      </transition>
+      <transition name="rise">
+        <div v-if="generateError" class="notice notice--danger" role="alert">
+          <UiIcon name="circle-x" />
+          <span>{{ generateError }}</span>
         </div>
-        <div class="content">
-          <p class="help">
-            <span class="help-icon icon has-text-info">
-              <i class="fas fa-info-circle"></i>
-            </span>
-            {{$t('spotifyUriHelp')}}
+      </transition>
+    </section>
+
+    <UiTabs class="mode-tabs" :value="currentTab" :tabs="tabs" :aria-label="$t('settingsPanel')" @input="selectTab" />
+
+    <div class="tab-panels">
+      <div v-show="currentTab === 'content'" class="tab-panel" role="tabpanel">
+        <div class="tab-panel__body">
+          <div class="notice notice--info">
+            <UiIcon name="info" />
+            <span>{{ $t('spotifyUriHelp') }}</span>
+          </div>
+          <p class="field-hint" title="Plz don't sue me Spotify">
+            I am not affiliated with Spotify and this tool is not endorsed by Spotify AB. Please follow the
+            <a href="https://www.spotifycodes.com/assets/Terms_and_Conditions_for_Spotify_Codes.pdf" target="_blank" rel="nofollow noopener noreferrer">Terms and Conditions</a>
+            for Spotify Codes.
           </p>
         </div>
-        <div class="content" v-if="spotifyCodeUrl">
-          <figure class="image">
-            <object
-              type="image/svg+xml"
-              id="spotify-code-preview"
-              :data="spotifyCodeUrl"
-              v-if="validSpotifyCode"
-              @load="validSpotifyCode = true"
-              @error="validSpotifyCode = false"
-            />
-            <p class="has-text-weight-bold has-text-success" v-if="validSpotifyCode">
-              <span class="icon">
-                <i class="fa fa-check"></i>
-              </span>
-              Valid Spotify URI
-            </p>
-            <p class="has-text-weight-bold has-text-danger" v-if="!validSpotifyCode">
-              <span class="icon">
-                <i class="fa fa-exclamation-triangle"></i>
-              </span>
-              Invalid Spotify URI
-            </p>
-          </figure>
-        </div>
-
       </div>
-    </nav>
-    <!-- 3D Options -->
-    <SpotifyModelOptionsPanel :options="options" :unit="unit" />
 
-    <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
-      {{generateError}}
+      <div v-show="currentTab === 'model'" class="tab-panel" role="tabpanel">
+        <SpotifyModelOptionsPanel :options="options" :unit="unit" />
+      </div>
+
+      <div v-show="currentTab === 'extras'" class="tab-panel" role="tabpanel">
+        <CodeStyleOptions :options="options" :unit="unit" />
+      </div>
     </div>
-
-    <button
-      class="button is-success is-large"
-      v-bind:class="{'is-loading': isGenerating}"
-      @click="generate3dModel"
-      v-if="validSpotifyCode"
-    >
-      <span class="icon">
-        <i class="fa fa-cube"></i>
-      </span>
-      <span>{{$t('generateButton')}}</span>
-    </button>
   </div>
 </template>
 
 <script>
-import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import pathThatSvg from 'path-that-svg';
-import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
-import JSZip from 'jszip';
-import modelWorker from '@/model-worker';
+import menuMixin, { hasValidNumbers } from './menuMixin';
 // 3D settings panel
 import SpotifyModelOptionsPanel from './SpotifyModelOptionsPanel.vue';
-import {
-  save, saveAsString, saveAsArrayBuffer, applyPreviewMaterial,
-} from '../utils';
-import { nextTick } from 'vue';
+import CodeStyleOptions from './sections/CodeStyleOptions.vue';
+import UiIcon from './ui/UiIcon.vue';
+import UiTabs from './ui/UiTabs.vue';
 
 const defaultOptions = {
   spotifyUri: '',
@@ -137,71 +127,81 @@ const defaultOptions = {
 
 export default {
   name: 'SpotifyMenu',
-  props: {
-    scene: Object,
-    exporter: Object,
-  },
+  mixins: [menuMixin],
   components: {
     SpotifyModelOptionsPanel,
+    CodeStyleOptions,
+    UiIcon,
+    UiTabs,
   },
   data() {
     return {
       options: JSON.parse(JSON.stringify(defaultOptions)),
       spotifyCodeUrl: '',
       validSpotifyCode: false,
-      unit: 'mm',
-      mesh: null,
-      baseMesh: null,
-      spotifyCodeMesh: null,
-      borderMesh: null,
-      subtitleMesh: null,
-      keychainAttachmentMesh: null,
-      stlType: 'binary',
-      dualExtrusion: false,
-      isGenerating: false,
-      generateError: null,
+      spotifyLoaded: false,
+      spotifyLoading: false,
+      spotifyInvalid: false,
+      codeVersion: 0,
+      importing: false,
     };
   },
-
+  computed: {
+    tabs() {
+      return [
+        { id: 'content', label: this.$t('tabContent'), icon: 'scan-line' },
+        { id: 'model', label: this.$t('tabModel'), icon: 'qr-code' },
+        { id: 'extras', label: this.$t('tabExtras'), icon: 'box' },
+      ];
+    },
+    exportParts() {
+      return [
+        ['base', 'base'],
+        ['spotifyCode', 'qrcode'],
+        ['border', 'border'],
+        ['subtitle', 'text'],
+        ['keychainAttachment', 'attachment'],
+      ];
+    },
+    spotifyStatus() {
+      if (this.spotifyLoading) return 'loading';
+      if (this.spotifyInvalid) return 'invalid';
+      if (this.spotifyLoaded && this.validSpotifyCode) return 'valid';
+      return '';
+    },
+  },
+  watch: {
+    // Spotify Codes have a fixed aspect ratio of 4:1
+    'options.base.width': function syncHeight(width) {
+      if (!this.importing && typeof width === 'number') {
+        this.options.base.height = width * 0.25;
+      }
+    },
+  },
+  beforeDestroy() {
+    window.clearTimeout(this.downloadTimer);
+  },
   methods: {
     getExportableOptions() {
       return JSON.parse(JSON.stringify(this.options));
     },
     importOptions(newOptions) {
+      this.importing = true;
       this.options = merge(this.options, newOptions);
-    },
-    initWorker() {
-      modelWorker.worker.onmessage = (event) => {
-        if (event.data.type !== 'result') {
-          return;
+      this.$nextTick(() => {
+        this.importing = false;
+        if (this.options.spotifyUri) {
+          this.downloadSpotifyCode();
         }
-        this.$emit('resetScene');
-        const jsonLoader = new THREE.ObjectLoader();
-        const { meshes } = event.data;
-        let i = 0;
-        Object.keys(meshes).forEach((key) => {
-          jsonLoader.parse(meshes[key], (parsed) => {
-            meshes[key] = applyPreviewMaterial(parsed, key);
-            i += 1;
-            if (key !== 'combined') {
-              this.scene.add(meshes[key]);
-            }
-            if (i === event.data.meshCount) {
-              this.mesh = meshes.combined;
-              this.baseMesh = meshes.base;
-              this.spotifyCodeMesh = meshes.spotifyCode;
-              this.borderMesh = meshes.border;
-              this.iconMesh = meshes.icon;
-              this.subtitleMesh = meshes.subtitle;
-              this.keychainAttachmentMesh = meshes.keychainAttachment;
-              this.isGenerating = false;
-            }
-          });
-        });
-        this.$emit('exportReady', diff(defaultOptions, this.options));
-      };
+      });
     },
-    async setup3dObject() {
+    signatureSource() {
+      return { ...this.options, codeVersion: this.codeVersion };
+    },
+    isReadyForAutoUpdate() {
+      return hasValidNumbers(this.options, defaultOptions) && this.spotifyLoaded && this.validSpotifyCode;
+    },
+    async setup3dObject(ticket) {
       try {
         const loader = new SVGLoader();
         const spotifyPreview = document.querySelector('#spotify-code-preview');
@@ -224,15 +224,12 @@ export default {
         // Use SVGLoader.createShapes for proper hole handling (r127+)
         const processedShapes = [];
 
-        svgData.paths.forEach(path => {
+        svgData.paths.forEach((path) => {
           try {
-            // Use the modern createShapes method
-            const shapes = SVGLoader.createShapes(path);
-
-            shapes.forEach(shape => {
+            SVGLoader.createShapes(path).forEach((shape) => {
               processedShapes.push({
                 shape: shape.toJSON(),
-                holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+                holes: shape.holes ? shape.holes.map((hole) => hole.toJSON()) : [],
               });
             });
           } catch (pathError) {
@@ -244,123 +241,143 @@ export default {
           throw new Error('No valid shapes found in Spotify code');
         }
 
-        modelWorker.send({
+        await this.requestModel(ticket, {
           mode: 'Spotify',
           spotifyCodeShapes: processedShapes,
           options: this.options,
         });
       } catch (error) {
         console.error('Error processing Spotify code:', error);
-        this.generateError = `Failed to process Spotify code: ${error.message}`;
-        this.isGenerating = false;
+        this.failGeneration(ticket, `Failed to process Spotify code: ${error.message}`);
       }
     },
     async generate3dModel() {
-      this.$emit('generating');
-      this.isGenerating = true;
-      this.generateError = null; // Clear any previous errors
-
-      nextTick(() => {
-        // this.init3d();
-        this.setup3dObject();
-        // this.startAnimation();
-      });
-    },
-    exportSTL(stlType, multipleParts) {
-      const timestamp = new Date().getTime();
-      const exportAsBinary = (stlType === 'binary');
-
-      if (multipleParts) {
-        const zip = new JSZip();
-        const filenameBase = `base-${timestamp}.stl`;
-        const filenameQrcode = `qrcode-${timestamp}.stl`;
-        const filenameBorder = `border-${timestamp}.stl`;
-        const filenameText = `text-${timestamp}.stl`;
-        const filenameKeychain = `attachment-${timestamp}.stl`;
-
-        const put = (name, data) => {
-          if (exportAsBinary) {
-            const content = (data && data.buffer) ? data.buffer : data;
-            zip.file(name, content, { binary: true });
-          } else {
-            zip.file(name, data);
-          }
-        };
-
-        const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
-        const qrcodeSTL = this.exporter.parse(this.spotifyCodeMesh, { binary: exportAsBinary });
-        put(filenameBase, baseSTL);
-        put(filenameQrcode, qrcodeSTL);
-
-        if (this.borderMesh) {
-          const borderSTL = this.exporter.parse(this.borderMesh, { binary: exportAsBinary });
-          put(filenameBorder, borderSTL);
-        }
-
-        if (this.subtitleMesh) {
-          const textSTL = this.exporter.parse(this.subtitleMesh, { binary: exportAsBinary });
-          put(filenameText, textSTL);
-        }
-
-        if (this.keychainAttachmentMesh) {
-          const kcaSTL = this.exporter.parse(this.keychainAttachmentMesh, { binary: exportAsBinary });
-          put(filenameKeychain, kcaSTL);
-        }
-
-        zip.generateAsync({ type: 'blob' })
-          .then((content) => {
-            save(new Blob([content]), `qrcode2stl-${timestamp}.zip`);
-          });
-      } else {
-        const filename = `combined-${timestamp}.stl`;
-        const result = this.exporter.parse(this.mesh, { binary: exportAsBinary });
-        if (exportAsBinary) {
-          saveAsArrayBuffer(result, filename);
-        } else {
-          saveAsString(result, filename);
-        }
+      const ticket = this.beginGeneration();
+      if (!this.validSpotifyCode || !this.spotifyCodeUrl) {
+        this.failGeneration(ticket, this.$t('errorNoSpotify'));
+        return;
       }
+      await this.setup3dObject(ticket);
+    },
+    scheduleDownload() {
+      window.clearTimeout(this.downloadTimer);
+      this.downloadTimer = window.setTimeout(this.downloadSpotifyCode, 700);
+    },
+    parseSpotifyUri(input) {
+      const value = (input || '').trim();
+      if (!value) {
+        return null;
+      }
+      if (value.startsWith('spotify:')) {
+        return value;
+      }
+      const regex = /spotify\.com\/(?:.*\/)*([^/]+)\/([^?/]+)/gm;
+      const parts = regex.exec(value);
+      if (!parts || parts.length !== 3) {
+        return null;
+      }
+      return `spotify:${parts[1]}:${parts[2]}`;
     },
     async downloadSpotifyCode() {
-      let uri = this.options.spotifyUri;
-      if (!uri.startsWith('spotify:')) {
-        const regex = /spotify\.com\/(?:.*\/)*([^/]+)\/([^?/]+)/gm;
-        const parts = regex.exec(uri);
-        if (parts.length !== 3) {
+      window.clearTimeout(this.downloadTimer);
+      const uri = this.parseSpotifyUri(this.options.spotifyUri);
+      if (!uri) {
+        if (this.options.spotifyUri.trim()) {
           console.error('Not a valid Spotify URI or Link');
+        }
+        this.spotifyInvalid = !!this.options.spotifyUri.trim();
+        this.validSpotifyCode = false;
+        this.spotifyLoaded = false;
+        return;
+      }
+      if (uri === this.loadedUri && this.spotifyLoaded) {
+        return;
+      }
+      this.loadedUri = uri;
+      this.spotifyInvalid = false;
+      this.spotifyLoading = true;
+      this.spotifyLoaded = false;
+      try {
+        const spotifyCodeSvgUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${uri}`;
+        const response = await fetch(spotifyCodeSvgUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const svgString = await response.text();
+        if (uri !== this.loadedUri) {
           return;
         }
-        uri = `spotify:${parts[1]}:${parts[2]}`;
+        if (this.spotifyCodeUrl) {
+          URL.revokeObjectURL(this.spotifyCodeUrl);
+        }
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+        this.validSpotifyCode = true;
+        this.spotifyCodeUrl = URL.createObjectURL(svgBlob);
+      } catch (error) {
+        console.error('Could not load Spotify code:', error);
+        if (uri === this.loadedUri) {
+          this.validSpotifyCode = false;
+          this.spotifyInvalid = true;
+          this.spotifyLoading = false;
+        }
       }
-      const spotifyCodeSvgUrl = `https://scannables.scdn.co/uri/plain/svg/000000/white/640/${uri}`;
-      this.validSpotifyCode = true;
-      const response = await fetch(spotifyCodeSvgUrl);
-      const utf8Decoder = new TextDecoder('utf-8');
-      const reader = response.body.getReader();
-      const data = await reader.read();
-      const svgString = utf8Decoder.decode(data.value);
-      const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
-      this.spotifyCodeUrl = URL.createObjectURL(svgBlob);
     },
-  },
-  async mounted() {
-    this.initWorker();
+    onPreviewLoad() {
+      this.validSpotifyCode = true;
+      this.spotifyLoading = false;
+      this.spotifyLoaded = true;
+      this.codeVersion += 1;
+    },
+    onPreviewError() {
+      this.validSpotifyCode = false;
+      this.spotifyLoading = false;
+      this.spotifyLoaded = false;
+      this.spotifyInvalid = true;
+    },
   },
 };
 </script>
 
-<style scoped>
-#notifications {
-  margin-top: 10px;
+<style>
+.content-card__fa {
+  color: #1db954;
+  font-size: 17px;
 }
 
-.field-label {
-  text-align: left;
-  flex-grow: 1.5;
-  margin-right: 0;
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pill .svg-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.status-pill--ok {
+  color: var(--accent-text);
+}
+
+.status-pill--error {
+  color: var(--danger-text);
+}
+
+.spotify-preview {
+  margin: 0;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: #000;
 }
 
 #spotify-code-preview {
+  display: block;
+  width: 100%;
   max-width: 100%;
+  pointer-events: none;
 }
 </style>

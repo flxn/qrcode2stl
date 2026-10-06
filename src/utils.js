@@ -153,8 +153,9 @@ const createPreviewPlasticMaterial = (color, type) => {
   const material = new THREE.MeshStandardMaterial({
     color,
     metalness: 0,
-    roughness: type === 'base' ? 0.86 : 0.58,
-    envMapIntensity: type === 'base' ? 0.1 : 0.2,
+    // rough enough that the dark code reads black from the angled default view instead of glaring
+    roughness: type === 'base' ? 0.86 : 0.8,
+    envMapIntensity: type === 'base' ? 0.1 : 0.07,
     bumpMap: getPreviewNoiseTexture(),
     bumpScale: type === 'base' ? 0.04 : 0.02,
   });
@@ -172,6 +173,9 @@ export const applyPreviewMaterial = (object, role) => {
       return;
     }
 
+    // the preview uses the role to find the base plate (e.g. for the dimension ruler)
+    // eslint-disable-next-line no-param-reassign
+    child.userData.role = role;
     child.geometry.computeVertexNormals();
     child.geometry.normalizeNormals();
 

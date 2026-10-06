@@ -1,562 +1,88 @@
-/* eslint-disable import/no-webpack-loader-syntax */
 <template>
-  <div id="qrcodeMenu">
-    <nav class="panel">
-      <p class="panel-heading">{{ $t("text") }}</p>
-
-      <!-- Text -->
-      <div class="option-pane">
-        <!-- Text Settings -->
-          <div class="field is-horizontal">
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <textarea
-                    class="textarea is-normal"
-                    rows="5"
-                    v-model="options.base.textMessage"
-                    :placeholder="$t('theText')"
-                  />
-                  <div class="buttons are-small mt-2 is-pulled-right">
-                    <button
-                      :class="{
-                        button: true,
-                        'is-primary': options.base.textAlign == 'left',
-                      }"
-                      @click="options.base.textAlign = 'left'"
-                    >
-                      <span class="icon is-normal">
-                        <i class="fas fa-align-left"></i>
-                      </span>
-                    </button>
-                    <button
-                      :class="{
-                        button: true,
-                        'is-primary': options.base.textAlign == 'center',
-                      }"
-                      @click="options.base.textAlign = 'center'"
-                    >
-                      <span class="icon is-normal">
-                        <i class="fas fa-align-center"></i>
-                      </span>
-                    </button>
-                    <button
-                      :class="{
-                        button: true,
-                        'is-primary': options.base.textAlign == 'right',
-                      }"
-                      @click="options.base.textAlign = 'right'"
-                    >
-                      <span class="icon is-normal">
-                        <i class="fas fa-align-right"></i>
-                      </span>
-                    </button>
-                  </div>
-                  <p class="help content">
-                    {{ $t("fontInfoText") }}<br />
-                    <i class="fas fa-italic"></i> {{ $t("italicInfoText")
-                    }}<br />
-                    <i class="fas fa-bold"></i> {{ $t("boldInfoText") }}<br />
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-normal">
-              <label class="label">{{ $t("text") }} {{ $t("size") }}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-normal"
-                    type="number"
-                    v-model.number="options.base.textSize"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-normal">{{ unit }}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-normal">
-              <label class="label">{{ $t("text") }} {{ $t("depth") }}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-normal"
-                    type="number"
-                    v-model.number="options.base.textDepth"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-normal">{{ unit }}</a>
-                </p>
-              </div>
-            </div>
-          </div>
+  <div id="textMenu" class="mode-panel">
+    <section class="content-card" :aria-label="$t('text')">
+      <div class="content-card__head">
+        <span class="content-card__title">
+          <UiIcon name="letter-a" />
+          {{ $t('text') }}
+        </span>
+        <UiSegmented
+          v-model="options.base.textAlign"
+          icons-only
+          tip-pos="bottom"
+          :options="alignOptions"
+          :aria-label="$t('alignment')"
+          title="base.textAlign"
+        />
       </div>
-    </nav>
+      <textarea
+        v-model="options.base.textMessage"
+        v-autosize
+        class="textarea content-textarea text-mode-textarea"
+        rows="3"
+        :placeholder="$t('theText')"
+        :aria-label="$t('text')"
+        :style="{ textAlign: options.base.textAlign }"
+        title="base.textMessage"
+      ></textarea>
+      <p class="field-hint">
+        {{ $t('fontInfoText') }}
+        <code>{{ $t('italicInfoText') }}</code>
+        <code>{{ $t('boldInfoText') }}</code>
+      </p>
+      <transition name="rise">
+        <div v-if="generateError" class="notice notice--danger" role="alert">
+          <UiIcon name="circle-x" />
+          <span>{{ generateError }}</span>
+        </div>
+      </transition>
+    </section>
 
-    <!-- 3D Options -->
-    <nav class="panel">
-      <p class="panel-heading">{{ $t("modelOptions") }}</p>
-      <div class="panel-block">
-        <div class="columns" style="width: 100%">
-          <div class="column">
-            <div class="model-options-title">
-              <div class="title is-size-5">{{ $t("base") }}</div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("shape") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control has-icons-left">
-                    <div class="select is-small">
-                      <select v-model="options.base.shape">
-                        <option value="rectangle">{{ $t("rectangle") }}</option>
-                        <option value="roundedRectangle">
-                          {{ $t("roundedRectangle") }}
-                        </option>
-                      </select>
-                      <span class="icon is-small is-left">
-                        <i class="fa fa-shapes"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("width") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.width"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{ unit }}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("height") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.height"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{ unit }}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("depth") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.depth"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{ unit }}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div
-              class="field is-horizontal"
-              v-if="options.base.shape === 'roundedRectangle'"
-            >
-              <div class="field-label is-small">
-                <label class="label">{{ $t("cornerRadius") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.cornerRadius"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{ unit }}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
+    <UiTabs class="mode-tabs" :value="currentTab" :tabs="tabs" :aria-label="$t('settingsPanel')" @input="selectTab" />
 
-            <!-- Border Settings -->
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("border") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="options.base.hasBorder" />
-                      <span class="is-size-7"
-                        ><i class="fa fa-border-all"></i>
-                        {{ $t("borderAroundBase") }}</span
-                      >
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="subsection" v-if="options.base.hasBorder">
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label"
-                    >{{ $t("border") }} {{ $t("width") }}</label
-                  >
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        v-model.number="options.base.borderWidth"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label"
-                    >{{ $t("border") }} {{ $t("depth") }}</label
-                  >
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        v-model.number="options.base.borderDepth"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div class="tab-panels">
+      <div v-show="currentTab === 'content'" class="tab-panel" role="tabpanel">
+        <UiSection :title="$t('text')" default-open>
+          <UiNumberField
+            v-model="options.base.textSize"
+            :label="$t('text') + ' ' + $t('size')"
+            :unit="unit"
+            :min="1"
+            title="base.textSize"
+          />
+          <UiNumberField
+            v-model="options.base.textDepth"
+            :label="$t('text') + ' ' + $t('depth')"
+            :unit="unit"
+            :min="0"
+            :step="0.5"
+            title="base.textDepth"
+          />
+        </UiSection>
+      </div>
 
-            <!-- Keychain Settings -->
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("keychain") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="control">
-                  <label class="checkbox">
-                    <div class="field">
-                      <input
-                        type="checkbox"
-                        v-model="options.base.hasKeychainAttachment"
-                      />
-                      <span class="is-size-7"
-                        ><i class="fa fa-key"></i>
-                        {{ $t("keychainHelp") }}</span
-                      >
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="subsection" v-if="options.base.hasKeychainAttachment">
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label"
-                    >{{ $t("keychain") }} {{ $t("placement") }}</label
-                  >
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <div class="control has-icons-left">
-                      <div class="select is-small">
-                        <select v-model="options.base.keychainPlacement">
-                          <option value="top">{{ $t("top") }}</option>
-                          <option value="left">{{ $t("left") }}</option>
-                          <option value="topLeft">
-                            {{ $t("top") }}-{{ $t("left") }} {{ $t("corner") }}
-                          </option>
-                        </select>
-                        <span class="icon is-small is-left">
-                          <i class="fa fa-arrows-alt-v"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label">{{ $t("keychainHoleDiameter") }}</label>
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        v-model.number="options.base.keychainHoleDiameter"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label">{{ $t("keychainMaterialThickness") }}</label>
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        v-model.number="options.base.keychainMaterialThickness"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label">{{ $t("keychainOffset") }}</label>
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        v-model.number="options.base.keychainOffset"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label">{{ $t("mirrorHoles") }}</label>
-                </div>
-                <div class="field-body">
-                  <div class="control">
-                    <label class="checkbox">
-                      <div class="field">
-                        <input
-                          type="checkbox"
-                          v-model="options.base.mirrorHoles"
-                        />
-                        <span class="is-size-7">{{
-                          $t("mirrorHolesHelp")
-                        }}</span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- NFC Tag Section -->
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label">{{ $t("nfcIndentation") }}</label>
-              </div>
-              <div class="field-body">
-                <div class="control">
-                  <label class="checkbox">
-                    <div class="field">
-                      <input
-                        type="checkbox"
-                        v-model="options.base.hasNfcIndentation"
-                      />
-                      <span class="is-size-7"
-                        ><i class="fa fa-wifi"></i>
-                        {{ $t("nfcIndentationHelp") }}</span
-                      >
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="subsection" v-if="options.base.hasNfcIndentation">
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label"
-                    >{{ $t("indentation") }} {{ $t("shape") }}</label
-                  >
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <div class="control has-icons-left">
-                      <div class="select is-small">
-                        <select v-model="options.base.nfcIndentationShape">
-                          <option value="square">{{ $t("square") }}</option>
-                          <option value="round">{{ $t("round") }}</option>
-                        </select>
-                        <span class="icon is-small is-left">
-                          <i class="fa fa-shapes"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label"
-                    >{{ $t("indentation") }} {{ $t("size") }}</label
-                  >
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        v-model.number="options.base.nfcIndentationSize"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label"
-                    >{{ $t("indentation") }} {{ $t("depth") }}</label
-                  >
-                </div>
-                <div class="field-body">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <input
-                        class="input is-small"
-                        type="number"
-                        v-model.number="options.base.nfcIndentationDepth"
-                      />
-                    </div>
-                    <p class="control">
-                      <a class="button is-static is-small">{{ unit }}</a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label">{{ $t("hidden") }}</label>
-                </div>
-                <div class="field-body">
-                  <div class="control">
-                    <label class="checkbox">
-                      <div class="field">
-                        <input
-                          type="checkbox"
-                          v-model="options.base.nfcIndentationHidden"
-                        />
-                        <span class="is-size-7"
-                          ><i class="fa fa-layer-group"></i>
-                          {{ $t("nfcIndentationHiddenHelp") }}</span
-                        >
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div v-show="currentTab === 'model'" class="tab-panel" role="tabpanel">
+        <div class="model-options">
+          <BaseOptions :options="options" :unit="unit" show-height />
+          <KeychainOptions :options="options" :unit="unit" />
+          <NfcOptions :options="options" :unit="unit" />
         </div>
       </div>
-    </nav>
-
-    <div
-      class="notification is-danger is-light"
-      v-if="generateError"
-      style="margin-top: 20px 0"
-    >
-      {{ generateError }}
     </div>
-
-    <button
-      class="button is-success is-large"
-      v-bind:class="{ 'is-loading': isGenerating }"
-      @click="generate3dModel"
-    >
-      <span class="icon">
-        <i class="fa fa-cube"></i>
-      </span>
-      <span>{{ $t("generateButton") }}</span>
-    </button>
-
   </div>
 </template>
 
 <script>
-import * as THREE from 'three';
-
-import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
-import JSZip from 'jszip';
-import modelWorker from '@/model-worker';
-
-import {
-  save, saveAsString, saveAsArrayBuffer, applyPreviewMaterial,
-} from '../utils';
-import { nextTick } from 'vue';
+import menuMixin, { hasValidNumbers } from './menuMixin';
+import BaseOptions from './sections/BaseOptions.vue';
+import KeychainOptions from './sections/KeychainOptions.vue';
+import NfcOptions from './sections/NfcOptions.vue';
+import UiIcon from './ui/UiIcon.vue';
+import UiTabs from './ui/UiTabs.vue';
+import UiSection from './ui/UiSection.vue';
+import UiNumberField from './ui/UiNumberField.vue';
+import UiSegmented from './ui/UiSegmented.vue';
 
 const defaultOptions = {
   code: {
@@ -582,8 +108,8 @@ const defaultOptions = {
     hasKeychainAttachment: false,
     keychainPlacement: 'left',
     keychainHoleDiameter: 6,
-  keychainMaterialThickness: 1.5,
-  keychainOffset: 3,
+    keychainMaterialThickness: 1.5,
+    keychainOffset: 3,
     mirrorHoles: false,
     hasNfcIndentation: false,
     nfcIndentationShape: 'square',
@@ -595,28 +121,45 @@ const defaultOptions = {
 
 export default {
   name: 'TextMenu',
-  props: {
-    scene: Object,
-    exporter: Object,
+  mixins: [menuMixin],
+  components: {
+    BaseOptions,
+    KeychainOptions,
+    NfcOptions,
+    UiIcon,
+    UiTabs,
+    UiSection,
+    UiNumberField,
+    UiSegmented,
   },
-  components: {},
   data() {
     return {
       options: JSON.parse(JSON.stringify(defaultOptions)),
-      unit: 'mm',
-      mesh: null,
-      baseMesh: null,
-      borderMesh: null,
-      subtitleMesh: null,
-      keychainAttachmentMesh: null,
-      stlType: 'binary',
-      dualExtrusion: false,
-      isGenerating: false,
-      generateError: null,
-      changelogModalVisible: false,
     };
   },
-
+  computed: {
+    tabs() {
+      return [
+        { id: 'content', label: this.$t('tabContent'), icon: 'scan-line' },
+        { id: 'model', label: this.$t('tabModel'), icon: 'qr-code' },
+      ];
+    },
+    exportParts() {
+      return [
+        ['base', 'base'],
+        ['border', 'border'],
+        ['subtitle', 'text'],
+        ['keychainAttachment', 'attachment'],
+      ];
+    },
+    alignOptions() {
+      return [
+        { value: 'left', icon: 'align-left', tip: this.$t('left') },
+        { value: 'center', icon: 'align-center', tip: this.$t('alignCenter') },
+        { value: 'right', icon: 'align-right', tip: this.$t('right') },
+      ];
+    },
+  },
   methods: {
     getExportableOptions() {
       return JSON.parse(JSON.stringify(this.options));
@@ -624,139 +167,22 @@ export default {
     importOptions(newOptions) {
       this.options = merge(this.options, newOptions);
     },
-    initWorker() {
-      modelWorker.worker.onmessage = (event) => {
-        if (event.data.type !== 'result') {
-          return;
-        }
-        this.$emit('resetScene');
-        const jsonLoader = new THREE.ObjectLoader();
-        const { meshes } = event.data;
-        let i = 0;
-        Object.keys(meshes).forEach((key) => {
-          jsonLoader.parse(meshes[key], (parsed) => {
-            meshes[key] = applyPreviewMaterial(parsed, key);
-            i += 1;
-            if (key !== 'combined') {
-              this.scene.add(meshes[key]);
-            }
-            if (i === event.data.meshCount) {
-              this.mesh = meshes.combined;
-              this.baseMesh = meshes.base;
-              this.borderMesh = meshes.border;
-              this.subtitleMesh = meshes.subtitle;
-              this.keychainAttachmentMesh = meshes.keychainAttachment;
-              this.isGenerating = false;
-            }
-          });
-        });
-        this.$emit('exportReady', diff(defaultOptions, this.options));
-      };
+    isReadyForAutoUpdate() {
+      return hasValidNumbers(this.options, defaultOptions) && this.options.base.textMessage.trim() !== '';
     },
-    setup3dObject() {
-      modelWorker.send({
+    async generate3dModel() {
+      const ticket = this.beginGeneration();
+      await this.requestModel(ticket, {
         mode: 'Text',
         options: this.options,
       });
     },
-    async generate3dModel() {
-      this.$emit('generating');
-
-      this.generateError = null;
-      this.isGenerating = true;
-
-      nextTick(() => {
-        // this.init3d();
-        this.setup3dObject();
-        // this.startAnimation();
-      });
-    },
-    exportSTL(stlType, multipleParts) {
-      const timestamp = new Date().getTime();
-      const exportAsBinary = stlType === 'binary';
-
-      if (multipleParts) {
-        const zip = new JSZip();
-        const filenameBase = `base-${timestamp}.stl`;
-        const filenameBorder = `border-${timestamp}.stl`;
-        const filenameText = `text-${timestamp}.stl`;
-        const filenameKeychain = `attachment-${timestamp}.stl`;
-
-        const put = (name, data) => {
-          if (exportAsBinary) {
-            const content = (data && data.buffer) ? data.buffer : data;
-            zip.file(name, content, { binary: true });
-          } else {
-            zip.file(name, data);
-          }
-        };
-
-        const baseSTL = this.exporter.parse(this.baseMesh, {
-          binary: exportAsBinary,
-        });
-        put(filenameBase, baseSTL);
-
-        if (this.borderMesh) {
-          const borderSTL = this.exporter.parse(this.borderMesh, {
-            binary: exportAsBinary,
-          });
-          put(filenameBorder, borderSTL);
-        }
-
-        if (this.subtitleMesh) {
-          const textSTL = this.exporter.parse(this.subtitleMesh, {
-            binary: exportAsBinary,
-          });
-          put(filenameText, textSTL);
-        }
-
-        if (this.keychainAttachmentMesh) {
-          const kcaSTL = this.exporter.parse(this.keychainAttachmentMesh, {
-            binary: exportAsBinary,
-          });
-          put(filenameKeychain, kcaSTL);
-        }
-
-        zip.generateAsync({ type: 'blob' }).then((content) => {
-          save(new Blob([content]), `qrcode2stl-${timestamp}.zip`);
-        });
-      } else {
-        const filename = `combined-${timestamp}.stl`;
-        const result = this.exporter.parse(this.mesh, {
-          binary: exportAsBinary,
-        });
-        if (exportAsBinary) {
-          saveAsArrayBuffer(result, filename);
-        } else {
-          saveAsString(result, filename);
-        }
-      }
-    },
-  },
-  async mounted() {
-    this.initWorker();
   },
 };
 </script>
 
-<style scoped>
-#main {
-  margin-top: 20px;
-}
-
-.export-button {
-  margin: 0 10px;
-}
-
-#notifications {
-  margin-top: 10px;
-}
-
-.field-label {
-  text-align: left;
-}
-
-#mode-buttons > button {
-  margin-right: 20px;
+<style>
+.text-mode-textarea.textarea {
+  min-height: 92px;
 }
 </style>

@@ -1,61 +1,15 @@
 <template>
   <ul class="share-buttons">
-    <li>
+    <li v-for="link in links" :key="link.title">
       <a
-        :href="facebookLink"
+        :href="link.href"
         target="_blank"
-        title="Share on Facebook"
+        rel="noopener"
+        :title="link.title"
+        :aria-label="link.title"
+        class="share-buttons__link"
       >
-        <i class="fab fa-facebook-square fa-2x" aria-hidden="true"></i>
-        <span class="sr-only">Share on Facebook</span>
-      </a>
-    </li>
-    <li>
-      <a
-        :href="twitterLink"
-        target="_blank"
-        title="Tweet"
-      >
-        <i class="fab fa-twitter-square fa-2x" aria-hidden="true"></i>
-        <span class="sr-only">Tweet</span>
-      </a>
-    </li>
-    <li>
-      <a
-        :href="pinterestLink"
-        target="_blank"
-        title="Pin it">
-          <i class="fab fa-pinterest-square fa-2x" aria-hidden="true"></i>
-          <span class="sr-only">Pin it</span>
-      </a>
-    </li>
-    <li>
-      <a
-        :href="redditLink"
-        target="_blank"
-        title="Submit to Reddit"
-      >
-        <i class="fab fa-reddit-square fa-2x" aria-hidden="true"></i>
-        <span class="sr-only">Submit to Reddit</span>
-      </a>
-    </li>
-    <li>
-      <a
-        :href="mailLink"
-        target="_blank"
-        title="Send email"
-      >
-        <i class="fas fa-envelope-square fa-2x" aria-hidden="true"></i>
-        <span class="sr-only">Send email</span>
-      </a>
-    </li>
-    <li>
-      <a
-        :href="pocketLink"
-        target="_blank"
-        title="Add to Pocket">
-          <i class="fab fab fa-get-pocket fa-2x" aria-hidden="true"></i>
-          <span class="sr-only">Add to Pocket</span>
+        <i :class="link.icon" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
@@ -70,52 +24,75 @@ const fullText = `${text}: ${url}`;
 const twitterHandle = 'flxnde';
 
 export default {
-  name: 'Header',
+  name: 'ShareButtons',
   data() {
     return {
-      mailLink: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(fullText)}`,
-      facebookLink: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(fullText)}`,
-      twitterLink: `https://twitter.com/intent/tweet?source=${encodeURIComponent(url)}&text=${encodeURIComponent(fullText)}&via=${twitterHandle}`,
-      redditLink: `http://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`,
-      pinterestLink: `http://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(text)}`,
-      pocketLink: `https://getpocket.com/save?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
+      links: [
+        {
+          title: 'Share on Facebook',
+          icon: 'fab fa-facebook-f',
+          href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(fullText)}`,
+        },
+        {
+          title: 'Tweet',
+          icon: 'fab fa-twitter',
+          href: `https://twitter.com/intent/tweet?source=${encodeURIComponent(url)}&text=${encodeURIComponent(fullText)}&via=${twitterHandle}`,
+        },
+        {
+          title: 'Pin it',
+          icon: 'fab fa-pinterest-p',
+          href: `http://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(text)}`,
+        },
+        {
+          title: 'Submit to Reddit',
+          icon: 'fab fa-reddit-alien',
+          href: `http://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`,
+        },
+        {
+          title: 'Send email',
+          icon: 'fas fa-envelope',
+          href: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(fullText)}`,
+        },
+        {
+          title: 'Add to Pocket',
+          icon: 'fab fa-get-pocket',
+          href: `https://getpocket.com/save?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
+        },
+      ],
     };
   },
 };
 </script>
 
-<style scoped>
-ul.share-buttons {
+<style>
+.share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
   list-style: none;
-  padding: 0;
 }
 
-ul.share-buttons li {
-  display: inline;
-  margin: 0 5px;
+.share-buttons__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 15px;
+  transition: color var(--duration) ease, border-color var(--duration) ease, background-color var(--duration) ease, transform var(--duration-fast) ease;
 }
 
-ul.share-buttons .title {
-  margin-bottom: 2px;
-  margin-left: 5px;
-}
-
-ul.share-buttons li a {
-  color: #363636;
-}
-
-ul.share-buttons li a:hover {
-  color: #4a4a4a;
-}
-
-ul.share-buttons .sr-only {
-  position: absolute;
-  clip: rect(1px 1px 1px 1px);
-  clip: rect(1px, 1px, 1px, 1px);
-  padding: 0;
-  border: 0;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
+.share-buttons__link:hover {
+  border-color: var(--accent-soft-border);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  text-decoration: none;
+  transform: translateY(-1px);
 }
 </style>

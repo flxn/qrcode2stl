@@ -1,88 +1,118 @@
-/* eslint-disable import/no-webpack-loader-syntax */
 <template>
-  <div id="qrcodeMenu">
+  <div id="qrcodeMenu" class="mode-panel">
+    <section class="content-card" :aria-label="$t('contentLabel')">
+      <div class="content-card__head">
+        <span class="content-card__title">
+          <UiIcon :name="contentTypeIcon" />
+          {{ $t('contentLabel') }}
+        </span>
+        <QRCodeOptionsTabs :active-tab-index="options.activeTabIndex" @tabChanged="setActiveTab" />
+      </div>
+      <QRCodeOptionsPanel :options="options" />
+      <transition name="rise">
+        <div v-if="generateError" class="notice notice--danger" role="alert">
+          <UiIcon name="circle-x" />
+          <span>{{ generateError }}</span>
+        </div>
+      </transition>
+    </section>
 
-    <button
-      class="button is-info is-medium is-fullwidth mb-3"
-      @click="openQRScanner">
-      <span class="icon">
-        <i class="fa fa-camera"></i>
-      </span>
-      <span>{{$t('copyExistingQRCode')}}</span>
-    </button>
+    <UiTabs class="mode-tabs" :value="currentTab" :tabs="tabs" :aria-label="$t('settingsPanel')" @input="selectTab" />
 
-    <!-- QR Code Options -->
-    <QRCodeOptionsPanel :options="options" />
+    <div class="tab-panels">
+      <div v-show="currentTab === 'content'" class="tab-panel" role="tabpanel">
+        <div class="tab-panel__body">
+          <button type="button" class="btn btn--block scan-button" @click="openQRScanner">
+            <UiIcon name="camera" />
+            <span>{{ $t('copyExistingQRCode') }}</span>
+          </button>
 
-    <!-- 3D Options -->
-    <QRCodeModelOptionsPanel ref="modelOptionsPanel" :options="options" :unit="unit" :iconCompatibilityStatus="iconCompatibilityStatus" />
+          <UiField :label="$t('errorCorrection')" :title="'errorCorrectionLevel — ' + $t('errorCorrection')" stack>
+            <UiSegmented
+              v-model="options.errorCorrectionLevel"
+              block
+              :options="errorCorrectionOptions"
+              :aria-label="$t('errorCorrection')"
+              :title="'errorCorrectionLevel — ' + $t('errorCorrection')"
+            />
+            <template #hint>
+              <strong class="ec-current">{{ errorCorrectionDescription }}</strong>
+              {{ $t('errorCorrectionHelp') }}
+            </template>
+          </UiField>
+          <transition name="rise">
+            <div v-if="options.code.iconName !== 'none'" class="notice notice--info">
+              <UiIcon name="info" />
+              <span>{{ $t('iconForcesHighCorrection') }}</span>
+            </div>
+          </transition>
 
-    <div class="notification is-danger is-light" v-if="generateError" style="margin-top: 20px 0;">
-      {{generateError}}
+          <div class="tab-panel__divider"></div>
+
+          <UiField
+            :label="$t('useEscapeSequences')"
+            :title="'useEscapeSequences — ' + $t('useEscapeSequences')"
+            :hint="$t('useEscapeSequencesHelp')"
+          >
+            <UiToggle
+              v-model="options.useEscapeSequences"
+              :aria-label="$t('useEscapeSequencesToggle')"
+              :title="'useEscapeSequences — ' + $t('useEscapeSequences')"
+            />
+          </UiField>
+        </div>
+      </div>
+
+      <div v-show="currentTab === 'model'" class="tab-panel" role="tabpanel">
+        <QRCodeModelOptionsPanel
+          ref="modelOptionsPanel"
+          :options="options"
+          :unit="unit"
+          :icon-compatibility-status="iconCompatibilityStatus"
+          :printability-warning="printabilityWarning"
+        />
+      </div>
+
+      <div v-show="currentTab === 'extras'" class="tab-panel" role="tabpanel">
+        <CodeStyleOptions :options="options" :unit="unit" show-block-size show-compatibility />
+      </div>
     </div>
-    <div
-      class="notification is-warning is-light"
-      v-if="(blockWidth && blockHeight) && (blockWidth < 2 || blockHeight < 2)"
-    >
-      <strong>{{$t('printabilityWarning')}}:</strong>
-      {{$t('printabilityWarningBody', { dimensions: `${Number(blockWidth).toFixed(1)}mm x ${Number(blockHeight).toFixed(1)}mm` })}}
-    </div>
 
-    <button
-      class="button is-success is-large"
-      v-bind:class="{'is-loading': isGenerating}"
-      @click="generate3dModel"
-    >
-      <span class="icon">
-        <i class="fa fa-cube"></i>
-      </span>
-      <span>{{$t('generateButton')}}</span>
-    </button>
+    <transition name="modal" :duration="{ enter: 300, leave: 180 }">
+      <ScannerModal v-if="scannerModalVisible" @decode="onDecode" />
+    </transition>
 
-    <button
-      class="button is-info is-large ml-4"
-      @click="openBatchMode"
-    >
-      <span class="icon">
-        <i class="fa fa-layer-group"></i>
-      </span>
-      <span>{{$t('batchMode')}}</span>
-    </button>
-
-    <div class="box mt-3" v-bind:class="{'is-hidden': mesh === null}" style="width: fit-content">
-      <figure class="image is-128x128" title="A QR Code in 2D? How lame ;)">
-        <img id="qr-image"/>
-      </figure>
-    </div>
-
-    <ScannerModal v-if="scannerModalVisible" @decode="onDecode"/>
-
-    <BatchModeModal
-      v-if="batchModalVisible"
-      :options="options"
-      :activeTabIndex="options.activeTabIndex"
-      :exporter="exporter"
-      :stlType="stlType"
-      :multipleParts="dualExtrusion"
-      @close="batchModalVisible = false"
-    />
+    <transition name="modal" :duration="{ enter: 300, leave: 180 }">
+      <BatchModeModal
+        v-if="batchModalVisible"
+        :options="options"
+        :activeTabIndex="options.activeTabIndex"
+        :exporter="exporter"
+        :stlType="stlType"
+        :multipleParts="multipleParts"
+        @close="batchModalVisible = false"
+      />
+    </transition>
   </div>
 </template>
 
 <script>
-import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
-import { diff } from 'deep-object-diff';
 import merge from 'deepmerge';
-import JSZip from 'jszip';
-import modelWorker from '@/model-worker';
 import { bus } from '../main';
-import {
-  save, saveAsString, saveAsArrayBuffer, trimIconShapesBounds, applyPreviewMaterial,
-} from '../utils';
-import { nextTick } from 'vue';
+import { trimIconShapesBounds } from '../utils';
+import menuMixin, { hasValidNumbers } from './menuMixin';
+import QRCodeOptionsPanel from './QRCodeOptionsPanel.vue';
+import QRCodeOptionsTabs from './QRCodeOptionsTabs.vue';
+import QRCodeModelOptionsPanel from './QRCodeModelOptionsPanel.vue';
+import CodeStyleOptions from './sections/CodeStyleOptions.vue';
+import UiIcon from './ui/UiIcon.vue';
+import UiTabs from './ui/UiTabs.vue';
+import UiField from './ui/UiField.vue';
+import UiSegmented from './ui/UiSegmented.vue';
+import UiToggle from './ui/UiToggle.vue';
 
 const defaultOptions = {
   activeTabIndex: 0,
@@ -176,48 +206,130 @@ const defaultOptions = {
   },
 };
 
+const CONTENT_TYPE_ICONS = ['letter-a', 'wifi', 'mail', 'contact', 'message', 'calendar'];
+
+// cache of default icon SVG markup, shared between generations
+const iconMarkupCache = new Map();
+
 export default {
   name: 'QRCodeMenu',
-  props: {
-    scene: Object,
-    exporter: Object,
-  },
+  mixins: [menuMixin],
   components: {
-    QRCodeOptionsPanel: () => import('./QRCodeOptionsPanel.vue'),
-    QRCodeModelOptionsPanel: () => import('./QRCodeModelOptionsPanel.vue'),
+    QRCodeOptionsPanel,
+    QRCodeOptionsTabs,
+    QRCodeModelOptionsPanel,
+    CodeStyleOptions,
+    UiIcon,
+    UiTabs,
+    UiField,
+    UiSegmented,
+    UiToggle,
     ScannerModal: () => import('./ScannerModal.vue'),
     BatchModeModal: () => import('./BatchModeModal.vue'),
   },
   data() {
     return {
       options: JSON.parse(JSON.stringify(defaultOptions)),
-      qrCodeBitMask: null,
-      unit: 'mm',
-      mesh: null,
-      baseMesh: null,
-      qrcodeMesh: null,
-      borderMesh: null,
-      iconMesh: null,
-      subtitleMesh: null,
-      keychainAttachmentMesh: null,
-      stlType: 'binary',
-      dualExtrusion: false,
       blockWidth: null,
       blockHeight: null,
-      isGenerating: false,
-      generateError: null,
       scannerModalVisible: false,
       batchModalVisible: false,
       iconCompatibilityStatus: null,
+      qrImageUrl: '',
     };
   },
-
+  computed: {
+    tabs() {
+      return [
+        { id: 'content', label: this.$t('tabContent'), icon: 'scan-line' },
+        { id: 'model', label: this.$t('tabModel'), icon: 'qr-code' },
+        { id: 'extras', label: this.$t('tabExtras'), icon: 'box' },
+      ];
+    },
+    exportParts() {
+      return [
+        ['base', 'base'],
+        ['qrcode', 'qrcode'],
+        ['border', 'border'],
+        ['icon', 'icon'],
+        ['subtitle', 'text'],
+        ['keychainAttachment', 'attachment'],
+      ];
+    },
+    contentTypeIcon() {
+      return CONTENT_TYPE_ICONS[this.options.activeTabIndex] || 'letter-a';
+    },
+    errorCorrectionOptions() {
+      return [
+        { value: 'L', label: 'L', tip: 'L (Low, 7% redundant)' },
+        { value: 'M', label: 'M', tip: 'M (Medium, 15% redundant)' },
+        { value: 'Q', label: 'Q', tip: 'Q (Quartile, 25% redundant)' },
+        { value: 'H', label: 'H', tip: 'H (High, 30% redundant)' },
+      ];
+    },
+    errorCorrectionDescription() {
+      const option = this.errorCorrectionOptions.find((item) => item.value === this.options.errorCorrectionLevel);
+      return option ? option.tip : '';
+    },
+    printabilityWarning() {
+      if (!(this.blockWidth && this.blockHeight) || (this.blockWidth >= 2 && this.blockHeight >= 2)) {
+        return '';
+      }
+      return `${this.$t('printabilityWarning')}: ${this.$t('printabilityWarningBody', { dimensions: `${Number(this.blockWidth).toFixed(1)}mm x ${Number(this.blockHeight).toFixed(1)}mm` })}`;
+    },
+  },
+  watch: {
+    // QR codes are square: the base height follows the width
+    'options.base.width': function syncHeight(width) {
+      this.options.base.height = width;
+    },
+    'options.code.compatibilityMode': {
+      handler(newValue, oldValue) {
+        // Without live updates, regenerate right away so the icon compatibility info is current
+        if (newValue !== oldValue && this.hasModel && !this.liveUpdate) {
+          this.generate3dModel();
+        }
+      },
+    },
+  },
+  mounted() {
+    bus.$on('openScannerModal', this.openQRScanner);
+    bus.$on('closeScannerModal', this.closeQRScanner);
+    bus.$on('openBatchMode', this.openBatchMode);
+  },
+  activated() {
+    if (this.qrImageUrl) {
+      this.$emit('qr-image', this.qrImageUrl);
+    }
+  },
+  beforeDestroy() {
+    bus.$off('openScannerModal', this.openQRScanner);
+    bus.$off('closeScannerModal', this.closeQRScanner);
+    bus.$off('openBatchMode', this.openBatchMode);
+  },
   methods: {
     getExportableOptions() {
       return JSON.parse(JSON.stringify(this.options));
     },
     importOptions(newOptions) {
       this.options = merge(this.options, newOptions);
+    },
+    setActiveTab(idx) {
+      this.options.activeTabIndex = idx;
+    },
+    signatureSource() {
+      // iconShapes is derived from the icon during generation and must not mark the model as outdated
+      const code = { ...this.options.code };
+      delete code.iconShapes;
+      return {
+        ...this.options,
+        // icons always force the highest error correction level
+        errorCorrectionLevel: code.iconName !== 'none' ? 'H' : this.options.errorCorrectionLevel,
+        code,
+      };
+    },
+    isReadyForAutoUpdate() {
+      return hasValidNumbers(this.options, defaultOptions) && this.getQRText(false) !== '';
     },
     interpretEscapeSequences(str) {
       if (typeof str !== 'string') return str;
@@ -239,113 +351,51 @@ export default {
         return str;
       }
     },
-    initWorker() {
-      modelWorker.worker.onmessage = (event) => {
-        if (event.data.type !== 'result') {
-          return;
+    async loadIconMarkup(iconName) {
+      // Check if it's a custom icon
+      if (iconName.startsWith('custom-')) {
+        const customIconContent = this.getCustomIconContent(iconName);
+        if (!customIconContent) {
+          throw new Error('Custom icon content not found');
         }
-        this.$emit('resetScene');
-        const jsonLoader = new THREE.ObjectLoader();
-        const { meshes } = event.data;
-        let i = 0;
-        Object.keys(meshes).forEach((key) => {
-          jsonLoader.parse(meshes[key], (parsed) => {
-            meshes[key] = applyPreviewMaterial(parsed, key);
-            i += 1;
-            if (key !== 'combined') {
-              this.scene.add(meshes[key]);
-            }
-            if (i === event.data.meshCount) {
-              this.mesh = meshes.combined;
-              this.baseMesh = meshes.base;
-              this.qrcodeMesh = meshes.qrcode;
-              this.borderMesh = meshes.border;
-              this.iconMesh = meshes.icon;
-              this.subtitleMesh = meshes.subtitle;
-              this.keychainAttachmentMesh = meshes.keychainAttachment;
-              this.iconCompatibilityStatus = event.data.iconCompatibilityStatus;
-              this.isGenerating = false;
-            }
-          });
-        });
-        this.$emit('exportReady', diff(defaultOptions, this.options));
-      };
-    },
-    setup3dObject() {
-      modelWorker.send({
-        mode: 'QR',
-        qrCodeBitMask: this.qrCodeBitMask,
-        options: this.options,
-      });
+        return customIconContent;
+      }
+      if (!iconMarkupCache.has(iconName)) {
+        const response = await fetch(`icons/${iconName}.svg`);
+        iconMarkupCache.set(iconName, await response.text());
+      }
+      return iconMarkupCache.get(iconName);
     },
     async generate3dModel() {
-      this.$emit('generating');
-
-      this.generateError = null;
-      this.isGenerating = true;
+      const ticket = this.beginGeneration();
 
       const txt = this.getQRText();
       if (txt === '') {
-        this.isGenerating = false;
-        this.generateError = 'You have not entered any text.';
+        this.failGeneration(ticket, this.$t('errorNoText'));
+        this.$nextTick(() => {
+          const input = this.$el.querySelector('.content-textarea');
+          if (input) {
+            input.focus();
+          }
+        });
         return;
       }
 
       if (this.options.code.iconName !== 'none') {
         this.options.errorCorrectionLevel = 'H';
         try {
-          const svgLoader = new SVGLoader();
-          const iconPreview = document.querySelector('#icon-preview');
-
-          // Wait for SVG to load if needed
-          if (!iconPreview || !iconPreview.contentDocument) {
-            console.warn('Icon preview not loaded yet, retrying...');
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-
-          let svgMarkup;
-
-          // Check if it's a custom icon
-          if (this.options.code.iconName.startsWith('custom-')) {
-            // Get custom icon content from the options panel
-            const customIconContent = this.getCustomIconContent(this.options.code.iconName);
-            if (customIconContent) {
-              svgMarkup = customIconContent;
-            } else {
-              throw new Error('Custom icon content not found');
-            }
-          } else {
-            // Handle default icons
-            if (iconPreview && iconPreview.contentDocument) {
-              const svgElement = iconPreview.contentDocument.querySelector('svg');
-              if (svgElement) {
-                svgMarkup = svgElement.outerHTML;
-              } else {
-                // Fallback: load SVG directly from file
-                const response = await fetch(`icons/${this.options.code.iconName}.svg`);
-                svgMarkup = await response.text();
-              }
-            } else {
-              // Fallback: load SVG directly from file
-              const response = await fetch(`icons/${this.options.code.iconName}.svg`);
-              svgMarkup = await response.text();
-            }
-          }
-
-          const svgData = svgLoader.parse(svgMarkup);
+          const svgMarkup = await this.loadIconMarkup(this.options.code.iconName);
+          // the fill color is irrelevant for the geometry; avoids THREE.Color warnings
+          const svgData = new SVGLoader().parse(svgMarkup.replace(/currentColor/g, '#000'));
 
           // Use SVGLoader.createShapes for proper hole handling (r127+)
           const processedShapes = [];
-
-          svgData.paths.forEach(path => {
+          svgData.paths.forEach((path) => {
             try {
-              // Use the modern createShapes method
-              const shapes = SVGLoader.createShapes(path);
-
-              shapes.forEach(shape => {
+              SVGLoader.createShapes(path).forEach((shape) => {
                 processedShapes.push({
                   shape: shape.toJSON(),
-                  holes: shape.holes ? shape.holes.map(hole => hole.toJSON()) : []
+                  holes: shape.holes ? shape.holes.map((hole) => hole.toJSON()) : [],
                 });
               });
             } catch (pathError) {
@@ -362,107 +412,51 @@ export default {
         }
       }
 
+      let qrCodeBitMask;
       try {
         console.time('2D QR Code Generation');
         const qrCodeObject = await qrcode.create(txt, {
           errorCorrectionLevel: this.options.errorCorrectionLevel,
         });
-        this.qrCodeBitMask = qrCodeObject.modules.data;
-        qrcode.toDataURL(txt, {
+        qrCodeBitMask = qrCodeObject.modules.data;
+        this.qrImageUrl = await qrcode.toDataURL(txt, {
           errorCorrectionLevel: this.options.errorCorrectionLevel,
           margin: 1,
-        }, (err, url) => {
-          console.timeEnd('2D QR Code Generation');
-          if (err) {
-            throw err;
-          }
-          const img = document.getElementById('qr-image');
-          img.src = url;
+          width: 512,
         });
+        console.timeEnd('2D QR Code Generation');
+        this.$emit('qr-image', this.qrImageUrl);
       } catch (e) {
-        this.generateError = `Error during generation: ${e.message}`;
-        this.isGenerating = false;
+        this.failGeneration(ticket, `Error during generation: ${e.message}`);
         return;
       }
 
-      nextTick(() => {
-        // this.init3d();
-        this.setup3dObject();
-        // this.startAnimation();
+      await this.requestModel(ticket, {
+        mode: 'QR',
+        qrCodeBitMask,
+        options: this.options,
       });
     },
-    exportSTL(stlType, multipleParts) {
-      const timestamp = new Date().getTime();
-      const exportAsBinary = (stlType === 'binary');
-
-      if (multipleParts) {
-        const zip = new JSZip();
-        const filenameBase = `base-${timestamp}.stl`;
-        const filenameQrcode = `qrcode-${timestamp}.stl`;
-        const filenameBorder = `border-${timestamp}.stl`;
-        const filenameIcon = `icon-${timestamp}.stl`;
-        const filenameText = `text-${timestamp}.stl`;
-        const filenameKeychain = `attachment-${timestamp}.stl`;
-
-        const put = (name, data) => {
-          if (exportAsBinary) {
-            // data may be ArrayBuffer, DataView, or a typed array
-            const content = (data && data.buffer) ? data.buffer : data;
-            zip.file(name, content, { binary: true });
-          } else {
-            // ASCII export returns a string
-            zip.file(name, data);
-          }
-        };
-
-        const baseSTL = this.exporter.parse(this.baseMesh, { binary: exportAsBinary });
-        const qrcodeSTL = this.exporter.parse(this.qrcodeMesh, { binary: exportAsBinary });
-        put(filenameBase, baseSTL);
-        put(filenameQrcode, qrcodeSTL);
-
-        if (this.borderMesh) {
-          const borderSTL = this.exporter.parse(this.borderMesh, { binary: exportAsBinary });
-          put(filenameBorder, borderSTL);
-        }
-
-        if (this.iconMesh) {
-          const iconSTL = this.exporter.parse(this.iconMesh, { binary: exportAsBinary });
-          put(filenameIcon, iconSTL);
-        }
-
-        if (this.subtitleMesh) {
-          const textSTL = this.exporter.parse(this.subtitleMesh, { binary: exportAsBinary });
-          put(filenameText, textSTL);
-        }
-
-        if (this.keychainAttachmentMesh) {
-          const kcaSTL = this.exporter.parse(this.keychainAttachmentMesh, { binary: exportAsBinary });
-          put(filenameKeychain, kcaSTL);
-        }
-
-        zip.generateAsync({ type: 'blob' })
-          .then((content) => {
-            save(new Blob([content]), `qrcode2stl-${timestamp}.zip`);
-          });
-      } else {
-        const filename = `combined-${timestamp}.stl`;
-        const result = this.exporter.parse(this.mesh, { binary: exportAsBinary });
-        if (exportAsBinary) {
-          saveAsArrayBuffer(result, filename);
-        } else {
-          saveAsString(result, filename);
-        }
-      }
+    onModelResult(result) {
+      this.iconCompatibilityStatus = result.iconCompatibilityStatus;
+      this.blockWidth = result.blockSize;
+      this.blockHeight = result.blockSize;
     },
     openQRScanner() {
       this.scannerModalVisible = true;
     },
+    closeQRScanner() {
+      this.scannerModalVisible = false;
+    },
     openBatchMode() {
-      this.batchModalVisible = true;
+      if (this.isActive) {
+        this.batchModalVisible = true;
+      }
     },
     onDecode(decodedText) {
       this.options.text = decodedText;
       this.options.activeTabIndex = 0;
+      bus.$emit('toast', { type: 'success', message: this.$t('decodedQRCodeData') });
     },
     wifiQREscape(str) {
       const regex = /([:|\\|;|,|"])/gm;
@@ -471,7 +465,7 @@ export default {
       return result;
     },
     generateICalString() {
-      const calendar = this.options.calendar;
+      const { calendar } = this.options;
 
       // Validate required fields
       if (!calendar.eventName || !calendar.startDate || !calendar.endDate) {
@@ -483,11 +477,10 @@ export default {
         if (allDay) {
           // For all-day events, use YYYYMMDD format
           return date.replace(/-/g, '');
-        } else {
-          // For timed events, use YYYYMMDDTHHMMSSZ format
-          const dateTime = `${date}T${time}:00`;
-          return new Date(dateTime).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
         }
+        // For timed events, use YYYYMMDDTHHMMSSZ format
+        const dateTime = `${date}T${time}:00`;
+        return `${new Date(dateTime).toISOString().replace(/[-:]/g, '').split('.')[0]}Z`;
       };
 
       // Helper function to escape special characters in iCal
@@ -546,8 +539,7 @@ export default {
 
       return icalString;
     },
-    getQRText() {
-      const vCard = vcardjs();
+    getQRText(log = true) {
       let ret = '';
       switch (this.options.activeTabIndex) {
         case 0: // Text
@@ -556,19 +548,17 @@ export default {
             ret = this.interpretEscapeSequences(ret);
           }
           break;
-        case 1: // Wifi
-          if (this.options.wifi.password === '') {
-            this.options.wifi.security = 'nopass';
-          }
-          if (this.options.wifi.security === 'nopass') {
-            this.options.wifi.password = '';
-          }
+        case 1: { // Wifi
+          // an empty password means an open network
+          const security = this.options.wifi.password === '' ? 'nopass' : this.options.wifi.security;
+          const password = security === 'nopass' ? '' : this.options.wifi.password;
           ret = `WIFI:S:${this.wifiQREscape(
             this.options.wifi.ssid,
-          )};T:${this.wifiQREscape(this.options.wifi.security)};P:${this.wifiQREscape(
-            this.options.wifi.password,
+          )};T:${this.wifiQREscape(security)};P:${this.wifiQREscape(
+            password,
           )};H:${this.options.wifi.hidden ? 'true' : 'false'};`;
           break;
+        }
         case 2: // E-Mail
           ret = `mailto:${this.options.email.recipient
             .split(',')
@@ -577,7 +567,8 @@ export default {
             this.options.email.subject,
           )}&body=${encodeURI(this.options.email.body)}`;
           break;
-        case 3: // Contact
+        case 3: { // Contact
+          const vCard = vcardjs();
           vCard.firstName = this.options.contact.firstName;
           vCard.lastName = this.options.contact.lastName;
           vCard.organization = this.options.contact.organization;
@@ -596,16 +587,11 @@ export default {
           vCard.homeAddress.postalCode = this.options.contact.postcode;
           vCard.homeAddress.countryRegion = this.options.contact.country;
 
-          // vCard.socialUrls.facebook = 'https://...';
-          // vCard.socialUrls.linkedIn = 'https://...';
-          // vCard.socialUrls.twitter = 'https://...';
-          // vCard.socialUrls.flickr = 'https://...';
-          // vCard.socialUrls.custom = 'https://...';
-
           vCard.version = '3.0'; // can also support 2.1 and 4.0, certain versions only support certain fields
 
           ret = vCard.getFormattedString();
           break;
+        }
         case 4: // SMS
           ret = `SMSTO:${this.options.sms.recipient}:${this.options.sms.message}`;
           break;
@@ -616,56 +602,19 @@ export default {
           break;
       }
 
-      console.log('QR Code String:', ret);
+      if (log) {
+        console.log('QR Code String:', ret);
+      }
       return ret;
     },
     getCustomIconContent(iconName) {
-      // This method will be called by the QRCodeModelOptionsPanel component
-      // We need to access the custom icons from the child component
-      const modelOptionsPanel = this.$refs.modelOptionsPanel;
+      // The custom icons live in the model options panel
+      const { modelOptionsPanel } = this.$refs;
       if (modelOptionsPanel && modelOptionsPanel.getCustomIconContent) {
         return modelOptionsPanel.getCustomIconContent(iconName);
       }
       return null;
     },
   },
-  watch: {
-    'options.code.compatibilityMode': {
-      handler(newValue, oldValue) {
-        // Only regenerate if the value actually changed and we have a mesh
-        if (newValue !== oldValue && this.mesh !== null) {
-          console.log('Compatibility mode changed, regenerating model...');
-          this.generate3dModel();
-        }
-      }
-    }
-  },
-  async mounted() {
-    this.initWorker();
-    bus.$on('openScannerModal', () => { this.scannerModalVisible = true; });
-    bus.$on('closeScannerModal', () => { this.scannerModalVisible = false; });
-  },
 };
 </script>
-
-<style scoped>
-#main {
-  margin-top: 20px;
-}
-
-.export-button {
-  margin: 0 10px;
-}
-
-#notifications {
-  margin-top: 10px;
-}
-
-.field-label {
-  text-align: left;
-}
-
-#mode-buttons>button {
-  margin-right: 20px;
-}
-</style>

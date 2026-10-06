@@ -1,894 +1,190 @@
 <template>
-  <nav class="panel">
-    <p class="panel-heading">{{$t('modelOptions')}}</p>
-    <div class="panel-block">
-      <div class="columns" style="width: 100%">
-        <div class="column">
-          <div class="model-options-title">
-            <div class="title is-size-5">{{$t('base')}}</div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.shape — ' + $t('shape')">{{$t('shape')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control has-icons-left">
-                  <div class="select is-small">
-                    <select v-model="options.base.shape" :title="'base.shape — ' + $t('shape')">
-                      <option value="rectangle">{{$t('rectangle')}}</option>
-                      <option value="roundedRectangle">{{$t('roundedRectangle')}}</option>
-                    </select>
-                    <span class="icon is-small is-left">
-                      <i class="fa fa-shapes"></i>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.width — ' + $t('width')">{{$t('width')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.width" @change="options.base.height = options.base.width" :title="'base.width — ' + $t('width')" />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.depth — ' + $t('depth')">{{$t('depth')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.base.depth" :title="'base.depth — ' + $t('depth')" />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.base.shape === 'roundedRectangle'">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.cornerRadius — ' + $t('cornerRadius')">{{$t('cornerRadius')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.base.cornerRadius"
-                    :title="'base.cornerRadius — ' + $t('cornerRadius')"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
+  <div class="model-options">
+    <BaseOptions :options="options" :unit="unit" />
 
-          <!-- Border Settings -->
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.hasBorder — ' + $t('border')">{{$t('border')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="options.base.hasBorder" :title="'base.hasBorder — ' + $t('border')" />
-                    <span class="is-size-7"><i class="fa fa-border-all"></i> {{$t("borderAroundBase")}}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="subsection" v-if="options.base.hasBorder">
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.borderWidth — ' + $t('border') + ' ' + $t('width')">{{$t('border')}} {{$t('width')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.borderWidth"
-                      :title="'base.borderWidth — ' + $t('border') + ' ' + $t('width')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.borderDepth — ' + $t('border') + ' ' + $t('depth')">{{$t('border')}} {{$t('depth')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.borderDepth"
-                      :title="'base.borderDepth — ' + $t('border') + ' ' + $t('depth')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <UiSection title="QR Code" default-open>
+      <UiNumberField
+        v-model="options.code.depth"
+        :label="$t('depth')"
+        :unit="unit"
+        :min="0"
+        :step="0.5"
+        :title="'code.depth — ' + $t('depth')"
+      />
+      <UiNumberField
+        v-model="options.code.margin"
+        :label="$t('margin')"
+        :unit="unit"
+        :min="0"
+        :title="'code.margin — ' + $t('margin')"
+      />
 
-          <!-- Text Settings -->
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.hasText — ' + $t('text')">{{$t('text')}}</label>
+      <!-- Icon Settings -->
+      <UiField :label="$t('icon')" :title="'code.iconName — ' + $t('icon')">
+        <UiPopover placement="bottom-end" :width="300" role="dialog" panel-class="icon-picker" :close-on-item-click="false">
+          <template #trigger="{ toggle, open }">
+            <button
+              type="button"
+              class="select-trigger"
+              :class="{ 'is-open': open }"
+              aria-haspopup="dialog"
+              :aria-expanded="open ? 'true' : 'false'"
+              :title="'code.iconName — ' + $t('icon')"
+              @click="toggle"
+            >
+              <span v-if="options.code.iconName !== 'none'" class="icon-chip" :class="{ 'is-custom': isCustomIcon }">
+                <img :src="getIconPreviewUrl()" alt="" />
+              </span>
+              <span class="select-trigger__label">{{ iconLabel }}</span>
+              <UiIcon name="chevron-down" class="select-trigger__chevron" />
+            </button>
+          </template>
+          <template #default="{ close }">
+            <div class="icon-picker__upload">
+              <label class="file-drop file-drop--compact">
+                <input
+                  ref="customIconInput"
+                  type="file"
+                  accept=".svg"
+                  @change="handleCustomIconUpload($event, close)"
+                />
+                <span class="file-drop__icon"><UiIcon name="upload" /></span>
+                <span class="file-drop__text">
+                  <span class="file-drop__title">{{ $t('uploadCustomIcon') }}</span>
+                  <span>{{ $t('selectSvgFile') }}</span>
+                </span>
+              </label>
             </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="options.base.hasText" :title="'base.hasText — ' + $t('text')" />
-                    <span class="is-size-7"><i class="fa fa-font"></i> {{$t('textOnEdge')}}</span>
-                  </label>
-                </div>
-              </div>
+            <div class="icon-picker__grid" role="listbox" :aria-label="$t('icon')">
+              <button
+                type="button"
+                class="icon-tile icon-tile--none"
+                :class="{ 'is-active': options.code.iconName === 'none' }"
+                role="option"
+                :aria-selected="options.code.iconName === 'none' ? 'true' : 'false'"
+                :title="$t('noIcon')"
+                data-popover-item
+                @click="iconSelected('none', close)"
+              >
+                <UiIcon name="x" />
+              </button>
+              <button
+                v-for="(customIcon, index) in customIcons"
+                :key="'custom-' + index"
+                type="button"
+                class="icon-tile is-custom"
+                :class="{ 'is-active': options.code.iconName === 'custom-' + index }"
+                role="option"
+                :aria-selected="options.code.iconName === 'custom-' + index ? 'true' : 'false'"
+                :title="customIcon.name"
+                data-popover-item
+                @click="iconSelected('custom-' + index, close)"
+              >
+                <img :src="customIcon.dataUrl" alt="" />
+              </button>
+              <button
+                v-for="icon in icons"
+                :key="icon"
+                type="button"
+                class="icon-tile"
+                :class="{ 'is-active': options.code.iconName === icon }"
+                role="option"
+                :aria-selected="options.code.iconName === icon ? 'true' : 'false'"
+                :title="icon"
+                data-popover-item
+                @click="iconSelected(icon, close)"
+              >
+                <img :src="'icons/' + icon + '.svg'" alt="" loading="lazy" />
+              </button>
             </div>
-          </div>
-          <div class="subsection" v-if="options.base.hasText">
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.textPlacement — ' + $t('text') + ' ' + $t('placement')">{{$t('text')}} {{$t('placement')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control has-icons-left">
-                    <div class="select is-small">
-                      <select v-model="options.base.textPlacement" :title="'base.textPlacement — ' + $t('text') + ' ' + $t('placement')">
-                        <option value="top">{{$t('top')}}</option>
-                        <option value="bottom">{{$t('bottom')}}</option>
-                        <option value="left">{{$t('left')}}</option>
-                        <option value="right">{{$t('right')}}</option>
-                      </select>
-                      <span class="icon is-small is-left">
-                        <i class="fa fa-arrows-alt-v"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.textMessage — ' + $t('text') + ' ' + $t('content')">{{$t('text')}} {{$t('content')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <div v-if="options.base.textPlacement === 'top' || options.base.textPlacement === 'bottom'" class="buttons are-small mb-0 is-pulled-right">
-                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'left'}" @click="options.base.textAlign = 'left'">
-                        <span class="icon is-small">
-                          <i class="fas fa-align-left"></i>
-                        </span>
-                      </button>
-                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'center'}" @click="options.base.textAlign = 'center'">
-                        <span class="icon is-small">
-                          <i class="fas fa-align-center"></i>
-                        </span>
-                      </button>
-                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'right'}" @click="options.base.textAlign = 'right'">
-                        <span class="icon is-small">
-                          <i class="fas fa-align-right"></i>
-                        </span>
-                      </button>
-                    </div>
-                    <div v-if="options.base.textPlacement === 'left' || options.base.textPlacement === 'right'" class="buttons are-small mb-0 is-pulled-right">
-                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'left'}" @click="options.base.textAlign = 'left'">
-                        <span class="icon is-small">
-                          <i class="fas fa-arrow-up"></i>
-                        </span>
-                      </button>
-                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'center'}" @click="options.base.textAlign = 'center'">
-                        <span class="icon is-small">
-                          <i class="fas fa-equals"></i>
-                        </span>
-                      </button>
-                      <button :class="{'button': true, 'is-primary': options.base.textAlign == 'right'}" @click="options.base.textAlign = 'right'">
-                        <span class="icon is-small">
-                          <i class="fas fa-arrow-down"></i>
-                        </span>
-                      </button>
-                    </div>
-                    <textarea
-                      class="textarea is-small"
-                      rows=3
-                      v-model="options.base.textMessage"
-                      :placeholder="$t('theText')"
-                      :title="'base.textMessage — ' + $t('text') + ' ' + $t('content')"
-                    />
-                    <p class="help content">
-                      {{$t('fontInfoText')}}<br/>
-                      <i class="fas fa-italic"></i> {{$t('italicInfoText')}}<br/>
-                      <i class="fas fa-bold"></i> {{$t('boldInfoText')}}<br/>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.textSize — ' + $t('text') + ' ' + $t('size')">{{$t('text')}} {{$t('size')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.textSize"
-                      :title="'base.textSize — ' + $t('text') + ' ' + $t('size')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.textMargin — ' + $t('text') + ' ' + $t('margin')">{{$t('text')}} {{$t('margin')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.textMargin"
-                      :title="'base.textMargin — ' + $t('text') + ' ' + $t('margin')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.textDepth — ' + $t('text') + ' ' + $t('depth')">{{$t('text')}} {{$t('depth')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.textDepth"
-                      :title="'base.textDepth — ' + $t('text') + ' ' + $t('depth')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          </template>
+        </UiPopover>
+      </UiField>
 
-          <!-- Keychain Settings -->
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.hasKeychainAttachment — ' + $t('keychain')">{{$t('keychain')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="control">
-                <label class="checkbox">
-                  <div class="field">
-                    <input type="checkbox" v-model="options.base.hasKeychainAttachment" :title="'base.hasKeychainAttachment — ' + $t('keychain')" />
-                    <span class="is-size-7"><i class="fa fa-key"></i> {{$t('keychainHelp')}}</span>
-                  </div>
-                </label>
-              </div>
-            </div>
+      <UiCollapse :open="options.code.iconName !== 'none'">
+        <UiNumberField
+          v-model="options.code.iconSizeRatio"
+          :label="$t('icon') + ' ' + $t('size')"
+          unit="%"
+          :min="1"
+          :help="$t('iconSizeHelp')"
+          :title="'code.iconSizeRatio — ' + $t('icon') + ' ' + $t('size')"
+        />
+        <div class="icon-notes">
+          <p class="field-hint">
+            <template v-if="!isCustomIcon">
+              Icons by Fontawesome
+              <a href="https://fontawesome.com/license/free" target="_blank" rel="noopener">CC BY 4.0</a>
+            </template>
+            <template v-else>Custom uploaded icon</template>
+          </p>
+          <div class="notice notice--warning">
+            <UiIcon name="alert" />
+            <span>Error Correction will be set to high if you use icons. Please make sure to test the scannability of your QR code before printing!</span>
           </div>
-          <div class="subsection" v-if="options.base.hasKeychainAttachment">
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.keychainPlacement — ' + $t('keychain') + ' ' + $t('placement')">{{$t('keychain')}} {{$t('placement')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control has-icons-left">
-                    <div class="select is-small">
-                      <select v-model="options.base.keychainPlacement" :title="'base.keychainPlacement — ' + $t('keychain') + ' ' + $t('placement')">
-                        <option value="top">{{$t('top')}}</option>
-                        <option value="left">{{$t('left')}}</option>
-                        <option value="topLeft">{{$t('top')}}-{{$t('left')}} {{$t('corner')}}</option>
-                      </select>
-                      <span class="icon is-small is-left">
-                        <i class="fa fa-arrows-alt-v"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.keychainHoleDiameter — ' + $t('keychainHoleDiameter')">{{$t('keychainHoleDiameter')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.keychainHoleDiameter"
-                      :title="'base.keychainHoleDiameter — ' + $t('keychainHoleDiameter')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.keychainMaterialThickness — ' + $t('keychainMaterialThickness')">{{$t("keychainMaterialThickness")}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      v-model.number="options.base.keychainMaterialThickness"
-                      :title="'base.keychainMaterialThickness — ' + $t('keychainMaterialThickness')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.keychainOffset — ' + $t('keychainOffset')">{{$t("keychainOffset")}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      v-model.number="options.base.keychainOffset"
-                      :title="'base.keychainOffset — ' + $t('keychainOffset')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.mirrorHoles — ' + $t('mirrorHoles')">{{$t('mirrorHoles')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="control">
-                  <label class="checkbox">
-                    <div class="field">
-                      <input type="checkbox" v-model="options.base.mirrorHoles" :title="'base.mirrorHoles — ' + $t('mirrorHoles')" />
-                      <span class="is-size-7">{{$t('mirrorHolesHelp')}}</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
+          <div v-if="isCustomIcon" class="notice notice--info">
+            <UiIcon name="info" />
+            <span>{{ $t('monochromeLogoInfo') }}</span>
           </div>
-
-          <!-- NFC Tag Section -->
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.hasNfcIndentation — ' + $t('nfcIndentation')">{{$t('nfcIndentation')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="control">
-                <label class="checkbox">
-                  <div class="field">
-                    <input type="checkbox" v-model="options.base.hasNfcIndentation" :title="'base.hasNfcIndentation — ' + $t('nfcIndentation')" />
-                    <span class="is-size-7"><i class="fa fa-wifi"></i> {{$t('nfcIndentationHelp')}}</span>
-                  </div>
-                </label>
-              </div>
-            </div>
+          <div v-if="showIconCompatibilityWarning" class="notice notice--info">
+            <UiIcon name="info" />
+            <span>{{ iconCompatibilityMessage }}</span>
           </div>
-          <div class="subsection" v-if="options.base.hasNfcIndentation">
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.nfcIndentationShape — ' + $t('indentation') + ' ' + $t('shape')">{{$t('indentation')}} {{$t('shape')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control has-icons-left">
-                    <div class="select is-small">
-                      <select v-model="options.base.nfcIndentationShape" :title="'base.nfcIndentationShape — ' + $t('indentation') + ' ' + $t('shape')">
-                        <option value="square">{{$t('square')}}</option>
-                        <option value="round">{{$t('round')}}</option>
-                      </select>
-                      <span class="icon is-small is-left">
-                        <i class="fa fa-shapes"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.nfcIndentationSize — ' + $t('indentation') + ' ' + $t('size')">{{$t('indentation')}} {{$t('size')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.nfcIndentationSize"
-                      :title="'base.nfcIndentationSize — ' + $t('indentation') + ' ' + $t('size')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.nfcIndentationDepth — ' + $t('indentation') + ' ' + $t('depth')">{{$t('indentation')}} {{$t('depth')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      v-model.number="options.base.nfcIndentationDepth"
-                      :title="'base.nfcIndentationDepth — ' + $t('indentation') + ' ' + $t('depth')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.nfcIndentationHidden — ' + $t('hidden')">{{$t('hidden')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="control">
-                  <label class="checkbox">
-                    <div class="field">
-                      <input type="checkbox" v-model="options.base.nfcIndentationHidden" :title="'base.nfcIndentationHidden — ' + $t('hidden')" />
-                      <span class="is-size-7"><i class="fa fa-layer-group"></i> {{$t('nfcIndentationHiddenHelp')}}</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'base.hasMagnetPockets — ' + $t('magnetPockets')">{{$t('magnetPockets')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="control">
-                <label class="checkbox">
-                  <div class="field">
-                    <input type="checkbox" v-model="options.base.hasMagnetPockets" :title="'base.hasMagnetPockets — ' + $t('magnetPockets')" />
-                    <span class="is-size-7"><i class="fa fa-magnet"></i> {{$t('magnetPocketsHelp')}}</span>
-                  </div>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="subsection" v-if="options.base.hasMagnetPockets">
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.magnetPocketSize — ' + $t('holeSize')">{{$t('holeSize')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      v-model.number="options.base.magnetPocketSize"
-                      :title="'base.magnetPocketSize — ' + $t('holeSize')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.magnetPocketDepth — ' + $t('depth')">{{$t('depth')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      v-model.number="options.base.magnetPocketDepth"
-                      :title="'base.magnetPocketDepth — ' + $t('depth')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'base.magnetPocketOffset — ' + $t('offsetFromOuterEdge')">{{$t('offsetFromOuterEdge')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input
-                      class="input is-small"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      v-model.number="options.base.magnetPocketOffset"
-                      :title="'base.magnetPocketOffset — ' + $t('offsetFromOuterEdge')"
-                    />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
+      </UiCollapse>
 
-        <!-- Right Column -->
-        <div class="column">
-          <div class="model-options-title">
-            <div class="title is-size-5">QR Code</div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.invert — ' + $t('invert')">{{$t('invert')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="options.code.invert" :title="'code.invert — ' + $t('invert')" />
-                    <span class="is-size-7"><i class="fa fa-retweet"></i> {{$t("invertText")}}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.depth — ' + $t('depth')">{{$t('depth')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.code.depth" :title="'code.depth — ' + $t('depth')" />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.margin — ' + $t('margin')">{{$t('margin')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input class="input is-small" type="number" v-model.number="options.code.margin" :title="'code.margin — ' + $t('margin')" />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">{{unit}}</a>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.blockSizeMultiplier — ' + $t('block') + ' ' + $t('size')">{{$t('block')}} {{$t('size')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.code.blockSizeMultiplier"
-                    :title="'code.blockSizeMultiplier — ' + $t('block') + ' ' + $t('size')"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">%</a>
-                </p>
-                <span
-                  class="help-icon icon has-text-info"
-                  :title="$t('blockSizeHelp')">
-                  <i class="fas fa-info-circle"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Icon Settings -->
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.iconName — ' + $t('icon')">{{$t('icon')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <div class="dropdown is-hoverable">
-                    <div class="dropdown-trigger">
-                      <button class="button is-small" aria-haspopup="true" aria-controls="dropdown-menu2">
-                        <span class="icon is-small">
-                          <i class="fa fa-icons" aria-hidden="true"></i>
-                        </span>
-                        <span>{{options.code.iconName}}</span>
-                        <span class="icon is-small">
-                          <i class="fas fa-angle-down" aria-hidden="true"></i>
-                        </span>
-                      </button>
-                    </div>
-                    <div class="dropdown-menu" id="dropdown-menu2" role="menu">
-                      <div class="dropdown-content" id="dropdown-content2">
-                        <!-- Custom Icon Upload Section -->
-                        <div class="custom-icon-section">
-                          <div class="field">
-                            <label class="label is-size-7">{{$t('uploadCustomIcon')}}</label>
-                            <div class="file is-small">
-                              <label class="file-label">
-                                <input
-                                  class="file-input"
-                                  type="file"
-                                  accept=".svg"
-                                  @change="handleCustomIconUpload"
-                                  ref="customIconInput"
-                                />
-                                <span class="file-cta">
-                                  <span class="file-icon">
-                                    <i class="fas fa-upload"></i>
-                                  </span>
-                                  <span class="file-label is-size-7">
-                                    {{$t('selectSvgFile')}}
-                                  </span>
-                                </span>
-                              </label>
-                            </div>
-                          </div>
-                          <div v-if="uploadNotification" :class="['notification', uploadNotification.type, 'is-light', 'is-size-7']" style="margin: 4px 0 0; padding: 6px 10px;">
-                            {{ uploadNotification.message }}
-                          </div>
-                          <hr class="dropdown-divider">
-                        </div>
-
-                        <!-- Icon Grid -->
-                        <div class="columns is-multiline">
-                          <div class="column is-4">
-                            <div class="no-icon icon-item dropdown-item is-vcentered" @click="iconSelected('none')">
-                              <span class="title is-size-7">{{$t('noIcon')}}</span>
-                            </div>
-                          </div>
-                          <!-- Default icons -->
-                          <div class="column is-4" v-for="icon in icons" :key="icon">
-                            <div class="icon-item dropdown-item is-vcentered" @click="iconSelected(icon)">
-                              <img width="18" height="18" :src="'icons/' + icon + '.svg'" loading="lazy" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <object
-                    type="image/svg+xml"
-                    id="icon-preview"
-                    width="32"
-                    height="32"
-                    :data="getIconPreviewUrl()"
-                    v-if="options.code.iconName !== 'none'"
-                  />
-                  <div class="is-size-7" v-if="options.code.iconName !== 'none'">
-                    <span v-if="!options.code.iconName.startsWith('custom-')">
-                      Icons by Fontawesome
-                      <a href="https://fontawesome.com/license/free" target="_blank">CC BY 4.0</a>
-                    </span>
-                    <span v-else>
-                      Custom uploaded icon
-                    </span>
-                    <br/>
-                    <p class="has-text-danger has-text-weight-bold">
-                      Error Correction will be set to high if you use icons. Please make sure to test the scannability of your QR code before printing!
-                    </p>
-                    <p class="has-text-info" v-if="showIconCompatibilityWarning">
-                      <i class="fas fa-info-circle"></i> {{ iconCompatibilityMessage }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field is-horizontal" v-if="options.code.iconName !== 'none'">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.iconSizeRatio — ' + $t('icon') + ' ' + $t('size')">{{$t('icon')}} {{$t('size')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <input
-                    class="input is-small"
-                    type="number"
-                    v-model.number="options.code.iconSizeRatio"
-                    :title="'code.iconSizeRatio — ' + $t('icon') + ' ' + $t('size')"
-                  />
-                </div>
-                <p class="control">
-                  <a class="button is-static is-small">%</a>
-                </p>
-                <span
-                  class="help-icon icon has-text-info"
-                  :title="$t('iconSizeHelp')"
-                >
-                  <i class="fas fa-info-circle"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Monochrome Logo Info -->
-          <div class="field is-horizontal" v-if="options.code.iconName.startsWith('custom-')">
-            <div class="field-body">
-              <div class="field">
-                <div class="notification is-info is-light">
-                  <i class="fas fa-info-circle"></i>
-                  {{$t('monochromeLogoInfo')}}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Skyscraper Mode -->
-          <div class="field is-horizontal" v-if="!options.code.invert">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.cityMode — ' + $t('cityMode')">{{$t('cityMode')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <div class="control">
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="options.code.cityMode" :title="'code.cityMode — ' + $t('cityMode')" />
-                    <span class="is-size-7"><i class="fa fa-city"></i> {{$t("cityModeText")}}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="subsection" v-if="options.code.cityMode">
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'code.depth — ' + $t('depth') + ' ' + $t('min')">{{$t('depth')}} {{$t('min')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input class="input is-small" type="number" v-model.number="options.code.depth" :title="'code.depth — ' + $t('depth') + ' ' + $t('min')" />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="field is-horizontal">
-              <div class="field-label is-small">
-                <label class="label" :title="'code.depthMax — ' + $t('depth') + ' ' + $t('max')">{{$t('depth')}} {{$t('max')}}</label>
-              </div>
-              <div class="field-body">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input class="input is-small" type="number" v-model.number="options.code.depthMax" :title="'code.depthMax — ' + $t('depth') + ' ' + $t('max')" />
-                  </div>
-                  <p class="control">
-                    <a class="button is-static is-small">{{unit}}</a>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label" :title="'code.compatibilityMode — ' + $t('compatibilityMode')">{{$t('compatibilityMode')}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field has-addons">
-                <div class="control">
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="options.code.compatibilityMode" :title="'code.compatibilityMode — ' + $t('compatibilityMode')" />
-                    <span class="is-size-7">{{$t("compatibilityModeLabel")}}</span>
-                  </label>
-                </div>
-                <span
-                  class="help-icon icon has-text-info"
-                  :title="$t('compatibilityModeHelp')">
-                  <i class="fas fa-info-circle"></i>
-                </span>
-              </div>
-            </div>
-          </div>
-
+      <transition name="rise">
+        <div v-if="printabilityWarning" class="notice notice--warning">
+          <UiIcon name="alert" />
+          <span>{{ printabilityWarning }}</span>
         </div>
-      </div>
-    </div>
-  </nav>
+      </transition>
+    </UiSection>
+
+    <TitleOptions :options="options" :unit="unit" />
+    <KeychainOptions :options="options" :unit="unit" />
+    <NfcOptions :options="options" :unit="unit" />
+    <MagnetOptions :options="options" :unit="unit" />
+  </div>
 </template>
 
 <script>
+import { bus } from '../main';
+import BaseOptions from './sections/BaseOptions.vue';
+import TitleOptions from './sections/TitleOptions.vue';
+import KeychainOptions from './sections/KeychainOptions.vue';
+import NfcOptions from './sections/NfcOptions.vue';
+import MagnetOptions from './sections/MagnetOptions.vue';
+import UiSection from './ui/UiSection.vue';
+import UiField from './ui/UiField.vue';
+import UiNumberField from './ui/UiNumberField.vue';
+import UiPopover from './ui/UiPopover.vue';
+import UiCollapse from './ui/UiCollapse.vue';
+import UiIcon from './ui/UiIcon.vue';
+
 export default {
   name: 'QRCodeModelOptionsPanel',
+  components: {
+    BaseOptions,
+    TitleOptions,
+    KeychainOptions,
+    NfcOptions,
+    MagnetOptions,
+    UiSection,
+    UiField,
+    UiNumberField,
+    UiPopover,
+    UiCollapse,
+    UiIcon,
+  },
   props: {
     options: Object,
     unit: String,
     iconCompatibilityStatus: Object,
+    printabilityWarning: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -936,15 +232,28 @@ export default {
         'moon',
       ],
       customIcons: [],
-      uploadNotification: null, // { type: 'is-success'|'is-danger', message: '' }
     };
   },
   computed: {
+    isCustomIcon() {
+      return this.options.code.iconName.startsWith('custom-');
+    },
+    iconLabel() {
+      const name = this.options.code.iconName;
+      if (name === 'none') {
+        return this.$t('noIcon');
+      }
+      if (this.isCustomIcon) {
+        const icon = this.customIcons[parseInt(name.replace('custom-', ''), 10)];
+        return icon ? icon.name : this.$t('customIcon');
+      }
+      return name.replace(/-/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+    },
     showIconCompatibilityWarning() {
       // Show warning whenever compatibility mode is active with icons
-      return this.iconCompatibilityStatus &&
-             this.iconCompatibilityStatus.hasIcon &&
-             this.iconCompatibilityStatus.isCompatibilityMode;
+      return this.iconCompatibilityStatus
+        && this.iconCompatibilityStatus.hasIcon
+        && this.iconCompatibilityStatus.isCompatibilityMode;
     },
     iconCompatibilityMessage() {
       if (!this.showIconCompatibilityWarning) return '';
@@ -962,17 +271,19 @@ export default {
       }
 
       return `${this.$t('iconCompatibilityWarning')}: ${messages.join(', ')}.`;
-    }
+    },
   },
   methods: {
     showUploadNotification(type, message) {
-      this.uploadNotification = { type, message };
-      setTimeout(() => { this.uploadNotification = null; }, 4000);
+      bus.$emit('toast', { type: type === 'is-success' ? 'success' : 'error', message });
     },
-    iconSelected(icon) {
+    iconSelected(icon, close) {
       this.options.code.iconName = icon;
+      if (close) {
+        close();
+      }
     },
-    handleCustomIconUpload(event) {
+    handleCustomIconUpload(event, close) {
       const file = event.target.files[0];
       if (!file) return;
 
@@ -1016,7 +327,7 @@ export default {
             name: file.name,
             content: svgContent, // Original for 3D processing
             previewContent: centeredSvgContent, // Centered for preview
-            dataUrl: dataUrl,
+            dataUrl,
           };
 
           // Limit to 10 custom icons to prevent memory issues
@@ -1028,13 +339,14 @@ export default {
 
           // Auto-select the uploaded icon
           const iconIndex = this.customIcons.length - 1;
-          this.iconSelected(`custom-${iconIndex}`);
+          this.iconSelected(`custom-${iconIndex}`, close);
 
           this.showUploadNotification('is-success', this.$t('customIconUploaded'));
 
           // Clear the file input
-          this.$refs.customIconInput.value = '';
-
+          if (this.$refs.customIconInput) {
+            this.$refs.customIconInput.value = '';
+          }
         } catch (error) {
           console.error('Error processing SVG file:', error);
           this.showUploadNotification('is-danger', this.$t('iconUploadError'));
@@ -1048,8 +360,8 @@ export default {
       reader.readAsText(file);
     },
     getIconPreviewUrl() {
-      if (this.options.code.iconName.startsWith('custom-')) {
-        const index = parseInt(this.options.code.iconName.replace('custom-', ''));
+      if (this.isCustomIcon) {
+        const index = parseInt(this.options.code.iconName.replace('custom-', ''), 10);
         if (this.customIcons[index]) {
           return this.customIcons[index].dataUrl;
         }
@@ -1058,7 +370,7 @@ export default {
     },
     getCustomIconContent(iconName) {
       if (iconName.startsWith('custom-')) {
-        const index = parseInt(iconName.replace('custom-', ''));
+        const index = parseInt(iconName.replace('custom-', ''), 10);
         if (this.customIcons[index]) {
           return this.customIcons[index].content;
         }
@@ -1077,7 +389,7 @@ export default {
         const viewBox = svgElement.getAttribute('viewBox');
         if (!viewBox) return svgContent;
 
-        const [x, y, width, height] = viewBox.split(' ').map(Number);
+        const [, , width, height] = viewBox.split(' ').map(Number);
 
         // Calculate actual content bounds for better centering
         const contentBounds = this.calculateSvgContentBounds(svgElement);
@@ -1115,7 +427,6 @@ export default {
         const offsetX = (standardSize - scaledContentWidth) / 2 - (contentBounds.minX * scale);
         const offsetY = (standardSize - scaledContentHeight) / 2 - (contentBounds.minY * scale);
 
-
         return this.createCenteredSvg(svgDoc, svgContent, scale, offsetX, offsetY, newViewBox);
       } catch (error) {
         console.warn('Error formatting SVG to standard format:', error);
@@ -1131,9 +442,12 @@ export default {
 
       try {
         const visualElements = tempSvg.querySelectorAll('path, rect, circle, ellipse, polygon, polyline, g, text');
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
 
-        visualElements.forEach(element => {
+        visualElements.forEach((element) => {
           try {
             const bbox = element.getBBox();
             if (bbox && bbox.width > 0 && bbox.height > 0) {
@@ -1155,7 +469,9 @@ export default {
           maxY = rect.height;
         }
 
-        return { minX, minY, maxX, maxY };
+        return {
+          minX, minY, maxX, maxY,
+        };
       } finally {
         document.body.removeChild(tempSvg);
       }
@@ -1178,7 +494,7 @@ export default {
         if (originalSvg) {
           const allElements = originalSvg.querySelectorAll('path, rect, circle, ellipse, polygon, polyline, g, defs, style, linearGradient, radialGradient, stop');
 
-          allElements.forEach(element => {
+          allElements.forEach((element) => {
             if (element.tagName === 'path') {
               const newPath = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
               newPath.setAttribute('d', element.getAttribute('d'));
@@ -1226,59 +542,145 @@ export default {
 </script>
 
 <style>
-.help-icon {
-  margin-top: 3px;
-  margin-left: 5px;
+.select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  text-align: left;
+  transition: border-color var(--duration) ease, box-shadow var(--duration) ease;
 }
 
-.model-options-title {
-  margin: 0 0 10px 5px;
-  padding-bottom: 7px;
-  border-bottom: 2px solid whitesmoke;
+.select-trigger:hover {
+  border-color: var(--input-border-hover);
 }
 
-#icon-preview {
-  margin-left: 15px;
+.select-trigger.is-open,
+.select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
-
-.icon-item {
-  border-radius: 10px;
+.select-trigger__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.icon-item>img {
+.select-trigger__chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--text-3);
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.select-trigger.is-open .select-trigger__chevron {
+  transform: rotate(180deg);
+}
+
+.icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.icon-chip img {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-picker {
+  padding: 10px;
+}
+
+.icon-picker__upload {
+  margin-bottom: 10px;
+}
+
+.file-drop--compact {
+  padding: 10px 12px;
+}
+
+.file-drop--compact .file-drop__icon {
+  width: 32px;
+  height: 32px;
+}
+
+.file-drop--compact .file-drop__icon .svg-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.icon-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-2);
+  transition: border-color var(--duration) ease, background-color var(--duration) ease, transform var(--duration-fast) ease;
+}
+
+.icon-tile:hover,
+.icon-tile:focus-visible {
+  outline: none;
+  border-color: var(--accent-soft-border);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.icon-tile.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.icon-tile img {
   width: 18px;
   height: 18px;
 }
 
-.icon-item:hover {
-  background: whitesmoke;
-  cursor: pointer;
+.icon-tile .svg-icon {
+  width: 16px;
+  height: 16px;
 }
 
-.icon-item.no-icon {
-  padding: 5px;
+[data-theme="dark"] .icon-tile:not(.is-custom) img {
+  filter: invert(1);
 }
 
-#dropdown-content2 {
-  width: 280px;
-  padding: 20px;
+.icon-tile.is-custom img {
+  padding: 2px;
+  border-radius: 4px;
+  background: #fff;
 }
 
-.custom-icon-section {
-  margin-bottom: 15px;
-}
-
-.custom-icon-section .file {
-  margin-bottom: 0;
-}
-
-.custom-icon-section .file-label {
-  width: 100%;
-}
-
-.custom-icon-section .file-cta {
-  width: 100%;
-  justify-content: center;
+.icon-notes {
+  display: grid;
+  gap: 8px;
 }
 </style>

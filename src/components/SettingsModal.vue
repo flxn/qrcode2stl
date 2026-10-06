@@ -1,123 +1,100 @@
 <template>
-  <div class="modal is-active">
-    <div class="modal-background" @click="close"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          <span class="icon">
-            <i class="fa fa-cog"></i>
-          </span>
-          <span>{{ $t('importExportSettings') }}</span>
-        </p>
-        <button class="delete" aria-label="close" @click="close"></button>
-      </header>
-      <section class="modal-card-body">
-        <!-- Export Section -->
-        <div class="box">
-          <h3 class="title is-5">
-            <span class="icon">
-              <i class="fa fa-download"></i>
-            </span>
-            <span>{{ $t('exportSettings') }}</span>
-          </h3>
-          <p class="subtitle is-6">{{ $t('exportSettingsDescription') }}</p>
-          <div class="field">
-            <div class="control">
-              <textarea
-                class="textarea is-family-monospace"
-                rows="8"
-                readonly
-                :value="exportJson"
-              ></textarea>
-            </div>
+  <UiModal :title="$t('importExportSettings')" icon="settings" size="lg" @close="close">
+    <div class="settings-grid">
+      <!-- Export Section -->
+      <section class="card">
+        <header class="card__header">
+          <span class="settings-card__icon"><UiIcon name="file-down" /></span>
+          <div>
+            <h3 class="card__title">{{ $t('exportSettings') }}</h3>
+            <p class="settings-card__subtitle">{{ $t('exportSettingsDescription') }}</p>
           </div>
-          <div class="buttons">
-            <button class="button is-info" @click="copyToClipboard">
-              <span class="icon">
-                <i class="fa fa-clipboard"></i>
-              </span>
-              <span>{{ $t('copyToClipboard') }}</span>
+        </header>
+        <div class="card__body">
+          <textarea
+            class="textarea textarea--mono settings-json"
+            rows="10"
+            readonly
+            :value="exportJson"
+            :aria-label="$t('exportSettings')"
+            @focus="$event.target.select()"
+          ></textarea>
+          <div class="button-row">
+            <button type="button" class="btn" :class="{ 'is-copied': copySuccess }" @click="copyToClipboard">
+              <transition name="icon-swap" mode="out-in">
+                <UiIcon v-if="copySuccess" key="ok" name="check" />
+                <UiIcon v-else key="copy" name="copy" />
+              </transition>
+              <span>{{ copySuccess ? $t('copiedToClipboard') : $t('copyToClipboard') }}</span>
             </button>
-            <button class="button is-primary" @click="downloadAsFile">
-              <span class="icon">
-                <i class="fa fa-file-download"></i>
-              </span>
+            <button type="button" class="btn btn--primary" @click="downloadAsFile">
+              <UiIcon name="download" />
               <span>{{ $t('downloadAsFile') }}</span>
             </button>
           </div>
-          <p v-if="copySuccess" class="help is-success">
-            <span class="icon">
-              <i class="fa fa-check"></i>
-            </span>
-            {{ $t('copiedToClipboard') }}
-          </p>
-        </div>
-
-        <!-- Import Section -->
-        <div class="box">
-          <h3 class="title is-5">
-            <span class="icon">
-              <i class="fa fa-upload"></i>
-            </span>
-            <span>{{ $t('importSettings') }}</span>
-          </h3>
-          <p class="subtitle is-6">{{ $t('importSettingsDescription') }}</p>
-          <div class="field">
-            <div class="control">
-              <textarea
-                class="textarea is-family-monospace"
-                rows="8"
-                v-model="importJson"
-                :placeholder="$t('pasteJsonHere')"
-              ></textarea>
-            </div>
-          </div>
-          <div class="buttons">
-            <button class="button is-success" @click="applySettings" :disabled="!isValidJson">
-              <span class="icon">
-                <i class="fa fa-check"></i>
-              </span>
-              <span>{{ $t('applySettings') }}</span>
-            </button>
-            <div class="file is-info">
-              <label class="file-label">
-                <input class="file-input" type="file" accept=".json" @change="loadFromFile">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fa fa-file-upload"></i>
-                  </span>
-                  <span class="file-label">{{ $t('loadFromFile') }}</span>
-                </span>
-              </label>
-            </div>
-          </div>
-          <p v-if="importError" class="help is-danger">
-            <span class="icon">
-              <i class="fa fa-exclamation-triangle"></i>
-            </span>
-            {{ $t('invalidJsonError') }}: {{ importError }}
-          </p>
-          <p v-if="importSuccess" class="help is-success">
-            <span class="icon">
-              <i class="fa fa-check"></i>
-            </span>
-            {{ $t('settingsApplied') }}
-          </p>
         </div>
       </section>
-      <footer class="modal-card-foot">
-        <button class="button" @click="close">{{ $t('close') }}</button>
-      </footer>
+
+      <!-- Import Section -->
+      <section class="card">
+        <header class="card__header">
+          <span class="settings-card__icon"><UiIcon name="file-up" /></span>
+          <div>
+            <h3 class="card__title">{{ $t('importSettings') }}</h3>
+            <p class="settings-card__subtitle">{{ $t('importSettingsDescription') }}</p>
+          </div>
+        </header>
+        <div class="card__body">
+          <textarea
+            v-model="importJson"
+            class="textarea textarea--mono settings-json"
+            :class="{ 'is-invalid': importJson.trim() && !isValidJson }"
+            rows="10"
+            :placeholder="$t('pasteJsonHere')"
+            :aria-label="$t('importSettings')"
+          ></textarea>
+          <div class="button-row">
+            <button type="button" class="btn btn--primary" :disabled="!isValidJson" @click="applySettings">
+              <UiIcon name="check" />
+              <span>{{ $t('applySettings') }}</span>
+            </button>
+            <label class="btn file-button">
+              <input type="file" accept=".json" @change="loadFromFile" />
+              <UiIcon name="upload" />
+              <span>{{ $t('loadFromFile') }}</span>
+            </label>
+          </div>
+          <transition name="rise">
+            <p v-if="importError" key="error" class="notice notice--danger">
+              <UiIcon name="alert" />
+              <span>{{ $t('invalidJsonError') }}: {{ importError }}</span>
+            </p>
+            <p v-else-if="importJson.trim() && !isValidJson" key="invalid" class="field-hint settings-hint--error">
+              {{ $t('invalidJsonError') }}
+            </p>
+            <p v-else-if="importSuccess" key="success" class="notice notice--success">
+              <UiIcon name="circle-check" />
+              <span>{{ $t('settingsApplied') }}</span>
+            </p>
+          </transition>
+        </div>
+      </section>
     </div>
-  </div>
+    <template #footer>
+      <button type="button" class="btn" @click="close">{{ $t('close') }}</button>
+    </template>
+  </UiModal>
 </template>
 
 <script>
 import { bus } from '../main';
 import { saveAsString } from '../utils';
+import UiModal from './ui/UiModal.vue';
+import UiIcon from './ui/UiIcon.vue';
 
 export default {
   name: 'SettingsModal',
+  components: { UiModal, UiIcon },
   data() {
     return {
       exportJson: '',
@@ -145,6 +122,7 @@ export default {
     copyToClipboard() {
       navigator.clipboard.writeText(this.exportJson).then(() => {
         this.copySuccess = true;
+        bus.$emit('toast', { type: 'success', icon: 'clipboard', message: this.$t('copiedToClipboard') });
         setTimeout(() => {
           this.copySuccess = false;
         }, 2000);
@@ -168,6 +146,9 @@ export default {
         this.importError = 'Failed to read file';
       };
       reader.readAsText(file);
+      // allow loading the same file again
+      // eslint-disable-next-line no-param-reassign
+      event.target.value = '';
     },
     applySettings() {
       this.importError = null;
@@ -177,6 +158,7 @@ export default {
         const settings = JSON.parse(this.importJson);
         bus.$emit('importSettings', settings);
         this.importSuccess = true;
+        bus.$emit('toast', { type: 'success', message: this.$t('settingsApplied') });
         setTimeout(() => {
           this.importSuccess = false;
         }, 2000);
@@ -201,39 +183,70 @@ export default {
 };
 </script>
 
-<style scoped>
-.modal-card {
-  max-width: 700px;
-  width: 90%;
+<style>
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.modal-card-body {
-  max-height: 70vh;
-  overflow-y: auto;
+.settings-card__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-inset);
+  color: var(--text-2);
 }
 
-.box {
-  margin-bottom: 1.5rem;
+.settings-card__icon .svg-icon {
+  width: 18px;
+  height: 18px;
 }
 
-.box:last-child {
-  margin-bottom: 0;
+.settings-card__subtitle {
+  margin: 2px 0 0;
+  color: var(--text-3);
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
-.textarea.is-family-monospace {
-  font-family: monospace;
-  font-size: 0.85rem;
+.settings-json.textarea {
+  min-height: 210px;
+  resize: vertical;
 }
 
-.buttons {
-  margin-top: 1rem;
+.settings-json.is-invalid {
+  border-color: var(--danger);
 }
 
-.help {
-  margin-top: 0.5rem;
+.settings-hint--error {
+  color: var(--danger-text);
 }
 
-.title .icon {
-  margin-right: 0.5rem;
+.btn.is-copied {
+  border-color: var(--accent-soft-border);
+  color: var(--accent-text);
+}
+
+.file-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-button input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

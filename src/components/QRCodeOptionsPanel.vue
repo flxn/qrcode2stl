@@ -1,91 +1,49 @@
 <template>
-  <nav class="panel">
-    <p class="panel-heading">{{ $t('qrCodeOptionsTitle') }}</p>
-    <!-- QR Code settings tabs -->
-    <QRCodeOptionsTabs :active-tab-index="options.activeTabIndex" @tabChanged="setActiveTab" />
-
-    <!-- Text -->
-    <div class="option-pane" v-if="options.activeTabIndex === 0">
-      <textarea
-        class="textarea"
-        :placeholder="$t('qrCodeTextPlaceholder')"
-        v-model="options.text"
-        style="width: 100%"
-        :title="'text — ' + $t('text')"
-      ></textarea>
-    </div>
-
-    <!-- Wifi -->
-    <div class="option-pane" v-if="options.activeTabIndex === 1">
-      <WifiForm :wifi="options.wifi" />
-    </div>
-
-    <!-- E-Mail -->
-    <div class="option-pane" v-if="options.activeTabIndex === 2">
-      <EmailForm :email="options.email" />
-    </div>
-
-    <!-- Contact -->
-    <div class="option-pane" v-if="options.activeTabIndex === 3">
-      <ContactForm :contact="options.contact" />
-    </div>
-
-    <!-- SMS -->
-    <div class="option-pane" v-if="options.activeTabIndex === 4">
-      <SMSForm :sms="options.sms" />
-    </div>
-
-    <!-- Calendar -->
-    <div class="option-pane" v-if="options.activeTabIndex === 5">
-      <CalendarForm :calendar="options.calendar" />
-    </div>
-
-    <!-- Error Correction + Escape Sequences -->
-    <div class="columns option-pane">
-      <div class="column field is-horizontal">
-        <div class="field-label is-small">
-          <label class="label" :title="'errorCorrectionLevel — ' + $t('errorCorrection')">{{$t('errorCorrection')}}</label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <div class="select is-small">
-                <select v-model="options.errorCorrectionLevel" :title="'errorCorrectionLevel — ' + $t('errorCorrection')">
-                  <option value="L">L (Low, 7% redundant)</option>
-                  <option value="M">M (Medium, 15% redundant)</option>
-                  <option value="Q">Q (Quartile, 25% redundant)</option>
-                  <option value="H">H (High, 30% redundant)</option>
-                </select>
-              </div>
-              <p class="help">{{$t('errorCorrectionHelp')}}</p>
-            </div>
-          </div>
-        </div>
+  <div class="content-form">
+    <transition name="content-swap">
+      <!-- Text -->
+      <div v-if="options.activeTabIndex === 0" key="text" class="option-pane">
+        <textarea
+          v-model="options.text"
+          v-autosize
+          class="textarea content-textarea"
+          rows="1"
+          :placeholder="$t('qrCodeTextPlaceholder')"
+          :aria-label="$t('contentLabel')"
+          :title="'text — ' + $t('text')"
+          spellcheck="false"
+        ></textarea>
       </div>
-      <div class="column field is-horizontal">
-        <div class="field-label is-small">
-          <label class="label" :title="'useEscapeSequences — ' + $t('useEscapeSequences')">{{$t('useEscapeSequences')}}</label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox" v-model="options.useEscapeSequences" :title="'useEscapeSequences — ' + $t('useEscapeSequences')" />
-                <span class="is-size-7" style="margin-left:6px">{{$t('useEscapeSequencesToggle')}}</span>
-              </label>
-              <p class="help">{{$t('useEscapeSequencesHelp')}}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
 
+      <!-- Wifi -->
+      <div v-else-if="options.activeTabIndex === 1" key="wifi" class="option-pane">
+        <WifiForm :wifi="options.wifi" />
+      </div>
+
+      <!-- E-Mail -->
+      <div v-else-if="options.activeTabIndex === 2" key="email" class="option-pane">
+        <EmailForm :email="options.email" />
+      </div>
+
+      <!-- Contact -->
+      <div v-else-if="options.activeTabIndex === 3" key="contact" class="option-pane">
+        <ContactForm :contact="options.contact" />
+      </div>
+
+      <!-- SMS -->
+      <div v-else-if="options.activeTabIndex === 4" key="sms" class="option-pane">
+        <SMSForm :sms="options.sms" />
+      </div>
+
+      <!-- Calendar -->
+      <div v-else-if="options.activeTabIndex === 5" key="calendar" class="option-pane">
+        <CalendarForm :calendar="options.calendar" />
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script>
-// QR Code settings tabs
-import QRCodeOptionsTabs from './QRCodeOptionsTabs.vue';
 // QR Code settings forms
 import WifiForm from './forms/Wifi.vue';
 import EmailForm from './forms/Email.vue';
@@ -104,24 +62,40 @@ export default {
     ContactForm,
     SMSForm,
     CalendarForm,
-    QRCodeOptionsTabs,
-  },
-  methods: {
-    setActiveTab(idx) {
-      this.options.activeTabIndex = idx;
-    },
   },
 };
 </script>
 
 <style>
-
-#option-tabs {
-  margin-bottom: 0;
+.content-form {
+  min-width: 0;
 }
 
 .option-pane {
-  padding: 10px;
+  display: grid;
+  gap: 10px;
 }
 
+.content-textarea.textarea {
+  min-height: 48px;
+  max-height: 168px;
+  padding: 13px 14px;
+  font-size: 15px;
+  resize: none;
+  overflow-y: auto;
+}
+
+.content-swap-enter-active {
+  transition: opacity 180ms ease, transform 240ms var(--ease-out);
+}
+
+/* swap instantly; only the incoming form animates */
+.content-swap-leave-active {
+  display: none;
+}
+
+.content-swap-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
 </style>

@@ -1,60 +1,39 @@
 <template>
-  <div>
-    <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'email.recipient — ' + $t('recipient')">{{$t('recipient')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="$t('recipientPlaceholder')"
-              v-model="email.recipient"
-              :title="'email.recipient — ' + $t('recipient')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'email.subject — ' + $t('subject')">{{$t('subject')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="$t('subjectPlaceholder')"
-              v-model="email.subject"
-              :title="'email.subject — ' + $t('subject')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'email.body — ' + $t('body')">{{$t('body')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <textarea
-              class="textarea"
-              :placeholder="$t('bodyPlaceholder')"
-              v-model="email.body"
-              style="width: 100%"
-              :title="'email.body — ' + $t('body')"
-            ></textarea>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="form-stack">
+    <p class="field-hint">{{ $t('optionalFieldsHint') }}</p>
+    <label class="field-stack" :title="'email.recipient — ' + $t('recipient')">
+      <span class="field-label">{{ $t('recipient') }}</span>
+      <input
+        v-model="email.recipient"
+        class="input"
+        type="text"
+        inputmode="email"
+        autocomplete="off"
+        :placeholder="$t('recipientPlaceholder')"
+        :title="'email.recipient — ' + $t('recipient')"
+      />
+    </label>
+    <label class="field-stack" :title="'email.subject — ' + $t('subject')">
+      <span class="field-label">{{ $t('subject') }}</span>
+      <input
+        v-model="email.subject"
+        class="input"
+        type="text"
+        :placeholder="$t('subjectPlaceholder')"
+        :title="'email.subject — ' + $t('subject')"
+      />
+    </label>
+    <label class="field-stack" :title="'email.body — ' + $t('body')">
+      <span class="field-label">{{ $t('body') }}</span>
+      <textarea
+        v-model="email.body"
+        v-autosize
+        class="textarea form-textarea"
+        rows="2"
+        :placeholder="$t('bodyPlaceholder')"
+        :title="'email.body — ' + $t('body')"
+      ></textarea>
+    </label>
   </div>
 </template>
 
@@ -66,6 +45,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

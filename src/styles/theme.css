@@ -1,0 +1,192 @@
+/*
+ * Design tokens for the QR2STL workbench.
+ * Light and dark palettes follow the approved redesign mockups.
+ * The active palette is selected via [data-theme] on <html> (see index.html and src/theme.js).
+ */
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --header-height: 64px;
+  --sidebar-width: 390px;
+  --control-height: 38px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-slow: 280ms;
+}
+
+@media (max-width: 1240px) {
+  :root {
+    --sidebar-width: 350px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+}
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Brand */
+  --accent: #04a96b;
+  --accent-fill: #03905c;
+  --accent-fill-hover: #037f51;
+  --accent-text: #037a4d;
+  --accent-soft: #e3f6ee;
+  --accent-soft-hover: #d4f1e5;
+  --accent-soft-border: #8fd6b8;
+  --accent-ring: rgba(4, 169, 107, 0.28);
+  --accent-glow: rgba(3, 144, 92, 0.45);
+
+  /* Surfaces */
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-inset: #f4f5f7;
+  --surface-hover: #f1f3f5;
+  --surface-active: #e9ecef;
+  --overlay: rgba(17, 24, 39, 0.42);
+
+  /* Lines */
+  --border: #e4e7ec;
+  --border-strong: #d6dae1;
+  --border-hover: #c4cad3;
+  --divider: #eceef2;
+
+  /* Text */
+  --text: #1d2433;
+  --text-2: #4b5466;
+  --text-3: #6b7486;
+  --text-inverse: #ffffff;
+
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #d9dde4;
+  --input-border-hover: #bfc6d0;
+  --unit-bg: #f4f5f7;
+  --switch-off: #cdd3db;
+
+  /* Feedback */
+  --danger: #d23c3c;
+  --danger-text: #b42323;
+  --danger-soft: #fdeeee;
+  --danger-border: #f3c2c2;
+  --warning: #c47f12;
+  --warning-text: #8f5b06;
+  --warning-soft: #fdf4e3;
+  --warning-border: #f2d9a6;
+  --info-text: #2c5ea8;
+  --info-soft: #eef4fd;
+  --info-border: #c9dbf5;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.07), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 6px 16px -4px rgba(16, 24, 40, 0.12), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 24px 48px -12px rgba(16, 24, 40, 0.22), 0 8px 16px -8px rgba(16, 24, 40, 0.1);
+  --focus-ring: 0 0 0 3px var(--accent-ring);
+
+  /* 3D viewport */
+  --viewport-bg: radial-gradient(120% 90% at 50% 35%, #f3f5f8 0%, #eaedf1 55%, #e2e6eb 100%);
+  --viewport-border: #e1e4ea;
+  --viewport-chrome: rgba(255, 255, 255, 0.92);
+  --viewport-chrome-border: #e1e4ea;
+  --ruler: #05995f;
+  --ruler-label-bg: rgba(255, 255, 255, 0.86);
+  --cube-face: #f6f7f9;
+  --cube-face-top: #ffffff;
+  --cube-face-side: #e4e7ec;
+  --cube-face-shade: #c9ced6;
+  --cube-edge: #c3c8d0;
+  --cube-text: #2a3242;
+
+  --logo-filter: none;
+  --scrollbar: rgba(29, 36, 51, 0.18);
+  --scrollbar-hover: rgba(29, 36, 51, 0.3);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --accent: #29b97d;
+  --accent-fill: #16935f;
+  --accent-fill-hover: #19a56b;
+  --accent-text: #4fd29a;
+  --accent-soft: rgba(41, 185, 125, 0.14);
+  --accent-soft-hover: rgba(41, 185, 125, 0.2);
+  --accent-soft-border: rgba(41, 185, 125, 0.55);
+  --accent-ring: rgba(41, 185, 125, 0.32);
+  --accent-glow: rgba(22, 147, 95, 0.55);
+
+  --bg: #12181c;
+  --surface: #1a2328;
+  --surface-raised: #1f2a30;
+  --surface-inset: #151d22;
+  --surface-hover: #222d34;
+  --surface-active: #29353d;
+  --overlay: rgba(4, 8, 10, 0.62);
+
+  --border: #26323a;
+  --border-strong: #334048;
+  --border-hover: #435159;
+  --divider: #222c33;
+
+  --text: #e7ecef;
+  --text-2: #b2bdc4;
+  --text-3: #85919a;
+  --text-inverse: #ffffff;
+
+  --input-bg: #1e2930;
+  --input-border: #33414a;
+  --input-border-hover: #46555f;
+  --unit-bg: #243139;
+  --switch-off: #3a4851;
+
+  --danger: #f06363;
+  --danger-text: #ff8e8e;
+  --danger-soft: rgba(240, 99, 99, 0.12);
+  --danger-border: rgba(240, 99, 99, 0.35);
+  --warning: #f0b14a;
+  --warning-text: #f5c674;
+  --warning-soft: rgba(240, 177, 74, 0.12);
+  --warning-border: rgba(240, 177, 74, 0.35);
+  --info-text: #8ab8f5;
+  --info-soft: rgba(110, 160, 240, 0.12);
+  --info-border: rgba(110, 160, 240, 0.32);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 20px -6px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 28px 56px -12px rgba(0, 0, 0, 0.65), 0 10px 20px -8px rgba(0, 0, 0, 0.45);
+
+  --viewport-bg: radial-gradient(120% 90% at 50% 30%, #30363c 0%, #262c32 50%, #1f2429 100%);
+  --viewport-border: #343c43;
+  --viewport-chrome: rgba(26, 34, 39, 0.9);
+  --viewport-chrome-border: #333e46;
+  --ruler: #5ddaa6;
+  --ruler-label-bg: rgba(24, 30, 35, 0.78);
+  --cube-face: #39434b;
+  --cube-face-top: #56616a;
+  --cube-face-side: #2c363d;
+  --cube-face-shade: #232c32;
+  --cube-edge: #59656e;
+  --cube-text: #e7ecef;
+
+  --logo-filter: invert(1);
+  --scrollbar: rgba(231, 236, 239, 0.16);
+  --scrollbar-hover: rgba(231, 236, 239, 0.28);
+}

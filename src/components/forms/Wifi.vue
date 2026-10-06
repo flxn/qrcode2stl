@@ -1,85 +1,64 @@
 <template>
-  <div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'wifi.ssid — SSID'">SSID</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="$t('ssidPlaceholder')"
-              v-model="wifi.ssid"
-              title="wifi.ssid — SSID"
-            />
-          </div>
-        </div>
-      </div>
+  <div class="form-stack">
+    <label class="field-stack" title="wifi.ssid — SSID">
+      <span class="field-label">SSID</span>
+      <input
+        v-model="wifi.ssid"
+        class="input"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        :placeholder="$t('ssidPlaceholder')"
+        title="wifi.ssid — SSID"
+      />
+    </label>
+    <UiCollapse :open="wifi.security !== 'nopass'">
+      <label class="field-stack" :title="'wifi.password — ' + $t('password')">
+        <span class="field-label">{{ $t('password') }}</span>
+        <input
+          v-model="wifi.password"
+          class="input"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          :placeholder="$t('passwordPlaceholder')"
+          :title="'wifi.password — ' + $t('password')"
+        />
+      </label>
+    </UiCollapse>
+    <div class="field-stack" :title="'wifi.security — ' + $t('security')">
+      <span class="field-label">{{ $t('security') }}</span>
+      <UiSegmented v-model="wifi.security" block :options="securityOptions" :aria-label="$t('security')" />
     </div>
-    <div class="field is-horizontal" v-if="wifi.security !== 'nopass'">
-      <div class="field-label is-normal">
-        <label class="label" :title="'wifi.password — ' + $t('password')">{{$t('password')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="$t('passwordPlaceholder')"
-              v-model="wifi.password"
-              :title="'wifi.password — ' + $t('password')"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'wifi.security — ' + $t('security')">{{$t('security')}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <div class="select">
-              <select v-model="wifi.security" :title="'wifi.security — ' + $t('security')">
-                <option value="WPA">WPA</option>
-                <option value="WEP">WEP</option>
-                <option value="nopass">No password</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'wifi.hidden — ' + $t('hidden')">{{$t('hidden')}}?</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control">
-            <label class="checkbox">
-              <input type="checkbox" v-model="wifi.hidden" :title="'wifi.hidden — ' + $t('hidden')" />
-              {{$t('hiddenText')}}
-            </label>
-          </div>
-        </div>
-      </div>
+    <div class="form-inline-row">
+      <UiToggle
+        v-model="wifi.hidden"
+        :label="$t('hiddenText')"
+        :title="'wifi.hidden — ' + $t('hidden')"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import UiSegmented from '../ui/UiSegmented.vue';
+import UiToggle from '../ui/UiToggle.vue';
+import UiCollapse from '../ui/UiCollapse.vue';
+
 export default {
   name: 'WifiForm',
+  components: { UiSegmented, UiToggle, UiCollapse },
   props: {
     wifi: Object,
   },
+  computed: {
+    securityOptions() {
+      return [
+        { value: 'WPA', label: 'WPA' },
+        { value: 'WEP', label: 'WEP' },
+        { value: 'nopass', label: 'No password' },
+      ];
+    },
+  },
 };
 </script>
-
-<style>
-</style>

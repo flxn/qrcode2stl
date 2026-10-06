@@ -11,6 +11,22 @@
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#2b5797">
     <meta name="theme-color" content="#ffffff">
+    <meta name="color-scheme" content="light dark">
+    <script>
+      // Apply the saved or system color theme before first paint to avoid a flash.
+      (function () {
+        var theme = 'light';
+        try {
+          var stored = window.localStorage.getItem('theme');
+          if (stored === 'light' || stored === 'dark') {
+            theme = stored;
+          } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          }
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <title>QRCode2STL - Create Custom 3D Printable QR Codes | Free Online Tool</title>
     <meta name="description" content="Generate customized 3D printable QR codes and STL files. Create QR codes for text, URLs, WiFi settings, or Spotify codes. Free online tool with direct STL export for 3D printing.">
     <meta name="keywords" content="3D QR code, QR code generator, STL file, 3D printing, QR code to STL, 3D printable QR codes, Spotify code 3D, custom QR codes">

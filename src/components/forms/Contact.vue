@@ -1,152 +1,57 @@
 <template>
-  <div>
-    <div class="field has-text-centered">{{$t('optionalFieldsHint')}}</div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.firstName / contact.lastName'">{{$t('yourName')}}:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" :placeholder="$t('firstname')" v-model="contact.firstName" :title="'contact.firstName — ' + $t('firstname')" />
-          </p>
-        </div>
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" :placeholder="$t('lastname')" v-model="contact.lastName" :title="'contact.lastName — ' + $t('lastname')" />
-          </p>
-        </div>
+  <div class="form-stack">
+    <p class="field-hint">{{ $t('optionalFieldsHint') }}</p>
+
+    <div class="field-stack">
+      <span class="field-label" title="contact.firstName / contact.lastName">{{ $t('yourName') }}</span>
+      <div class="field-grid">
+        <input v-model="contact.firstName" class="input" type="text" autocomplete="given-name" :placeholder="$t('firstname')" :aria-label="$t('firstname')" :title="'contact.firstName — ' + $t('firstname')" />
+        <input v-model="contact.lastName" class="input" type="text" autocomplete="family-name" :placeholder="$t('lastname')" :aria-label="$t('lastname')" :title="'contact.lastName — ' + $t('lastname')" />
       </div>
     </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.organization — ' + $t('organization')">{{$t('organization')}}:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="ACME Inc." v-model="contact.organization" :title="'contact.organization — ' + $t('organization')" />
-          </p>
-        </div>
+
+    <div class="field-grid">
+      <label class="field-stack">
+        <span class="field-label" :title="'contact.organization — ' + $t('organization')">{{ $t('organization') }}</span>
+        <input v-model="contact.organization" class="input" type="text" autocomplete="organization" placeholder="ACME Inc." :title="'contact.organization — ' + $t('organization')" />
+      </label>
+      <label class="field-stack">
+        <span class="field-label" :title="'contact.role — ' + $t('role')">{{ $t('role') }}</span>
+        <input v-model="contact.role" class="input" type="text" autocomplete="organization-title" placeholder="Senior Money Maker" :title="'contact.role — ' + $t('role')" />
+      </label>
+    </div>
+
+    <div class="field-stack">
+      <span class="field-label" title="contact.cell / contact.phone / contact.fax">{{ $t('numbers') }}</span>
+      <input v-model="contact.cell" class="input" type="text" inputmode="tel" autocomplete="tel" :placeholder="$t('cellphone')" :aria-label="$t('cellphone')" :title="'contact.cell — ' + $t('cellphone')" />
+      <div class="field-grid">
+        <input v-model="contact.phone" class="input" type="text" inputmode="tel" :placeholder="$t('phone')" :aria-label="$t('phone')" :title="'contact.phone — ' + $t('phone')" />
+        <input v-model="contact.fax" class="input" type="text" inputmode="tel" placeholder="Fax" aria-label="Fax" title="contact.fax — Fax" />
       </div>
     </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.role — ' + $t('role')">{{$t('role')}}:</label>
+
+    <label class="field-stack">
+      <span class="field-label" title="contact.email — E-Mail">E-Mail</span>
+      <input v-model="contact.email" class="input" type="text" inputmode="email" autocomplete="email" placeholder="you@example.com" title="contact.email — E-Mail" />
+    </label>
+
+    <div class="field-stack">
+      <span class="field-label" :title="'contact.street — ' + $t('street')">{{ $t('street') }}</span>
+      <input v-model="contact.street" class="input" type="text" autocomplete="street-address" placeholder="My Street 31" :aria-label="$t('street')" :title="'contact.street — ' + $t('street')" />
+      <div class="field-grid field-grid--postcode">
+        <input v-model="contact.postcode" class="input" type="text" autocomplete="postal-code" placeholder="12345" aria-label="Postcode" title="contact.postcode — Postcode" />
+        <input v-model="contact.city" class="input" type="text" autocomplete="address-level2" placeholder="My Town" :aria-label="$t('city')" :title="'contact.city — ' + $t('city')" />
       </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input
-              class="input"
-              type="text"
-              placeholder="Senior Money Maker"
-              v-model="contact.role"
-              :title="'contact.role — ' + $t('role')"
-            />
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.cell / contact.phone / contact.fax'">{{$t('numbers')}}:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" :placeholder="$t('cellphone')" v-model="contact.cell" :title="'contact.cell — ' + $t('cellphone')" />
-          </p>
-        </div>
+      <div class="field-grid">
+        <input v-model="contact.state" class="input" type="text" autocomplete="address-level1" placeholder="My State" :aria-label="$t('state')" :title="'contact.state — ' + $t('state')" />
+        <input v-model="contact.country" class="input" type="text" autocomplete="country-name" placeholder="My Country" aria-label="Country" title="contact.country — Country" />
       </div>
     </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label for class="label"></label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" :placeholder="$t('phone')" v-model="contact.phone" :title="'contact.phone — ' + $t('phone')" />
-          </p>
-        </div>
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="Fax" v-model="contact.fax" title="contact.fax — Fax" />
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" title="contact.email — E-Mail">E-Mail:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="you@example.com" v-model="contact.email" title="contact.email — E-Mail" />
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.street — ' + $t('street')">{{$t('street')}}:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="My Street 31" v-model="contact.street" :title="'contact.street — ' + $t('street')" />
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.postcode / contact.city'">{{$t('city')}}:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="12345" v-model="contact.postcode" title="contact.postcode — Postcode" />
-          </p>
-        </div>
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="My Town" v-model="contact.city" :title="'contact.city — ' + $t('city')" />
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" :title="'contact.state / contact.country'">{{$t('state')}}:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="My State" v-model="contact.state" :title="'contact.state — ' + $t('state')" />
-          </p>
-        </div>
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="My Country" v-model="contact.country" title="contact.country — Country" />
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label" title="contact.website — Website">Website:</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input class="input" type="text" placeholder="www.mysite.com" v-model="contact.website" title="contact.website — Website" />
-          </p>
-        </div>
-      </div>
-    </div>
+
+    <label class="field-stack">
+      <span class="field-label" title="contact.website — Website">Website</span>
+      <input v-model="contact.website" class="input" type="text" inputmode="url" autocomplete="url" placeholder="www.mysite.com" title="contact.website — Website" />
+    </label>
   </div>
 </template>
 
@@ -158,6 +63,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

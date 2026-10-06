@@ -1,313 +1,291 @@
 <template>
-  <div class="modal is-active">
-    <div class="modal-background" @click="close"></div>
-    <div class="modal-card" style="width: 90%; max-width: 1000px;">
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          <i class="fas fa-layer-group"></i> {{ $t('batchMode') }}
-        </p>
-        <button class="delete" aria-label="close" @click="close"></button>
-      </header>
-      <section class="modal-card-body">
-        <!-- Mode Selector and Options (visible before processing and results) -->
-        <div class="content" v-if="!isProcessing && !showResults">
-          <p>{{ $t('batchModeDescription') }}</p>
+  <UiModal
+    :title="$t('batchMode')"
+    :subtitle="!isProcessing && !showResults ? $t('batchModeDescription') : ''"
+    icon="layers"
+    size="lg"
+    :close-on-backdrop="!isProcessing"
+    @close="close"
+  >
+    <!-- Mode Selector and Options (visible before processing and results) -->
+    <div v-if="!isProcessing && !showResults" class="batch">
+      <div class="batch__options">
+        <div class="field-stack">
+          <span class="field-label">{{ $t('batchModeType') }}</span>
+          <UiSegmented v-model="batchModeType" :options="modeOptions" :aria-label="$t('batchModeType')" />
+        </div>
+        <div class="batch__parts">
+          <UiToggle v-model="localMultipleParts" :label="$t('separateParts')" />
+          <p class="field-hint">{{ $t('exportSeparatePartsHelp') }}</p>
+        </div>
+      </div>
+      <p class="field-hint batch__mode-help">
+        {{ batchModeType === 'simple' ? $t('batchModeSimpleHelp') : $t('batchModeAdvancedHelp') }}
+      </p>
 
-          <!-- Mode Toggle -->
-          <div class="field">
-            <label class="label">{{ $t('batchModeType') }}</label>
-            <div class="control">
-              <div class="buttons has-addons">
-                <button
-                  class="button"
-                  :class="{ 'is-primary is-selected': batchModeType === 'simple' }"
-                  @click="batchModeType = 'simple'"
-                >
-                  <span class="icon"><i class="fas fa-list"></i></span>
-                  <span>{{ $t('batchModeSimple') }}</span>
-                </button>
-                <button
-                  class="button"
-                  :class="{ 'is-primary is-selected': batchModeType === 'advanced' }"
-                  @click="batchModeType = 'advanced'"
-                >
-                  <span class="icon"><i class="fas fa-file-csv"></i></span>
-                  <span>{{ $t('batchModeAdvanced') }}</span>
-                </button>
-              </div>
-            </div>
-            <p class="help">{{ batchModeType === 'simple' ? $t('batchModeSimpleHelp') : $t('batchModeAdvancedHelp') }}</p>
+      <!-- Simple Mode: Textarea for text entries -->
+      <div v-if="batchModeType === 'simple'" key="simple" class="batch__panel">
+        <details class="howto">
+          <summary><UiIcon name="info" /> {{ $t('batchSimpleHowToTitle') }}</summary>
+          <ol>
+            <li>{{ $t('batchSimpleStep1') }}</li>
+            <li>{{ $t('batchSimpleStep2') }}</li>
+            <li>{{ $t('batchSimpleStep3') }}</li>
+          </ol>
+        </details>
+
+        <label class="field-stack">
+          <span class="field-label">{{ $t('batchSimpleTextareaLabel') }}</span>
+          <div class="batch__textarea-wrap">
+            <textarea
+              v-model="simpleTextInput"
+              class="textarea textarea--mono batch__textarea"
+              :placeholder="$t('batchSimpleTextareaPlaceholder')"
+              rows="10"
+              spellcheck="false"
+            ></textarea>
+            <span class="batch__count" :class="{ 'is-active': simpleTextLines.length > 0 }">
+              {{ $t('batchSimpleTextareaHelp', { count: simpleTextLines.length }) }}
+            </span>
           </div>
+        </label>
 
-          <!-- Separate Parts Toggle -->
-          <div class="field">
-            <label class="label">{{ $t('separateParts') }}</label>
-            <div class="control">
-              <label class="radio">
-                <input type="radio" name="separateParts" :value="false" v-model="localMultipleParts" />
-                {{ $t('no') }}
-              </label>
-              <label class="radio">
-                <input type="radio" name="separateParts" :value="true" v-model="localMultipleParts" />
-                {{ $t('yes') }}
-              </label>
-            </div>
-            <p class="help">{{ $t('exportSeparatePartsHelp') }}</p>
-          </div>
+        <!-- Warning for large batches -->
+        <div v-if="simpleTextLines.length > 50" class="notice notice--warning">
+          <UiIcon name="alert" />
+          <span>{{ $t('batchLargeWarning', { count: simpleTextLines.length }) }}</span>
+        </div>
+      </div>
 
-          <hr />
+      <!-- Advanced Mode: CSV approach -->
+      <div v-else key="advanced" class="batch__panel">
+        <details class="howto">
+          <summary><UiIcon name="info" /> {{ $t('batchHowToTitle') }}</summary>
+          <ol>
+            <li>{{ $t('batchStep1') }}</li>
+            <li>{{ $t('batchStep2') }}</li>
+            <li>{{ $t('batchStep3') }}</li>
+            <li>{{ $t('batchStep4') }}</li>
+          </ol>
+          <p><strong>{{ $t('batchTips') }}</strong></p>
+          <ul>
+            <li>{{ $t('batchTip1') }}</li>
+            <li>{{ $t('batchTip2') }}</li>
+            <li>{{ $t('batchTip3') }}</li>
+          </ul>
+        </details>
 
-          <!-- Simple Mode: Textarea for text entries -->
-          <div v-if="batchModeType === 'simple'">
-            <div class="notification is-info is-light">
-              <p class="mb-2"><strong>{{ $t('batchSimpleHowToTitle') }}</strong></p>
-              <ol class="mt-0">
-                <li>{{ $t('batchSimpleStep1') }}</li>
-                <li>{{ $t('batchSimpleStep2') }}</li>
-                <li>{{ $t('batchSimpleStep3') }}</li>
-              </ol>
-            </div>
-
-            <div class="field">
-              <label class="label">{{ $t('batchSimpleTextareaLabel') }}</label>
-              <div class="control">
-                <textarea
-                  class="textarea"
-                  :placeholder="$t('batchSimpleTextareaPlaceholder')"
-                  v-model="simpleTextInput"
-                  rows="10"
-                ></textarea>
-              </div>
-              <p class="help">{{ $t('batchSimpleTextareaHelp', { count: simpleTextLines.length }) }}</p>
-            </div>
-
-            <!-- Warning for large batches -->
-            <div class="notification is-warning" v-if="simpleTextLines.length > 50">
-              <i class="fas fa-exclamation-triangle"></i>
-              {{ $t('batchLargeWarning', { count: simpleTextLines.length }) }}
-            </div>
-          </div>
-
-          <!-- Advanced Mode: CSV approach (existing) -->
-          <div v-if="batchModeType === 'advanced'">
-            <div class="notification is-info is-light">
-              <p class="mb-2"><strong>{{ $t('batchHowToTitle') }}</strong></p>
-              <ol class="mt-0">
-                <li>{{ $t('batchStep1') }}</li>
-                <li>{{ $t('batchStep2') }}</li>
-                <li>{{ $t('batchStep3') }}</li>
-                <li>{{ $t('batchStep4') }}</li>
-              </ol>
-              <p class="mb-1"><strong>{{ $t('batchTips') }}</strong></p>
-              <ul class="mt-0">
-                <li>{{ $t('batchTip1') }}</li>
-                <li>{{ $t('batchTip2') }}</li>
-                <li>{{ $t('batchTip3') }}</li>
-              </ul>
-            </div>
-
-            <!-- Template Download -->
-            <div class="field">
-              <label class="label">{{ $t('batchTemplateDownload') }}</label>
-              <p class="help mb-2">{{ $t('batchTemplateHelp') }}</p>
-              <button class="button is-info is-small" @click="downloadTemplate">
-                <span class="icon"><i class="fas fa-download"></i></span>
+        <div class="batch__steps">
+          <!-- Template Download -->
+          <section class="batch-step">
+            <span class="batch-step__number">1</span>
+            <div class="batch-step__content">
+              <h3 class="batch-step__title">{{ $t('batchTemplateDownload') }}</h3>
+              <p class="field-hint">{{ $t('batchTemplateHelp') }}</p>
+              <button type="button" class="btn btn--sm" @click="downloadTemplate">
+                <UiIcon name="download" />
                 <span>{{ $t('downloadCsvTemplate') }}</span>
               </button>
             </div>
+          </section>
 
-            <hr />
-
-            <!-- CSV Upload -->
-            <div class="field">
-              <label class="label">{{ $t('uploadCsvFile') }}</label>
-              <div class="file has-name is-fullwidth">
-                <label class="file-label">
-                  <input
-                    class="file-input"
-                    type="file"
-                    accept=".csv"
-                    @change="handleFileUpload"
-                    ref="fileInput"
-                  />
-                  <span class="file-cta">
-                    <span class="file-icon">
-                      <i class="fas fa-upload"></i>
-                    </span>
-                    <span class="file-label">{{ $t('chooseFile') }}</span>
-                  </span>
-                  <span class="file-name">
-                    {{ fileName || $t('noFileSelected') }}
-                  </span>
-                </label>
-              </div>
+          <!-- CSV Upload -->
+          <section class="batch-step">
+            <span class="batch-step__number">2</span>
+            <div class="batch-step__content">
+              <h3 class="batch-step__title">{{ $t('uploadCsvFile') }}</h3>
+              <label
+                class="file-drop"
+                :class="{ 'is-dragover': isDragOver }"
+                @dragover.prevent="isDragOver = true"
+                @dragleave.prevent="isDragOver = false"
+                @drop.prevent="onDrop"
+              >
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept=".csv"
+                  @change="handleFileUpload"
+                />
+                <span class="file-drop__icon"><UiIcon name="file-spreadsheet" /></span>
+                <span class="file-drop__text">
+                  <span class="file-drop__title">{{ fileName || $t('chooseFile') }}</span>
+                  <span>{{ fileName ? $t('batchReplaceFile') : $t('noFileSelected') }}</span>
+                </span>
+              </label>
             </div>
-
-            <!-- Warning for large batches -->
-            <div class="notification is-warning" v-if="parsedRows.length > 50">
-              <i class="fas fa-exclamation-triangle"></i>
-              {{ $t('batchLargeWarning', { count: parsedRows.length }) }}
-            </div>
-
-            <!-- Parse Errors -->
-            <div class="notification is-danger" v-if="parseError">
-              <i class="fas fa-times-circle"></i>
-              {{ parseError }}
-            </div>
-
-            <!-- Preview Table -->
-            <div v-if="parsedRows.length > 0 && !parseError">
-              <label class="label">{{ $t('batchPreview') }} ({{ $t('batchShowingRows', { shown: Math.min(5, parsedRows.length), total: parsedRows.length }) }})</label>
-              <div class="table-container">
-                <table class="table is-striped is-narrow is-hoverable is-fullwidth">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th v-for="col in csvColumns" :key="col">{{ col }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(row, index) in parsedRows.slice(0, 5)" :key="index">
-                      <td>{{ index + 1 }}</td>
-                      <td v-for="col in csvColumns" :key="col">
-                        <span class="has-text-grey" v-if="!row[col]">—</span>
-                        <span v-else>{{ truncateValue(row[col]) }}</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="help" v-if="parsedRows.length > 5">
-                {{ $t('batchMoreRows', { count: parsedRows.length - 5 }) }}
-              </p>
-
-              <!-- Validation Summary -->
-              <div class="notification is-info is-light mt-3" v-if="validationSummary">
-                <p><strong>{{ $t('batchValidation') }}:</strong></p>
-                <p>{{ $t('batchValidRows') }}: {{ validationSummary.valid }}</p>
-                <p v-if="validationSummary.invalid > 0" class="has-text-danger">
-                  {{ $t('batchInvalidRows') }}: {{ validationSummary.invalid }}
-                </p>
-              </div>
-            </div>
-          </div>
+          </section>
         </div>
 
-        <!-- Processing Progress -->
-        <div v-if="isProcessing" class="has-text-centered">
-          <p class="title is-5">{{ $t('batchProcessing') }}</p>
-          <progress class="progress is-primary is-large" :value="processedCount" :max="totalCount">
-            {{ Math.round((processedCount / totalCount) * 100) }}%
-          </progress>
-          <p class="subtitle is-6">
-            {{ $t('batchProgress', { current: processedCount, total: totalCount }) }}
-          </p>
-          <p v-if="currentItemLabel" class="has-text-grey">
-            {{ $t('batchCurrentItem') }}: {{ currentItemLabel }}
+        <!-- Warning for large batches -->
+        <div v-if="parsedRows.length > 50" class="notice notice--warning">
+          <UiIcon name="alert" />
+          <span>{{ $t('batchLargeWarning', { count: parsedRows.length }) }}</span>
+        </div>
+
+        <!-- Parse Errors -->
+        <div v-if="parseError" class="notice notice--danger">
+          <UiIcon name="circle-x" />
+          <span>{{ parseError }}</span>
+        </div>
+
+        <!-- Preview Table -->
+        <div v-if="parsedRows.length > 0 && !parseError" class="batch__preview">
+          <div class="batch__preview-head">
+            <span class="field-label">
+              {{ $t('batchPreview') }} ({{ $t('batchShowingRows', { shown: Math.min(5, parsedRows.length), total: parsedRows.length }) }})
+            </span>
+            <span v-if="validationSummary" class="batch__validation">
+              <span class="badge">{{ $t('batchValidRows') }}: {{ validationSummary.valid }}</span>
+              <span v-if="validationSummary.invalid > 0" class="badge badge--danger">
+                {{ $t('batchInvalidRows') }}: {{ validationSummary.invalid }}
+              </span>
+            </span>
+          </div>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th v-for="col in csvColumns" :key="col">{{ col }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, index) in parsedRows.slice(0, 5)" :key="index">
+                  <td>{{ index + 1 }}</td>
+                  <td v-for="col in csvColumns" :key="col">
+                    <span v-if="!row[col]" class="data-table__empty">—</span>
+                    <span v-else>{{ truncateValue(row[col]) }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p v-if="parsedRows.length > 5" class="field-hint">
+            {{ $t('batchMoreRows', { count: parsedRows.length - 5 }) }}
           </p>
         </div>
-
-        <!-- Results Summary with Thank You and Countdown -->
-        <div v-if="showResults">
-          <div class="columns">
-            <div class="column" v-if="!adblockEnabled">
-              <div v-html="exportAd"></div>
-            </div>
-            <div class="column content">
-              <div class="notification is-success" v-if="successCount > 0">
-                <i class="fas fa-check-circle"></i>
-                {{ $t('batchSuccessCount', { count: successCount }) }}
-              </div>
-              <div class="notification is-danger" v-if="errorResults.length > 0">
-                <p><strong><i class="fas fa-times-circle"></i> {{ $t('batchErrorCount', { count: errorResults.length }) }}</strong></p>
-                <ul>
-                  <li v-for="(err, index) in errorResults.slice(0, 10)" :key="index">
-                    {{ $t('batchRowError', { row: err.row, error: err.error }) }}
-                  </li>
-                  <li v-if="errorResults.length > 10">
-                    {{ $t('batchMoreErrors', { count: errorResults.length - 10 }) }}
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Countdown and Thank You Message -->
-              <div v-if="successCount > 0" class="mt-4">
-                <p class="is-size-4">
-                  <progress class="progress is-small is-primary" max="100" v-if="countdownSeconds !== 0"></progress>
-                  <progress class="progress is-small is-primary" max="100" v-if="countdownSeconds === 0" value="100"></progress>
-                  <span v-if="countdownSeconds > 0">{{ $t('batchDownloadCountdown', { seconds: countdownSeconds }) }}</span>
-                  <span v-if="countdownSeconds === 0">{{ $t('batchDownloadStarting') }}</span>
-                </p>
-                <p v-if="!adblockEnabled">
-                  <br/>{{ $t('batchThankYou') }}
-                </p>
-                <p v-if="adblockEnabled">
-                  {{ $t('batchAdblockMessage') }}
-                  <br/>
-                  <br/>
-                  <a class="button" href="https://paypal.me/fstein42" target="_blank" v-if="!showingThankYou" @click="showThanks">
-                    <span class="icon">
-                      <i class="fab fa-paypal"></i>
-                    </span>
-                    <span>Support qrcode2stl</span>
-                  </a>
-                  <a class="button is-danger" href="https://paypal.me/fstein42" target="_blank" v-if="showingThankYou">
-                    <span class="icon">
-                      <i class="fa fa-heart"></i>
-                    </span>
-                    <span>{{ $t('thankYou') }}</span>
-                  </a>
-                  <br/>
-                  <br/>
-                  {{ $t('batchThankYou') }}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <footer class="modal-card-foot">
-        <div class="buttons" v-if="!isProcessing && !showResults">
-          <button
-            class="button is-success"
-            :disabled="!canGenerate"
-            @click="startBatchGeneration"
-          >
-            <span class="icon"><i class="fas fa-play"></i></span>
-            <span>{{ $t('batchGenerate') }} ({{ totalItemCount }})</span>
-          </button>
-          <button class="button" @click="close">{{ $t('cancel') }}</button>
-        </div>
-        <div class="buttons" v-if="isProcessing">
-          <button class="button is-danger" @click="abortGeneration">
-            <span class="icon"><i class="fas fa-stop"></i></span>
-            <span>{{ $t('batchAbort') }}</span>
-          </button>
-        </div>
-        <div class="buttons" v-if="showResults">
-          <button class="button is-primary" @click="downloadZip" v-if="successCount > 0">
-            <span class="icon"><i class="fas fa-download"></i></span>
-            <span>{{ $t('batchDownloadZip') }}</span>
-          </button>
-          <button class="button" @click="reset">{{ $t('batchStartNew') }}</button>
-          <button class="button" @click="close">{{ $t('close') }}</button>
-        </div>
-      </footer>
+      </div>
     </div>
-  </div>
+
+    <!-- Processing Progress -->
+    <div v-if="isProcessing" class="batch-progress" role="status" aria-live="polite">
+      <div class="batch-progress__head">
+        <span class="batch-progress__title">
+          <UiIcon name="loader" class="spin" />
+          {{ $t('batchProcessing') }}
+        </span>
+        <span class="batch-progress__percent">{{ progressPercent }}%</span>
+      </div>
+      <div class="progress">
+        <div class="progress__bar" :style="{ width: progressPercent + '%' }"></div>
+      </div>
+      <p class="field-hint">{{ $t('batchProgress', { current: processedCount, total: totalCount }) }}</p>
+      <p v-if="currentItemLabel" class="batch-progress__current">
+        {{ $t('batchCurrentItem') }}: <code>{{ currentItemLabel }}</code>
+      </p>
+    </div>
+
+    <!-- Results Summary with Thank You and Countdown -->
+    <div v-if="showResults" class="batch-results" :class="{ 'has-ad': !adblockEnabled && exportAd }">
+      <div v-if="!adblockEnabled && exportAd" class="batch-results__ad" v-html="exportAd"></div>
+      <div class="batch-results__content">
+        <div v-if="successCount > 0" class="notice notice--success">
+          <UiIcon name="circle-check" />
+          <span>{{ $t('batchSuccessCount', { count: successCount }) }}</span>
+        </div>
+        <div v-if="errorResults.length > 0" class="notice notice--danger">
+          <UiIcon name="circle-x" />
+          <div>
+            <strong>{{ $t('batchErrorCount', { count: errorResults.length }) }}</strong>
+            <ul class="batch-results__errors">
+              <li v-for="(err, index) in errorResults.slice(0, 10)" :key="index">
+                {{ $t('batchRowError', { row: err.row, error: err.error }) }}
+              </li>
+              <li v-if="errorResults.length > 10">
+                {{ $t('batchMoreErrors', { count: errorResults.length - 10 }) }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Countdown and Thank You Message -->
+        <div v-if="successCount > 0" class="batch-results__download">
+          <div class="progress" :class="{ 'progress--indeterminate': countdownSeconds !== 0 }">
+            <div class="progress__bar" :style="countdownSeconds === 0 ? { width: '100%' } : null"></div>
+          </div>
+          <p class="batch-results__countdown">
+            <span v-if="countdownSeconds > 0">{{ $t('batchDownloadCountdown', { seconds: countdownSeconds }) }}</span>
+            <span v-if="countdownSeconds === 0">{{ $t('batchDownloadStarting') }}</span>
+          </p>
+          <p v-if="!adblockEnabled" class="field-hint">{{ $t('batchThankYou') }}</p>
+          <template v-if="adblockEnabled">
+            <p class="field-hint">{{ $t('batchAdblockMessage') }}</p>
+            <div class="button-row">
+              <a class="btn" href="https://paypal.me/fstein42" target="_blank" rel="noopener" v-if="!showingThankYou" @click="showThanks">
+                <i class="fab fa-paypal" aria-hidden="true"></i>
+                <span>Support qrcode2stl</span>
+              </a>
+              <a class="btn btn--danger" href="https://paypal.me/fstein42" target="_blank" rel="noopener" v-if="showingThankYou">
+                <UiIcon name="heart" />
+                <span>{{ $t('thankYou') }}</span>
+              </a>
+            </div>
+            <p class="field-hint">{{ $t('batchThankYou') }}</p>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <template #footer>
+      <template v-if="!isProcessing && !showResults">
+        <button type="button" class="btn" @click="close">{{ $t('cancel') }}</button>
+        <button
+          type="button"
+          class="btn btn--primary"
+          :disabled="!canGenerate"
+          @click="startBatchGeneration"
+        >
+          <UiIcon name="play" />
+          <span>{{ $t('batchGenerate') }} ({{ totalItemCount }})</span>
+        </button>
+      </template>
+      <template v-if="isProcessing">
+        <button type="button" class="btn btn--danger" @click="abortGeneration">
+          <UiIcon name="square" />
+          <span>{{ $t('batchAbort') }}</span>
+        </button>
+      </template>
+      <template v-if="showResults">
+        <button type="button" class="btn" @click="reset">{{ $t('batchStartNew') }}</button>
+        <button type="button" class="btn" @click="close">{{ $t('close') }}</button>
+        <button v-if="successCount > 0" type="button" class="btn btn--primary" @click="downloadZip">
+          <UiIcon name="file-archive" />
+          <span>{{ $t('batchDownloadZip') }}</span>
+        </button>
+      </template>
+    </template>
+  </UiModal>
 </template>
 
 <script>
-import * as THREE from 'three';
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
 import { save, getRandomBanner, trimIconShapesBounds } from '../utils';
+import parseWorkerMeshes from '../model-worker/meshes';
+import UiModal from './ui/UiModal.vue';
+import UiIcon from './ui/UiIcon.vue';
+import UiSegmented from './ui/UiSegmented.vue';
+import UiToggle from './ui/UiToggle.vue';
 
 export default {
   name: 'BatchModeModal',
+  components: {
+    UiModal, UiIcon, UiSegmented, UiToggle,
+  },
   props: {
     options: Object,
     activeTabIndex: Number,
@@ -347,9 +325,19 @@ export default {
       exportAd: '',
       showingThankYou: false,
       hasAutoDownloaded: false,
+      isDragOver: false,
     };
   },
   computed: {
+    modeOptions() {
+      return [
+        { value: 'simple', label: this.$t('batchModeSimple'), icon: 'list' },
+        { value: 'advanced', label: this.$t('batchModeAdvanced'), icon: 'file-spreadsheet' },
+      ];
+    },
+    progressPercent() {
+      return this.totalCount ? Math.round((this.processedCount / this.totalCount) * 100) : 0;
+    },
     simpleTextLines() {
       if (!this.simpleTextInput.trim()) return [];
       return this.simpleTextInput
@@ -407,6 +395,10 @@ export default {
   },
   methods: {
     close() {
+      if (this.isProcessing) {
+        // stop the running batch instead of leaving it working in the background
+        this.aborted = true;
+      }
       this.stopCountdown();
       this.$emit('close');
     },
@@ -567,7 +559,18 @@ export default {
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
+      this.readCsvFile(file);
+    },
 
+    onDrop(event) {
+      this.isDragOver = false;
+      const file = event.dataTransfer && event.dataTransfer.files[0];
+      if (file) {
+        this.readCsvFile(file);
+      }
+    },
+
+    readCsvFile(file) {
       this.fileName = file.name;
       this.parseError = null;
       this.parsedRows = [];
@@ -869,7 +872,7 @@ export default {
                 const svgLoader = new SVGLoader();
                 const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);
                 const svgMarkup = await response.text();
-                const svgData = svgLoader.parse(svgMarkup);
+                const svgData = svgLoader.parse(svgMarkup.replace(/currentColor/g, '#000'));
 
                 const processedShapes = [];
                 svgData.paths.forEach(path => {
@@ -955,7 +958,7 @@ export default {
                 const svgLoader = new SVGLoader();
                 const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);
                 const svgMarkup = await response.text();
-                const svgData = svgLoader.parse(svgMarkup);
+                const svgData = svgLoader.parse(svgMarkup.replace(/currentColor/g, '#000'));
 
                 const processedShapes = [];
                 svgData.paths.forEach(path => {
@@ -1020,82 +1023,32 @@ export default {
     },
 
     generateModelAsync(modelWorker, qrCodeBitMask, options) {
-      return new Promise((resolve, reject) => {
-        let timeoutId;
-
-        // Store original handler to restore later
-        const originalHandler = modelWorker.worker.onmessage;
-
-        const handler = (event) => {
-          console.log('[Batch] Worker message received:', event.data);
-
-          // Guard against undefined or malformed messages
-          if (!event.data || typeof event.data !== 'object') {
-            console.log('[Batch] Ignoring non-object message');
-            return;
-          }
-
-          if (event.data.type !== 'result') {
-            console.log('[Batch] Ignoring non-result message, type:', event.data.type);
-            return;
-          }
-
-          // Clear timeout since we got a response
-          clearTimeout(timeoutId);
-
-          // Restore original handler
-          modelWorker.worker.onmessage = originalHandler;
-
-          const jsonLoader = new THREE.ObjectLoader();
-          const { meshes } = event.data;
-
-          if (!meshes) {
-            reject(new Error('No meshes in worker response'));
-            return;
-          }
-
-          const parsedMeshes = {};
-          let parsed = 0;
-          const meshKeys = Object.keys(meshes);
-          const total = meshKeys.length;
-
-          console.log('[Batch] Parsing', total, 'meshes:', meshKeys);
-
-          if (total === 0) {
-            reject(new Error('Empty meshes object'));
-            return;
-          }
-
-          meshKeys.forEach((key) => {
-            jsonLoader.parse(meshes[key], (mesh) => {
-              parsedMeshes[key] = mesh;
-              parsed++;
-              console.log(`[Batch] Parsed mesh ${key} (${parsed}/${total})`);
-              if (parsed === total) {
-                resolve(parsedMeshes);
-              }
-            });
-          });
-        };
-
-        // Take over the worker's message handler
-        modelWorker.worker.onmessage = handler;
-
-        console.log('[Batch] Sending to worker:', { mode: 'QR', optionsKeys: Object.keys(options) });
-        modelWorker.send({
-          mode: 'QR',
-          qrCodeBitMask: qrCodeBitMask,
-          options: options,
-        });
-
+      let timeoutId;
+      const timeout = new Promise((resolve, reject) => {
         // Timeout after 30 seconds
         timeoutId = setTimeout(() => {
           console.error('[Batch] Model generation timeout after 30s');
-          // Restore original handler on timeout too
-          modelWorker.worker.onmessage = originalHandler;
           reject(new Error('Model generation timeout'));
         }, 30000);
       });
+
+      console.log('[Batch] Sending to worker:', { mode: 'QR', optionsKeys: Object.keys(options) });
+      const generation = modelWorker.request({
+        mode: 'QR',
+        qrCodeBitMask,
+        options,
+      }).then((result) => {
+        if (!result.meshes) {
+          throw new Error('No meshes in worker response');
+        }
+        const meshes = parseWorkerMeshes(result.meshes, { preview: false });
+        if (Object.keys(meshes).length === 0) {
+          throw new Error('Empty meshes object');
+        }
+        return meshes;
+      });
+
+      return Promise.race([generation, timeout]).finally(() => clearTimeout(timeoutId));
     },
 
     async exportToBuffer(meshes, filename) {
@@ -1196,24 +1149,325 @@ export default {
 };
 </script>
 
-<style scoped>
-.modal-card-body {
-  min-height: 300px;
+<style>
+.batch {
+  display: grid;
+  gap: 16px;
 }
 
-.table-container {
-  max-height: 300px;
+.batch__options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.batch__parts {
+  display: grid;
+  gap: 4px;
+  max-width: 420px;
+}
+
+.batch__mode-help {
+  margin-top: -6px;
+}
+
+.batch__panel {
+  display: grid;
+  gap: 14px;
+}
+
+.howto {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-inset);
+  color: var(--text-2);
+  font-size: 13.5px;
+}
+
+.howto summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.howto summary::-webkit-details-marker {
+  display: none;
+}
+
+.howto summary::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border-right: 2px solid var(--text-3);
+  border-bottom: 2px solid var(--text-3);
+  transform: rotate(45deg);
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.howto[open] summary::after {
+  transform: rotate(-135deg);
+}
+
+.howto summary .svg-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--info-text);
+}
+
+.howto ol,
+.howto ul,
+.howto p {
+  margin: 0;
+  padding: 0 14px 10px 34px;
+  line-height: 1.55;
+}
+
+.howto ol {
+  list-style: decimal;
+}
+
+.howto ul {
+  list-style: disc;
+}
+
+.howto li {
+  margin: 3px 0;
+}
+
+.howto p {
+  padding-left: 14px;
+}
+
+.batch__textarea-wrap {
+  position: relative;
+}
+
+.batch__textarea.textarea {
+  min-height: 220px;
+  padding-bottom: 36px;
+}
+
+.batch__count {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-inset);
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+  transition: background-color var(--duration) ease, color var(--duration) ease;
+}
+
+.batch__count.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.batch__steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.batch-step {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.batch-step__number {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.batch-step__content {
+  display: grid;
+  flex: 1 1 auto;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.batch-step__content .file-drop {
+  width: 100%;
+}
+
+.batch-step__title {
+  margin: 2px 0 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.batch__preview {
+  display: grid;
+  gap: 8px;
+}
+
+.batch__preview-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.batch__validation {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.badge--danger {
+  background: var(--danger-soft);
+  color: var(--danger-text);
+}
+
+.data-table-wrap {
+  max-height: 260px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: auto;
 }
 
-.table th, .table td {
-  white-space: nowrap;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
 }
 
-.progress {
-  margin: 20px 0;
+.data-table th,
+.data-table td {
+  max-width: 200px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--divider);
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-inset);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: var(--surface-inset);
+}
+
+.data-table__empty {
+  color: var(--text-3);
+}
+
+.batch-progress {
+  display: grid;
+  gap: 10px;
+  padding: 24px 4px;
+}
+
+.batch-progress__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.batch-progress__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.batch-progress__title .svg-icon {
+  color: var(--accent);
+}
+
+.batch-progress__percent {
+  color: var(--accent-text);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.batch-progress .progress {
+  height: 10px;
+}
+
+.batch-progress__current {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-results {
+  display: grid;
+  gap: 20px;
+}
+
+.batch-results.has-ad {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+}
+
+.batch-results__content {
+  display: grid;
+  gap: 12px;
+}
+
+.batch-results__errors {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.batch-results__download {
+  display: grid;
+  gap: 10px;
+}
+
+.batch-results__countdown {
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .batch__steps,
+  .batch-results.has-ad {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
