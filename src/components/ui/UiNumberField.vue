@@ -34,11 +34,19 @@
       </div>
       <slot />
     </div>
+    <div v-if="hint" class="field-hint field-row__hint">{{ hint }}</div>
+    <transition name="rise">
+      <div v-if="warning" class="field-hint field-hint--warning" role="status">
+        <UiIcon name="alert" />
+        <span>{{ warning }}</span>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
 import UiHelp from './UiHelp.vue';
+import UiIcon from './UiIcon.vue';
 
 const PIXELS_PER_STEP = 4;
 
@@ -50,7 +58,7 @@ const decimalsOf = (step) => {
 
 export default {
   name: 'UiNumberField',
-  components: { UiHelp },
+  components: { UiHelp, UiIcon },
   props: {
     value: {
       type: [Number, String],
@@ -95,6 +103,15 @@ export default {
     stack: {
       type: Boolean,
       default: false,
+    },
+    hint: {
+      type: String,
+      default: '',
+    },
+    // shown below the field, e.g. when the generator had to adjust this value
+    warning: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -176,18 +193,23 @@ export default {
         this.$emit('input', parsed);
       }
     },
+    /** Parses the typed text and keeps it within min / max. */
+    settle() {
+      const parsed = this.parse(this.text);
+      const value = parsed === '' ? '' : this.clamp(parsed);
+      if (value !== parsed && value !== '') {
+        this.triggerFlash();
+      }
+      this.commit(value, true);
+    },
     onBlur() {
       this.focused = false;
-      const parsed = this.parse(this.text);
-      this.text = this.format(parsed);
-      this.$emit('change', parsed);
+      this.settle();
     },
     onKeydown(event) {
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
         if (event.key === 'Enter') {
-          const parsed = this.parse(this.text);
-          this.text = this.format(parsed);
-          this.$emit('change', parsed);
+          this.settle();
         }
         return;
       }

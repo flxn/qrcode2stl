@@ -29,11 +29,12 @@
 
           <UiField :label="$t('errorCorrection')" :title="'errorCorrectionLevel — ' + $t('errorCorrection')" stack>
             <UiSegmented
-              v-model="options.errorCorrectionLevel"
+              :value="effectiveErrorCorrection"
               block
               :options="errorCorrectionOptions"
               :aria-label="$t('errorCorrection')"
               :title="'errorCorrectionLevel — ' + $t('errorCorrection')"
+              @input="options.errorCorrectionLevel = $event"
             />
             <template #hint>
               <strong class="ec-current">{{ errorCorrectionDescription }}</strong>
@@ -41,9 +42,9 @@
             </template>
           </UiField>
           <transition name="rise">
-            <div v-if="options.code.iconName !== 'none'" class="notice notice--info">
+            <div v-if="hasIcon" class="notice notice--info">
               <UiIcon name="info" />
-              <span>{{ $t('iconForcesHighCorrection') }}</span>
+              <span>{{ $t('errorCorrectionIconLocked') }}</span>
             </div>
           </transition>
 
@@ -172,6 +173,7 @@ const defaultOptions = {
     hasText: false,
     textPlacement: 'bottom',
     textMargin: 4,
+    textSpacing: 5,
     textSize: 10,
     textMessage: '',
     textDepth: 1,
@@ -259,16 +261,24 @@ export default {
     contentTypeIcon() {
       return CONTENT_TYPE_ICONS[this.options.activeTabIndex] || 'letter-a';
     },
+    hasIcon() {
+      return this.options.code.iconName !== 'none';
+    },
+    // icons cover part of the code, so they always need the highest level.
+    // The chosen level is kept and applies again once the icon is removed.
+    effectiveErrorCorrection() {
+      return this.hasIcon ? 'H' : this.options.errorCorrectionLevel;
+    },
     errorCorrectionOptions() {
       return [
         { value: 'L', label: 'L', tip: 'L (Low, 7% redundant)' },
         { value: 'M', label: 'M', tip: 'M (Medium, 15% redundant)' },
         { value: 'Q', label: 'Q', tip: 'Q (Quartile, 25% redundant)' },
         { value: 'H', label: 'H', tip: 'H (High, 30% redundant)' },
-      ];
+      ].map((option) => ({ ...option, disabled: this.hasIcon && option.value !== 'H' }));
     },
     errorCorrectionDescription() {
-      const option = this.errorCorrectionOptions.find((item) => item.value === this.options.errorCorrectionLevel);
+      const option = this.errorCorrectionOptions.find((item) => item.value === this.effectiveErrorCorrection);
       return option ? option.tip : '';
     },
     printabilityWarning() {
@@ -324,7 +334,7 @@ export default {
       return {
         ...this.options,
         // icons always force the highest error correction level
-        errorCorrectionLevel: code.iconName !== 'none' ? 'H' : this.options.errorCorrectionLevel,
+        errorCorrectionLevel: this.effectiveErrorCorrection,
         code,
       };
     },
@@ -381,8 +391,8 @@ export default {
         return;
       }
 
+      const errorCorrectionLevel = this.effectiveErrorCorrection;
       if (this.options.code.iconName !== 'none') {
-        this.options.errorCorrectionLevel = 'H';
         try {
           const svgMarkup = await this.loadIconMarkup(this.options.code.iconName);
           // the fill color is irrelevant for the geometry; avoids THREE.Color warnings
@@ -416,11 +426,11 @@ export default {
       try {
         console.time('2D QR Code Generation');
         const qrCodeObject = await qrcode.create(txt, {
-          errorCorrectionLevel: this.options.errorCorrectionLevel,
+          errorCorrectionLevel,
         });
         qrCodeBitMask = qrCodeObject.modules.data;
         this.qrImageUrl = await qrcode.toDataURL(txt, {
-          errorCorrectionLevel: this.options.errorCorrectionLevel,
+          errorCorrectionLevel,
           margin: 1,
           width: 512,
         });

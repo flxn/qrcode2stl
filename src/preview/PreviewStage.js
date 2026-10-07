@@ -224,11 +224,29 @@ export default class PreviewStage {
     grazingLight.position.set(3.4, -3.2, 0.45);
     this.scene.add(grazingLight);
 
+    // lights the underside from a low angle; its shadows make NFC and magnet pockets
+    // readable in the bottom view (all downward faces would otherwise look the same)
+    const bottomLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    bottomLight.position.set(-2.2, -1.5, -1.9).multiplyScalar(100);
+    bottomLight.castShadow = true;
+    bottomLight.shadow.mapSize.width = 1024;
+    bottomLight.shadow.mapSize.height = 1024;
+    bottomLight.shadow.camera.near = 1;
+    bottomLight.shadow.camera.far = 1200;
+    bottomLight.shadow.camera.left = -180;
+    bottomLight.shadow.camera.right = 180;
+    bottomLight.shadow.camera.top = 180;
+    bottomLight.shadow.camera.bottom = -180;
+    bottomLight.shadow.bias = -0.0002;
+    bottomLight.shadow.normalBias = 0.02;
+    this.scene.add(bottomLight);
+
     this.lights = {
       hemisphere: hemisphereLight,
       key: keyLight,
       fill: fillLight,
       rim: rimLight,
+      bottom: bottomLight,
       grazing: grazingLight,
     };
   }
@@ -341,7 +359,7 @@ export default class PreviewStage {
 
   /**
    * Points that should be visible when the camera frames the model:
-   * the corners of the model bounds plus the dimension ruler in front of it.
+   * the corners of the model bounds plus the dimension rulers in front of and left of it.
    */
   computeFraming(box, baseBox = box) {
     const size = baseBox.getSize(new THREE.Vector3());
@@ -349,6 +367,7 @@ export default class PreviewStage {
     const rulerDepth = Math.max(8, span * 0.09) + Math.max(5, span * 0.06) + 4;
     const framed = box.clone();
     framed.min.y = Math.min(framed.min.y, baseBox.min.y - rulerDepth);
+    framed.min.x = Math.min(framed.min.x, baseBox.min.x - rulerDepth);
     const points = [];
     [framed.min.x, framed.max.x].forEach((x) => {
       [framed.min.y, framed.max.y].forEach((y) => {
@@ -651,7 +670,7 @@ export default class PreviewStage {
     if (this.onFrame) {
       this.onFrame({
         cube: this.cubeTransform(),
-        ruler: this.rulerGeometry(),
+        rulers: this.rulerGeometry(),
       });
     }
   }
@@ -687,34 +706,54 @@ export default class PreviewStage {
   }
 
   /**
-   * Screen-space geometry for the width dimension line along the edge closest to the camera.
+   * Screen-space geometry for the dimension lines: the width along the front or back edge and
+   * the height along the left or right edge, each on the side closest to the camera.
    */
   rulerGeometry() {
-    if (!this.hasModel || !this.bounds || this.modelAnimation) return null;
+    if (!this.hasModel || !this.bounds || this.modelAnimation) return [];
     const box = this.bounds.baseBox;
-    const size = box.getSize(new THREE.Vector3());
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
-    if (!width || !height) return null;
+    if (!width || !height) return [];
+    return ['x', 'y']
+      .map((axis) => this.dimensionLine(box, axis, width, height))
+      .filter(Boolean);
+  }
 
-    const centerY = (box.min.y + box.max.y) / 2;
-    const front = this.camera.position.y <= centerY;
-    const direction = front ? -1 : 1;
-    const edgeY = front ? box.min.y : box.max.y;
+  /**
+   * One dimension line measuring `axis` ('x' = width, 'y' = height) of `box`.
+   * It sits outside the edge that runs along `axis` and faces the camera.
+   */
+  dimensionLine(box, axis, width, height) {
+    const size = box.getSize(new THREE.Vector3());
+    const across = axis === 'x' ? 'y' : 'x';
+    const center = (box.min[across] + box.max[across]) / 2;
+    // the default views look from the front-left, so ties go to the front / left edge
+    const near = this.camera.position[across] <= center;
+    const direction = near ? -1 : 1;
+    const edge = near ? box.min[across] : box.max[across];
     const span = Math.max(size.x, size.y);
     const gap = Math.max(3, span * 0.035);
     const offset = Math.max(8, span * 0.09);
-    const z = 0;
+    const lineAt = edge + direction * offset;
 
-    const lineY = edgeY + direction * offset;
+    // builds a point from a position along the measured axis and one across it
+    const point = (along, acrossValue) => {
+      const vector = new THREE.Vector3(0, 0, 0);
+      vector[axis] = along;
+      vector[across] = acrossValue;
+      return vector;
+    };
+    const min = box.min[axis];
+    const max = box.max[axis];
     const points = {
-      extA0: new THREE.Vector3(box.min.x, edgeY + direction * gap, z),
-      extA1: new THREE.Vector3(box.min.x, lineY + direction * gap, z),
-      extB0: new THREE.Vector3(box.max.x, edgeY + direction * gap, z),
-      extB1: new THREE.Vector3(box.max.x, lineY + direction * gap, z),
-      start: new THREE.Vector3(box.min.x, lineY, z),
-      end: new THREE.Vector3(box.max.x, lineY, z),
-      label: new THREE.Vector3((box.min.x + box.max.x) / 2, lineY + direction * Math.max(5, span * 0.06), z),
+      extA0: point(min, edge + direction * gap),
+      extA1: point(min, lineAt + direction * gap),
+      extB0: point(max, edge + direction * gap),
+      extB1: point(max, lineAt + direction * gap),
+      start: point(min, lineAt),
+      end: point(max, lineAt),
+      label: point((min + max) / 2, lineAt + direction * Math.max(5, span * 0.06)),
     };
 
     const screen = {};
@@ -736,8 +775,9 @@ export default class PreviewStage {
 
     return {
       ...screen,
+      axis,
       angle,
-      value: size.x,
+      value: size[axis],
     };
   }
 

@@ -45,6 +45,7 @@
           :live-update="liveUpdate"
           :qr-image="mode === 'QR' ? qrImage : ''"
           :printability-warning="printabilityWarning"
+          :model-warnings="modelWarnings"
           :empty-hint="emptyHint"
           @update:liveUpdate="setLiveUpdate"
           @generate="generate"
@@ -194,6 +195,7 @@ export default {
       generatedSignature: null,
       canAutoGenerate: false,
       printabilityWarning: '',
+      modelWarnings: [],
       qrImage: '',
       changelogModalVisible: false,
       settingsModalVisible: false,
@@ -304,6 +306,7 @@ export default {
       this.generatedSignature = null;
       this.currentSignature = null;
       this.printabilityWarning = '';
+      this.modelWarnings = [];
       this.qrImage = '';
       this.fitPending = true;
       if (this.$refs.viewport) {
@@ -343,6 +346,7 @@ export default {
       this.currentSignature = state.signature;
       this.canAutoGenerate = state.canAutoGenerate;
       this.printabilityWarning = state.printabilityWarning;
+      this.modelWarnings = state.warnings || [];
       this.scheduleAutoUpdate();
     },
     onMenuActivated(state) {

@@ -44,6 +44,8 @@ addEventListener('message', async (event) => {
       iconCompatibilityStatus,
       // size of a single QR module, used for the printability warning
       blockSize: typeof generator.blockWidth === 'number' ? generator.blockWidth : null,
+      // layout problems that were corrected automatically ({ code, params })
+      warnings: generator.getWarnings(),
     });
   } catch (error) {
     console.error('3D model generation failed:', error);

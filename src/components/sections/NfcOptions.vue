@@ -46,6 +46,7 @@
       :unit="unit"
       :min="0"
       :step="0.1"
+      :warning="options.base.hasNfcIndentation ? modelWarning('nfcLimited') : ''"
       :title="'base.nfcIndentationDepth — ' + $t('indentation') + ' ' + $t('depth')"
     />
     <UiField :label="$t('hidden')" :title="'base.nfcIndentationHidden — ' + $t('hidden')" :help="$t('nfcIndentationHiddenHelp')">
@@ -59,9 +60,11 @@ import UiSection from '../ui/UiSection.vue';
 import UiField from '../ui/UiField.vue';
 import UiNumberField from '../ui/UiNumberField.vue';
 import UiToggle from '../ui/UiToggle.vue';
+import modelWarnings from './modelWarnings';
 
 export default {
   name: 'NfcOptions',
+  mixins: [modelWarnings],
   components: {
     UiSection, UiField, UiNumberField, UiToggle,
   },

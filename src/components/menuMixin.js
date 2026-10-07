@@ -59,6 +59,14 @@ export default {
       isGenerating: false,
       generateError: null,
       hasModel: false,
+      // adjustments the generator made to keep the model valid ({ code, params })
+      modelWarnings: [],
+    };
+  },
+  provide() {
+    // lets option sections show inline hints for the warnings that concern them
+    return {
+      getModelWarnings: () => this.modelWarnings,
     };
   },
   computed: {
@@ -73,6 +81,7 @@ export default {
         signature: this.signature,
         canAutoGenerate: this.isReadyForAutoUpdate(),
         printabilityWarning: this.printabilityWarning || '',
+        warnings: this.modelWarnings,
       };
     },
   },
@@ -140,6 +149,7 @@ export default {
         }
         this.parts = parseWorkerMeshes(result.meshes);
         this.generatedSignature = ticket.signature;
+        this.modelWarnings = result.warnings || [];
         this.onModelResult(result);
         this.hasModel = true;
         this.isGenerating = false;

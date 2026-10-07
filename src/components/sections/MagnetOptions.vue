@@ -17,11 +17,12 @@
     />
     <UiNumberField
       v-model="options.base.magnetPocketDepth"
-      :label="$t('depth')"
+      :label="$t('labelPocketDepth')"
       :unit="unit"
       :min="0"
       :step="0.1"
-      :title="'base.magnetPocketDepth — ' + $t('depth')"
+      :warning="options.base.hasMagnetPockets ? modelWarning('magnetLimited') : ''"
+      :title="'base.magnetPocketDepth — ' + $t('labelPocketDepth')"
     />
     <UiNumberField
       v-model="options.base.magnetPocketOffset"
@@ -37,9 +38,11 @@
 <script>
 import UiSection from '../ui/UiSection.vue';
 import UiNumberField from '../ui/UiNumberField.vue';
+import modelWarnings from './modelWarnings';
 
 export default {
   name: 'MagnetOptions',
+  mixins: [modelWarnings],
   components: { UiSection, UiNumberField },
   props: {
     options: {

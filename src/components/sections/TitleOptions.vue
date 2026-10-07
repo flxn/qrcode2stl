@@ -65,6 +65,12 @@
         <code>{{ $t('italicInfoText') }}</code>
         <code>{{ $t('boldInfoText') }}</code>
       </p>
+      <transition name="rise">
+        <p v-if="textWarning" class="field-hint field-hint--warning" role="status">
+          <UiIcon name="alert" />
+          <span>{{ textWarning }}</span>
+        </p>
+      </transition>
     </div>
 
     <UiNumberField
@@ -75,19 +81,31 @@
       :title="'base.textSize — ' + $t('text') + ' ' + $t('size')"
     />
     <UiNumberField
-      v-model="options.base.textMargin"
-      :label="$t('text') + ' ' + $t('margin')"
-      :unit="unit"
-      :min="0"
-      :title="'base.textMargin — ' + $t('text') + ' ' + $t('margin')"
-    />
-    <UiNumberField
-      v-model="options.base.textDepth"
-      :label="$t('text') + ' ' + $t('depth')"
+      v-model="options.base.textSpacing"
+      :label="$t('textSpacing')"
       :unit="unit"
       :min="0"
       :step="0.5"
-      :title="'base.textDepth — ' + $t('text') + ' ' + $t('depth')"
+      :help="$t('textSpacingHelp')"
+      :title="'base.textSpacing — ' + $t('textSpacing')"
+    />
+    <UiNumberField
+      v-model="options.base.textMargin"
+      :label="$t('textEdgeMargin')"
+      :unit="unit"
+      :min="0"
+      :step="0.5"
+      :help="$t('textEdgeMarginHelp')"
+      :title="'base.textMargin — ' + $t('textEdgeMargin')"
+    />
+    <UiNumberField
+      v-model="options.base.textDepth"
+      :label="$t('labelTextDepth')"
+      :unit="unit"
+      :min="0.1"
+      :step="0.5"
+      :help="$t('labelTextDepthHelp')"
+      :title="'base.textDepth — ' + $t('labelTextDepth')"
     />
   </UiSection>
 </template>
@@ -97,11 +115,14 @@ import UiSection from '../ui/UiSection.vue';
 import UiField from '../ui/UiField.vue';
 import UiNumberField from '../ui/UiNumberField.vue';
 import UiSegmented from '../ui/UiSegmented.vue';
+import UiIcon from '../ui/UiIcon.vue';
+import modelWarnings from './modelWarnings';
 
 export default {
   name: 'TitleOptions',
+  mixins: [modelWarnings],
   components: {
-    UiSection, UiField, UiNumberField, UiSegmented,
+    UiSection, UiField, UiNumberField, UiSegmented, UiIcon,
   },
   props: {
     options: {
@@ -118,6 +139,9 @@ export default {
     },
   },
   computed: {
+    textWarning() {
+      return this.options.base.hasText ? this.modelWarning('titleWrapped', 'textOverflow') : '';
+    },
     textareaId() {
       return `title-text-${this._uid}`;
     },

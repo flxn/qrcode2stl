@@ -51,11 +51,22 @@
             title="base.textSize"
           />
           <UiNumberField
-            v-model="options.base.textDepth"
-            :label="$t('text') + ' ' + $t('depth')"
+            v-model="options.base.textMargin"
+            :label="$t('textEdgeMargin')"
             :unit="unit"
             :min="0"
             :step="0.5"
+            :help="$t('textModeMarginHelp')"
+            :warning="modelWarning('plateEnlarged', 'textOverflow', 'titleWrapped')"
+            title="base.textMargin"
+          />
+          <UiNumberField
+            v-model="options.base.textDepth"
+            :label="$t('labelTextDepth')"
+            :unit="unit"
+            :min="0.1"
+            :step="0.5"
+            :help="$t('labelTextDepthHelp')"
             title="base.textDepth"
           />
         </UiSection>
@@ -83,6 +94,7 @@ import UiTabs from './ui/UiTabs.vue';
 import UiSection from './ui/UiSection.vue';
 import UiNumberField from './ui/UiNumberField.vue';
 import UiSegmented from './ui/UiSegmented.vue';
+import modelWarnings from './sections/modelWarnings';
 
 const defaultOptions = {
   code: {
@@ -101,6 +113,7 @@ const defaultOptions = {
     hasText: true,
     textPlacement: 'center',
     textMargin: 4,
+    textSpacing: 5,
     textSize: 10,
     textMessage: '',
     textDepth: 1,
@@ -121,7 +134,7 @@ const defaultOptions = {
 
 export default {
   name: 'TextMenu',
-  mixins: [menuMixin],
+  mixins: [menuMixin, modelWarnings],
   components: {
     BaseOptions,
     KeychainOptions,

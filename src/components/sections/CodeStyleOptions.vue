@@ -23,19 +23,19 @@
         <div class="subgroup">
           <UiNumberField
             v-model="options.code.depth"
-            :label="$t('depth') + ' ' + $t('min')"
+            :label="$t('labelCodeDepthMin')"
             :unit="unit"
-            :min="0"
+            :min="0.1"
             :step="0.5"
-            :title="'code.depth — ' + $t('depth') + ' ' + $t('min')"
+            :title="'code.depth — ' + $t('labelCodeDepthMin')"
           />
           <UiNumberField
             v-model="options.code.depthMax"
-            :label="$t('depth') + ' ' + $t('max')"
+            :label="$t('labelCodeDepthMax')"
             :unit="unit"
-            :min="0"
+            :min="0.1"
             :step="0.5"
-            :title="'code.depthMax — ' + $t('depth') + ' ' + $t('max')"
+            :title="'code.depthMax — ' + $t('labelCodeDepthMax')"
           />
         </div>
       </UiCollapse>

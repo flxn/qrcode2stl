@@ -1,21 +1,25 @@
 <template>
   <div class="model-options">
-    <BaseOptions :options="options" :unit="unit" show-height :height-help="$t('spotifyCodeHeightInfo')" />
+    <BaseOptions :options="options" :unit="unit" show-height :height-help="$t('spotifyCodeHeightInfo')" :width-help="$t('widthHelpPlate')" />
 
     <UiSection title="Spotify Code" default-open>
       <UiNumberField
         v-model="options.code.depth"
-        :label="$t('depth')"
+        :label="$t('labelCodeDepth')"
         :unit="unit"
-        :min="0"
+        :min="0.1"
         :step="0.5"
-        :title="'code.depth — ' + $t('depth')"
+        :help="$t('labelCodeDepthHelp')"
+        :title="'code.depth — ' + $t('labelCodeDepth')"
       />
       <UiNumberField
         v-model="options.code.margin"
         :label="$t('margin')"
         :unit="unit"
         :min="0"
+        :step="0.5"
+        :help="$t('spotifyMarginHelp')"
+        :warning="modelWarning('marginLimited', 'quietZone')"
         :title="'code.margin — ' + $t('margin')"
       />
     </UiSection>
@@ -33,9 +37,11 @@ import KeychainOptions from './sections/KeychainOptions.vue';
 import NfcOptions from './sections/NfcOptions.vue';
 import UiSection from './ui/UiSection.vue';
 import UiNumberField from './ui/UiNumberField.vue';
+import modelWarnings from './sections/modelWarnings';
 
 export default {
   name: 'SpotifyModelOptionsPanel',
+  mixins: [modelWarnings],
   components: {
     BaseOptions,
     TitleOptions,

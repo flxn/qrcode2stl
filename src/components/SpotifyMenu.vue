@@ -102,6 +102,7 @@ const defaultOptions = {
     hasText: false,
     textPlacement: 'bottom',
     textMargin: 4,
+    textSpacing: 5,
     textSize: 10,
     textMessage: '',
     textDepth: 1,

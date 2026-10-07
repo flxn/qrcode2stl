@@ -2,15 +2,17 @@
   <div class="viewport" :class="{ 'has-model': hasModel, 'is-generating': isGenerating }">
     <div ref="canvasHost" class="viewport__canvas" role="img" :aria-label="$t('preview')"></div>
 
-    <!-- dimension ruler, positioned every frame from the 3D bounds -->
-    <svg ref="ruler" class="viewport__ruler" aria-hidden="true" style="display: none">
-      <line ref="extA" class="ruler-ext" />
-      <line ref="extB" class="ruler-ext" />
-      <line ref="dimLine" class="ruler-line" />
-      <polygon ref="arrowA" class="ruler-arrow" />
-      <polygon ref="arrowB" class="ruler-arrow" />
+    <!-- dimension rulers (width and height), positioned every frame from the 3D bounds -->
+    <svg class="viewport__ruler" aria-hidden="true">
+      <g v-for="axis in rulerAxes" :key="axis" ref="rulerGroups" style="display: none">
+        <line class="ruler-ext" />
+        <line class="ruler-ext" />
+        <line class="ruler-line" />
+        <polygon class="ruler-arrow" />
+        <polygon class="ruler-arrow" />
+      </g>
     </svg>
-    <div ref="rulerLabel" class="ruler-label" style="display: none"></div>
+    <div v-for="axis in rulerAxes" :key="'label-' + axis" ref="rulerLabels" class="ruler-label" style="display: none"></div>
 
     <!-- toolbar -->
     <div class="viewport__toolbar" role="toolbar" :aria-label="$t('viewControls')">
@@ -133,6 +135,18 @@
 
     <!-- bottom right: dimensions and warnings -->
     <div class="viewport__meta">
+      <transition-group name="rise" tag="div" class="viewport__warnings">
+        <span
+          v-for="warning in describedWarnings"
+          :key="warning.code"
+          class="chip chip--warning"
+          :title="warning.help"
+          role="status"
+        >
+          <UiIcon name="alert" />
+          {{ warning.label }}
+        </span>
+      </transition-group>
       <transition name="rise">
         <span v-if="printabilityWarning && hasModel" class="chip chip--warning" :title="printabilityWarning">
           <UiIcon name="alert" />
@@ -153,6 +167,7 @@
 import PreviewStage from '../preview/PreviewStage';
 import UiIcon from './ui/UiIcon.vue';
 import UiSegmented from './ui/UiSegmented.vue';
+import { describeWarning } from './sections/modelWarnings';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
@@ -193,6 +208,11 @@ export default {
       type: String,
       default: '',
     },
+    // adjustments the generator made to the model ({ code, params })
+    modelWarnings: {
+      type: Array,
+      default: () => [],
+    },
     emptyHint: {
       type: String,
       default: '',
@@ -202,11 +222,19 @@ export default {
     return {
       viewMode: '3d',
       pointerMode: 'rotate',
+      // world axes that get a dimension ruler: x = width, y = height
+      rulerAxes: ['x', 'y'],
       dimensions: null,
       qrExpanded: false,
     };
   },
   computed: {
+    describedWarnings() {
+      if (!this.hasModel) {
+        return [];
+      }
+      return this.modelWarnings.map((warning) => describeWarning(this, warning)).filter(Boolean);
+    },
     modifierKey() {
       return isMac ? '⌘' : 'Ctrl';
     },
@@ -304,34 +332,39 @@ export default {
     viewFrom(face) {
       this.stage.viewFrom(face);
     },
-    onFrame({ cube, ruler }) {
+    onFrame({ cube, rulers }) {
       if (this.$refs.cube) {
         this.$refs.cube.style.transform = cube;
       }
-      this.updateRuler(ruler);
+      const groups = this.$refs.rulerGroups || [];
+      const labels = this.$refs.rulerLabels || [];
+      this.rulerAxes.forEach((axis, index) => {
+        const ruler = (rulers || []).find((item) => item.axis === axis);
+        this.updateRuler(groups[index], labels[index], ruler);
+      });
     },
-    updateRuler(ruler) {
-      const svg = this.$refs.ruler;
-      const label = this.$refs.rulerLabel;
-      if (!svg || !label) {
+    updateRuler(group, label, ruler) {
+      if (!group || !label) {
         return;
       }
       if (!ruler) {
-        svg.style.display = 'none';
+        group.style.display = 'none';
         label.style.display = 'none';
         return;
       }
-      svg.style.display = '';
+      group.style.display = '';
       label.style.display = '';
+      const [extA, extB, dimLine] = group.querySelectorAll('line');
+      const [arrowA, arrowB] = group.querySelectorAll('polygon');
       const setLine = (el, a, b) => {
         el.setAttribute('x1', a.x);
         el.setAttribute('y1', a.y);
         el.setAttribute('x2', b.x);
         el.setAttribute('y2', b.y);
       };
-      setLine(this.$refs.extA, ruler.extA0, ruler.extA1);
-      setLine(this.$refs.extB, ruler.extB0, ruler.extB1);
-      setLine(this.$refs.dimLine, ruler.start, ruler.end);
+      setLine(extA, ruler.extA0, ruler.extA1);
+      setLine(extB, ruler.extB0, ruler.extB1);
+      setLine(dimLine, ruler.start, ruler.end);
 
       // arrow heads pointing outwards at both ends
       const dx = ruler.end.x - ruler.start.x;
@@ -346,8 +379,8 @@ export default {
         const by = tip.y - uy * size * direction;
         return `${tip.x},${tip.y} ${bx - uy * spread},${by + ux * spread} ${bx + uy * spread},${by - ux * spread}`;
       };
-      this.$refs.arrowA.setAttribute('points', arrow(ruler.start, -1));
-      this.$refs.arrowB.setAttribute('points', arrow(ruler.end, 1));
+      arrowA.setAttribute('points', arrow(ruler.start, -1));
+      arrowB.setAttribute('points', arrow(ruler.end, 1));
 
       const text = `${formatMillimeters(ruler.value)} mm`;
       if (label.textContent !== text) {
@@ -837,5 +870,20 @@ export default {
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+}
+
+.viewport__warnings {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.viewport__warnings:empty {
+  display: none;
+}
+
+.viewport__warnings .chip {
+  cursor: help;
 }
 </style>

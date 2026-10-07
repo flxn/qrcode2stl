@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import { CSG } from 'three-csg-ts';
 import BaseTag3D from './base';
-import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
+import { getBoundingBoxSize, subtractMesh } from './utils';
 
 /**
  * Class used for generating the 3D model from a bitmask that contains the QR Code Data.
@@ -16,8 +16,9 @@ class QRCode3D extends BaseTag3D {
     this.iconMesh = null;
     this.qrcodeMesh = null;
     this.exportedMeshes = super.getPartMeshes();
-    // the width of the actual qr code blocks
-    this.blockWidth = (this.availableWidth / this.maskWidth) * (this.options.code.blockSizeMultiplier / 100);
+    // size of one module cell and of the printed block inside it
+    this.cellSize = this.availableWidth / this.maskWidth;
+    this.blockWidth = this.cellSize * (this.options.code.blockSizeMultiplier / 100);
     // Track icon compatibility status
     this.iconCompatibilityStatus = {
       isCompatibilityMode: false,
@@ -887,6 +888,24 @@ class QRCode3D extends BaseTag3D {
   }
 
   /**
+   * Area covered by the QR modules; the title is laid out relative to it.
+   */
+  getCodeRect() {
+    const half = this.availableWidth / 2 + Math.max(0, (this.blockWidth - this.cellSize) / 2);
+    return {
+      minX: -half, maxX: half, minY: -half, maxY: half,
+    };
+  }
+
+  /**
+   * Raised area of an inverted code: the plate inside the border width
+   * (also without a visible border, so the code keeps a light frame).
+   */
+  getInvertAreaShape() {
+    return this.getPlateShape(this.options.base.borderWidth);
+  }
+
+  /**
    * @return {THREE.Mesh} the mesh of the actual QR-Code segment
    */
   getQRCodeMesh() {
@@ -910,8 +929,8 @@ class QRCode3D extends BaseTag3D {
           }
           const blockGeo = new THREE.BoxGeometry(this.blockWidth, this.blockWidth, blockDepth);
           const blockMesh = new THREE.Mesh(blockGeo, this.materialDetail);
-          const blockX = (x / this.maskWidth) * this.availableWidth - this.availableWidth / 2 + this.blockWidth / 2;
-          const blockY = (y / this.maskWidth) * this.availableWidth - this.availableWidth / 2 + this.blockWidth / 2;
+          const blockX = (x + 0.5) * this.cellSize - this.availableWidth / 2;
+          const blockY = (y + 0.5) * this.cellSize - this.availableWidth / 2;
           if (this.iconMesh) {
             const margin = Math.min(this.blockWidth * 1.5, 4);
             if (blockX > -iconSize.x / 2 - margin && blockX < iconSize.x / 2 + margin
@@ -965,13 +984,9 @@ class QRCode3D extends BaseTag3D {
           const qrBlockMesh = new THREE.Mesh(qrBlock, this.materialDetail);
 
           // qr code block positions
-          let blockX = (x / this.maskWidth) * this.availableWidth;
-          blockX -= this.availableWidth / 2;
-          blockX += this.blockWidth / 2;
-
-          let blockY = (y / this.maskWidth) * this.availableWidth;
-          blockY -= this.availableWidth / 2;
-          blockY += this.blockWidth / 2;
+          // centre of the module cell (blocks may be larger or smaller than the cell)
+          const blockX = (x + 0.5) * this.cellSize - this.availableWidth / 2;
+          const blockY = (y + 0.5) * this.cellSize - this.availableWidth / 2;
 
           if (this.iconMesh) {
             // don't draw block if it collides with icon bounding box
@@ -1003,32 +1018,7 @@ class QRCode3D extends BaseTag3D {
     }
     // If no blocks were added (edge case), build and return just the inner area mesh
     if (!bspQRMesh) {
-      const cornerRadius = this.getCornerRadius();
-      const textBaseOffset = this.getTextBaseOffset();
-      const topOffset = this.getTextTopOffset();
-      const leftOffset = this.getTextLeftOffset();
-      const isOffsetTopBottom = this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center';
-      const isOffsetLeftRight = this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right';
-
-      let innerAreaShape;
-      if (isOffsetTopBottom) {
-        innerAreaShape = getRoundedRectShape(
-          -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
-          -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-          this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
-          this.options.base.width - this.options.base.borderWidth * 2,
-          Math.max(0, cornerRadius - this.options.base.borderWidth),
-        );
-      } else if (isOffsetLeftRight) {
-        innerAreaShape = getRoundedRectShape(
-          -(this.options.base.height - this.options.base.borderWidth * 2) / 2,
-          -(this.options.base.width + leftOffset - this.options.base.borderWidth * 2) / 2,
-          this.options.base.height - this.options.base.borderWidth * 2,
-          this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
-          Math.max(0, cornerRadius - this.options.base.borderWidth),
-        );
-      }
-
+      const innerAreaShape = this.getInvertAreaShape();
       const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(innerAreaShape, {
         steps: 1,
         depth: this.options.code.depth,
@@ -1043,39 +1033,7 @@ class QRCode3D extends BaseTag3D {
     finalBlockMesh.material = this.materialDetail;
 
     if (this.options.code.invert) {
-      const cornerRadius = this.getCornerRadius();
-      const textBaseOffset = this.getTextBaseOffset();
-      const topOffset = this.getTextTopOffset();
-      const leftOffset = this.getTextLeftOffset();
-      const isOffsetTopBottom = this.options.base.textPlacement === 'top' || this.options.base.textPlacement === 'bottom' || this.options.base.textPlacement === 'center';
-      const isOffsetLeftRight = this.options.base.textPlacement === 'left' || this.options.base.textPlacement === 'right';
-
-      // const innerAreaShape = getRoundedRectShape(
-      //   -(this.options.base.width + topOffset - this.options.base.borderWidth * 2) / 2,
-      //   -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-      //   this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
-      //   this.options.base.width - this.options.base.borderWidth * 2,
-      //   Math.max(0, cornerRadius - this.options.base.borderWidth),
-      // );
-      let innerAreaShape;
-      if (isOffsetTopBottom) {
-        innerAreaShape = getRoundedRectShape(
-          -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
-          -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-          this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
-          this.options.base.width - this.options.base.borderWidth * 2,
-          Math.max(0, cornerRadius - this.options.base.borderWidth),
-        );
-      } else if (isOffsetLeftRight) {
-        innerAreaShape = getRoundedRectShape(
-          -(this.options.base.height - this.options.base.borderWidth * 2) / 2,
-          -(this.options.base.width + leftOffset - this.options.base.borderWidth * 2) / 2,
-          this.options.base.height - this.options.base.borderWidth * 2,
-          this.options.base.width + textBaseOffset - this.options.base.borderWidth * 2,
-          Math.max(0, cornerRadius - this.options.base.borderWidth),
-        );
-      }
-
+      const innerAreaShape = this.getInvertAreaShape();
       const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(innerAreaShape, {
         steps: 1,
         depth: this.options.code.depth,
@@ -1151,7 +1109,13 @@ class QRCode3D extends BaseTag3D {
    * Generates all required meshes of the 3D model and combines them
    */
   async generate3dModel() {
-    super.generate3dModel();
+    // scanners need a light quiet zone around the code; the standard asks for 4 modules,
+    // printed tags scan reliably down to about one module
+    const quietZone = this.options.code.margin;
+    if (quietZone < this.cellSize - 1e-6) {
+      this.warn('quietZone', { modules: Math.round((quietZone / this.cellSize) * 10) / 10 });
+    }
+    await super.generate3dModel();
 
     if (this.options.code.iconName !== 'none') {
       try {

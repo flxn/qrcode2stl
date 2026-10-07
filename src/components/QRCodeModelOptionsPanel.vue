@@ -1,21 +1,25 @@
 <template>
   <div class="model-options">
-    <BaseOptions :options="options" :unit="unit" />
+    <BaseOptions :options="options" :unit="unit" :width-help="$t('widthHelpSquare')" />
 
     <UiSection title="QR Code" default-open>
       <UiNumberField
         v-model="options.code.depth"
-        :label="$t('depth')"
+        :label="$t('labelCodeDepth')"
         :unit="unit"
-        :min="0"
+        :min="0.1"
         :step="0.5"
-        :title="'code.depth — ' + $t('depth')"
+        :help="$t('labelCodeDepthHelp')"
+        :title="'code.depth — ' + $t('labelCodeDepth')"
       />
       <UiNumberField
         v-model="options.code.margin"
         :label="$t('margin')"
         :unit="unit"
         :min="0"
+        :step="0.5"
+        :help="$t('codeMarginHelp')"
+        :warning="modelWarning('marginLimited', 'quietZone')"
         :title="'code.margin — ' + $t('margin')"
       />
 
@@ -161,9 +165,11 @@ import UiNumberField from './ui/UiNumberField.vue';
 import UiPopover from './ui/UiPopover.vue';
 import UiCollapse from './ui/UiCollapse.vue';
 import UiIcon from './ui/UiIcon.vue';
+import modelWarnings from './sections/modelWarnings';
 
 export default {
   name: 'QRCodeModelOptionsPanel',
+  mixins: [modelWarnings],
   components: {
     BaseOptions,
     TitleOptions,

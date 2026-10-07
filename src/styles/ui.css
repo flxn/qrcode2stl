@@ -916,6 +916,21 @@
     line-height: 1.45;
   }
 
+  .field-hint--warning {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: flex-start;
+    gap: 6px;
+    color: var(--warning-text);
+  }
+
+  .field-hint--warning > .svg-icon {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin-top: 2px;
+  }
+
   .form-stack {
     --stack-gap: 12px;
     display: grid;

@@ -20,7 +20,7 @@
       v-model="options.base.keychainHoleDiameter"
       :label="$t('keychainHoleDiameter')"
       :unit="unit"
-      :min="0"
+      :min="0.5"
       :step="0.5"
       :title="'base.keychainHoleDiameter — ' + $t('keychainHoleDiameter')"
     />
@@ -29,8 +29,9 @@
         v-model="options.base.keychainMaterialThickness"
         :label="$t('keychainMaterialThickness')"
         :unit="unit"
-        :min="0"
+        :min="0.4"
         :step="0.1"
+        :help="$t('keychainMaterialThicknessHelp')"
         :title="'base.keychainMaterialThickness — ' + $t('keychainMaterialThickness')"
       />
       <UiNumberField
@@ -38,7 +39,8 @@
         :label="$t('keychainOffset')"
         :unit="unit"
         :min="0"
-        :step="0.1"
+        :step="0.5"
+        :help="$t('keychainOffsetHelp')"
         :title="'base.keychainOffset — ' + $t('keychainOffset')"
       />
     </template>

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import BaseTag3D from './base';
-import { getRoundedRectShape, getBoundingBoxSize, subtractMesh } from './utils';
+import { getBoundingBoxSize, subtractMesh } from './utils';
 
 /**
  * Class used for generating the 3D model of the Spotify Code
@@ -36,9 +36,9 @@ class SpotifyCode3D extends BaseTag3D {
   }
 
   /**
-   * @return {THREE.Mesh} the 3D mesh of the icon
+   * @return {THREE.Mesh} the raised 3D mesh of the code, centred on the plate
    */
-  async getSpotifyCodeMesh() {
+  buildSpotifyCodeMesh() {
     const geometries = [];
     this.spotifyCodeShapes.forEach((shape, shapeNo) => {
       let shapeDepth = this.options.code.depth;
@@ -87,45 +87,39 @@ class SpotifyCode3D extends BaseTag3D {
     spotifyCodeMesh.scale.x /= scaleRatio;
     spotifyCodeMesh.scale.y /= scaleRatio;
     spotifyCodeMesh.rotation.x = Math.PI;
-    // move icon to center
-    iconSize = getBoundingBoxSize(spotifyCodeMesh);
-
-    spotifyCodeMesh.position.x = (-iconSize.x / 2) - (0.05 * (this.options.base.width - this.options.code.margin));
-    spotifyCodeMesh.position.y = (-iconSize.y / 2) - (0.05 * (this.options.base.width - this.options.code.margin));
+    spotifyCodeMesh.position.set(0, 0, 0);
+    spotifyCodeMesh.updateMatrix();
+    // centre the code on the plate
+    const bounds = new THREE.Box3().setFromObject(spotifyCodeMesh);
+    const center = bounds.getCenter(new THREE.Vector3());
+    const size = bounds.getSize(new THREE.Vector3());
+    spotifyCodeMesh.position.x = -center.x;
+    spotifyCodeMesh.position.y = -center.y;
     spotifyCodeMesh.position.z = this.options.base.depth + this.options.code.depth;
     spotifyCodeMesh.updateMatrix();
-
-    if (this.options.code.invert) {
-      const cornerRadius = this.getCornerRadius();
-      const textBaseOffset = this.getTextBaseOffset();
-      const topOffset = this.getTextTopOffset();
-
-      const innerAreaShape = getRoundedRectShape(
-        -(this.options.base.height + topOffset - this.options.base.borderWidth * 2) / 2,
-        -(this.options.base.width - this.options.base.borderWidth * 2) / 2,
-        this.options.base.height + textBaseOffset - this.options.base.borderWidth * 2,
-        this.options.base.width - this.options.base.borderWidth * 2,
-        Math.max(0, cornerRadius - this.options.base.borderWidth),
-      );
-
-      const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(innerAreaShape, {
-        steps: 1,
-        depth: this.options.code.depth,
-        bevelEnabled: false,
-      }), this.materialDetail);
-      innerAreaMesh.position.z = this.options.base.depth;
-      innerAreaMesh.updateMatrix();
-
-      spotifyCodeMesh.position.z = this.options.base.depth + this.options.code.depth;
-      spotifyCodeMesh.updateMatrix();
-
-      const invertedMesh = subtractMesh(innerAreaMesh, spotifyCodeMesh);
-      invertedMesh.position.z = this.options.base.depth;
-      invertedMesh.updateMatrix();
-      return invertedMesh;
-    }
+    this.codeRect = {
+      minX: -size.x / 2, maxX: size.x / 2, minY: -size.y / 2, maxY: size.y / 2,
+    };
 
     return spotifyCodeMesh;
+  }
+
+  getCodeRect() {
+    return this.codeRect || null;
+  }
+
+  /**
+   * Inverted code: a raised inner area with the code cut out of it.
+   */
+  getInvertedCodeMesh(codeMesh) {
+    const innerAreaMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(this.getPlateShape(this.options.base.borderWidth), {
+      steps: 1,
+      depth: this.options.code.depth,
+      bevelEnabled: false,
+    }), this.materialDetail);
+    innerAreaMesh.position.z = this.options.base.depth;
+    innerAreaMesh.updateMatrix();
+    return subtractMesh(innerAreaMesh, codeMesh);
   }
 
   /**
@@ -158,10 +152,13 @@ class SpotifyCode3D extends BaseTag3D {
    * Generates all required meshes of the 3D model and combines them
    */
   async generate3dModel() {
-    super.generate3dModel();
-    this.spotifyCodeMesh = await this.getSpotifyCodeMesh();
+    // the code is built first: the title and plate are laid out around it
+    const codeMesh = this.buildSpotifyCodeMesh();
+    await super.generate3dModel();
+    this.spotifyCodeMesh = codeMesh;
 
-    if (this.options.code.invert) {
+    if (this.options.code.invert && codeMesh) {
+      this.spotifyCodeMesh = this.getInvertedCodeMesh(codeMesh);
       if (this.subtitleMesh) {
         this.spotifyCodeMesh = subtractMesh(this.spotifyCodeMesh, this.subtitleMesh);
       }

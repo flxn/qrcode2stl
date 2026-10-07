@@ -456,6 +456,7 @@ export default {
         'base.textMessage',
         'base.textSize',
         'base.textMargin',
+        'base.textSpacing',
         'base.textDepth',
         'base.textAlign',
         'base.hasKeychainAttachment',
@@ -866,8 +867,11 @@ export default {
             this.currentItemLabel = this.truncateValue(textValue);
 
             // Handle icon if present
-            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
+            // icons (including custom ones) always need the highest error correction level
+            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none') {
               rowOptions.errorCorrectionLevel = 'H';
+            }
+            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
               try {
                 const svgLoader = new SVGLoader();
                 const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);
@@ -952,8 +956,11 @@ export default {
             }
 
             // Handle icon if present
-            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
+            // icons (including custom ones) always need the highest error correction level
+            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none') {
               rowOptions.errorCorrectionLevel = 'H';
+            }
+            if (rowOptions.code.iconName && rowOptions.code.iconName !== 'none' && !rowOptions.code.iconName.startsWith('custom-')) {
               try {
                 const svgLoader = new SVGLoader();
                 const response = await fetch(`icons/${rowOptions.code.iconName}.svg`);

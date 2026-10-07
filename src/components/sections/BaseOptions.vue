@@ -33,7 +33,8 @@
       v-model="options.base.width"
       :label="$t('width')"
       :unit="unit"
-      :min="1"
+      :min="5"
+      :help="widthHelp"
       :title="'base.width — ' + $t('width')"
     />
     <UiNumberField
@@ -41,17 +42,17 @@
       v-model="options.base.height"
       :label="$t('height')"
       :unit="unit"
-      :min="1"
+      :min="5"
       :help="heightHelp"
       :title="'base.height — ' + $t('height')"
     />
     <UiNumberField
       v-model="options.base.depth"
-      :label="$t('depth')"
+      :label="$t('labelBaseDepth')"
       :unit="unit"
-      :min="0"
+      :min="0.4"
       :step="0.5"
-      :title="'base.depth — ' + $t('depth')"
+      :title="'base.depth — ' + $t('labelBaseDepth')"
     />
     <UiCollapse :open="options.base.shape === 'roundedRectangle'">
       <UiNumberField
@@ -59,6 +60,7 @@
         :label="$t('cornerRadius')"
         :unit="unit"
         :min="0"
+        :warning="modelWarning('radiusLimited')"
         :title="'base.cornerRadius — ' + $t('cornerRadius')"
       />
     </UiCollapse>
@@ -78,11 +80,11 @@
         />
         <UiNumberField
           v-model="options.base.borderDepth"
-          :label="$t('border') + ' ' + $t('depth')"
+          :label="$t('labelBorderDepth')"
           :unit="unit"
           :min="0"
           :step="0.5"
-          :title="'base.borderDepth — ' + $t('border') + ' ' + $t('depth')"
+          :title="'base.borderDepth — ' + $t('labelBorderDepth')"
         />
       </div>
     </UiCollapse>
@@ -95,9 +97,11 @@ import UiField from '../ui/UiField.vue';
 import UiNumberField from '../ui/UiNumberField.vue';
 import UiToggle from '../ui/UiToggle.vue';
 import UiCollapse from '../ui/UiCollapse.vue';
+import modelWarnings from './modelWarnings';
 
 export default {
   name: 'BaseOptions',
+  mixins: [modelWarnings],
   components: {
     UiSection, UiField, UiNumberField, UiToggle, UiCollapse,
   },
@@ -115,6 +119,10 @@ export default {
       default: false,
     },
     heightHelp: {
+      type: String,
+      default: '',
+    },
+    widthHelp: {
       type: String,
       default: '',
     },
