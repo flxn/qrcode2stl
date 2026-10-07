@@ -429,4 +429,5 @@ export default {
   warnMagnetLimitedHelp: 'Über den Magneten müssen mindestens 0,6 mm Material bleiben, sonst brechen die Taschen durch die Platte.',
   warnQuietZone: 'Schmale Ruhezone ({modules} Module)',
   warnQuietZoneHelp: 'Der helle Rand um den Code ist schmaler als ein QR-Modul, was viele Handys nicht scannen können. Vergrößere den Abstand.',
+  advertisement: 'Anzeige',
 };

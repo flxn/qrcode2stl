@@ -187,8 +187,10 @@
     </div>
 
     <!-- Results Summary with Thank You and Countdown -->
-    <div v-if="showResults" class="batch-results" :class="{ 'has-ad': !adblockEnabled && exportAd }">
-      <div v-if="!adblockEnabled && exportAd" class="batch-results__ad" v-html="exportAd"></div>
+    <div v-if="showResults" class="batch-results" :class="{ 'has-ad': showAd }">
+      <div v-if="showAd" class="batch-results__ad">
+        <AdSlot name="export" label @state="adState = $event" />
+      </div>
       <div class="batch-results__content">
         <div v-if="successCount > 0" class="notice notice--success">
           <UiIcon name="circle-check" />
@@ -218,8 +220,8 @@
             <span v-if="countdownSeconds > 0">{{ $t('batchDownloadCountdown', { seconds: countdownSeconds }) }}</span>
             <span v-if="countdownSeconds === 0">{{ $t('batchDownloadStarting') }}</span>
           </p>
-          <p v-if="!adblockEnabled" class="field-hint">{{ $t('batchThankYou') }}</p>
-          <template v-if="adblockEnabled">
+          <p v-if="!adBlocked" class="field-hint">{{ $t('batchThankYou') }}</p>
+          <template v-if="adBlocked">
             <p class="field-hint">{{ $t('batchAdblockMessage') }}</p>
             <div class="button-row">
               <a class="btn" href="https://paypal.me/fstein42" target="_blank" rel="noopener" v-if="!showingThankYou" @click="showThanks">
@@ -274,7 +276,8 @@ import qrcode from 'qrcode';
 import vcardjs from 'vcards-js';
 import merge from 'deepmerge';
 import JSZip from 'jszip';
-import { save, getRandomBanner, trimIconShapesBounds } from '../utils';
+import { save, trimIconShapesBounds } from '../utils';
+import AdSlot from './AdSlot.vue';
 import parseWorkerMeshes from '../model-worker/meshes';
 import UiModal from './ui/UiModal.vue';
 import UiIcon from './ui/UiIcon.vue';
@@ -284,6 +287,7 @@ import UiToggle from './ui/UiToggle.vue';
 export default {
   name: 'BatchModeModal',
   components: {
+    AdSlot,
     UiModal, UiIcon, UiSegmented, UiToggle,
   },
   props: {
@@ -321,14 +325,20 @@ export default {
       // Countdown and ad
       countdownSeconds: 5,
       countdownInterval: null,
-      adblockEnabled: false,
-      exportAd: '',
+      // 'loading' | 'filled' | 'unfilled' | 'blocked', reported by the ad slot
+      adState: 'loading',
       showingThankYou: false,
       hasAutoDownloaded: false,
       isDragOver: false,
     };
   },
   computed: {
+    showAd() {
+      return this.adState === 'loading' || this.adState === 'filled';
+    },
+    adBlocked() {
+      return this.adState === 'blocked';
+    },
     modeOptions() {
       return [
         { value: 'simple', label: this.$t('batchModeSimple'), icon: 'list' },
@@ -410,15 +420,6 @@ export default {
     startCountdown() {
       this.countdownSeconds = 5;
       this.hasAutoDownloaded = false;
-
-      // Check for adblock
-      // eslint-disable-next-line camelcase
-      if (typeof __google_ad_urls === 'undefined') {
-        this.exportAd = getRandomBanner('300x250');
-      } else {
-        const adElement = document.getElementById('adsenseloader-export');
-        this.exportAd = adElement ? adElement.innerHTML : '';
-      }
 
       this.countdownInterval = setInterval(() => {
         if (this.countdownSeconds > 0) {
@@ -843,6 +844,7 @@ export default {
       this.errorResults = [];
       this.generatedFiles = [];
       this.showResults = false;
+      this.adState = 'loading';
 
       // Import model worker
       const modelWorker = (await import('@/model-worker')).default;
@@ -1144,6 +1146,7 @@ export default {
       this.successCount = 0;
       this.errorResults = [];
       this.showResults = false;
+      this.adState = 'loading';
       this.generatedFiles = [];
       this.countdownSeconds = 5;
       this.hasAutoDownloaded = false;

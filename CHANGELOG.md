@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 - QR codes with a block size other than 100% are centered again.
 - Spotify codes are exactly centered on the plate.
 - A width, thickness or margin of 0 or less no longer produces a broken model.
+- The Export button is no longer cut off on laptop screens, and the header buttons fit on tablets.
 
 ## [1.23.0] - 2026-05-25
 

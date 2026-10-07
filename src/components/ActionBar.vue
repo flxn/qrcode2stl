@@ -328,6 +328,10 @@ export default {
     display: none;
   }
 
+  .export-stl {
+    min-width: 0;
+  }
+
   .export-png {
     width: 50px;
     padding: 0;
@@ -342,7 +346,7 @@ export default {
   }
 }
 
-@container actionbar (max-width: 820px) {
+@container actionbar (max-width: 900px) {
   .action-bar__inner {
     flex-wrap: wrap;
     row-gap: 10px;

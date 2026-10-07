@@ -449,4 +449,5 @@ export default {
   warnMagnetLimitedHelp: 'At least 0.6 mm of material has to stay above the magnets, otherwise the pockets would break through the plate.',
   warnQuietZone: 'Narrow quiet zone ({modules} modules)',
   warnQuietZoneHelp: 'The light margin around the code is narrower than one QR module, which many phones cannot scan. Increase the margin.',
+  advertisement: 'Advertisement',
 };

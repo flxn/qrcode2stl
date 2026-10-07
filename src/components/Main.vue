@@ -2,8 +2,7 @@
   <div class="app-shell">
     <Header
       :mode="mode"
-      :header-ad="headerAd"
-      :show-header-ad="!!headerAd && headerAdInHeader"
+      :show-header-ad="headerAdInHeader"
       @change-mode="changeMode"
       @open-batch="openBatchMode"
     />
@@ -72,8 +71,10 @@
     </main>
 
     <div class="info-area">
-      <div v-if="modelAd" class="ad-slot" v-html="modelAd"></div>
-      <div v-if="headerAd && !headerAdInHeader" class="ad-slot" v-html="headerAd"></div>
+      <div v-if="adsPlaced" class="ad-row">
+        <AdSlot name="model" label />
+        <AdSlot v-if="!headerAdInHeader" name="header" label />
+      </div>
 
       <nav class="info-nav" :aria-label="$t('help')">
         <a class="info-nav__link" href="#printguide">
@@ -137,13 +138,14 @@ import changelog from '../../CHANGELOG.md?raw';
 import packageJson from '../../package.json';
 import { bus } from '../main';
 import { themeState } from '../theme';
-import { getRandomBanner, saveAsArrayBuffer } from '../utils';
+import { saveAsArrayBuffer } from '../utils';
 import Header from './Header.vue';
 import QRCodeMenu from './QRCodeMenu.vue';
 import PreviewViewport from './PreviewViewport.vue';
 import ActionBar from './ActionBar.vue';
 import ChangelogModal from './ChangelogModal.vue';
 import ReleaseBanner from './ReleaseBanner.vue';
+import AdSlot from './AdSlot.vue';
 import UiIcon from './ui/UiIcon.vue';
 
 const LIVE_UPDATE_DELAY = 380;
@@ -173,6 +175,7 @@ export default {
     ActionBar,
     ChangelogModal,
     ReleaseBanner,
+    AdSlot,
     UiIcon,
     SettingsModal: () => import('./SettingsModal.vue'),
     PrintGuide: () => import('./PrintGuide.vue'),
@@ -201,10 +204,9 @@ export default {
       settingsModalVisible: false,
       changelogExpanded: false,
       exportModal: null,
-      modelAd: '',
-      headerAd: '',
+      // where the 468x60 unit goes is decided once, so resizing never reloads an ad
       headerAdInHeader: false,
-      adblockEnabled: false,
+      adsPlaced: false,
       appVersion: packageJson.version,
       themeState,
     };
@@ -252,23 +254,8 @@ export default {
     bus.$on('importSettings', this.setActiveMenuOptions);
   },
   mounted() {
-    // eslint-disable-next-line camelcase
-    if (typeof __google_ad_urls === 'undefined') {
-      this.adblockEnabled = true;
-      this.modelAd = getRandomBanner('728x90');
-    } else {
-      this.modelAd = document.getElementById('adsenseloader-model').innerHTML;
-    }
-    const headerAdSource = document.getElementById('adsenseloader-header');
-    this.headerAd = headerAdSource ? headerAdSource.innerHTML : '';
-
-    if (window.matchMedia) {
-      this.wideHeaderQuery = window.matchMedia(WIDE_HEADER_QUERY);
-      this.onWideHeaderChange();
-      if (this.wideHeaderQuery.addEventListener) {
-        this.wideHeaderQuery.addEventListener('change', this.onWideHeaderChange);
-      }
-    }
+    this.headerAdInHeader = !!(window.matchMedia && window.matchMedia(WIDE_HEADER_QUERY).matches);
+    this.adsPlaced = true;
 
     window.addEventListener('keydown', this.onKeydown);
   },
@@ -276,9 +263,6 @@ export default {
     window.clearTimeout(this.autoTimer);
     window.clearTimeout(this.exportTimer);
     window.removeEventListener('keydown', this.onKeydown);
-    if (this.wideHeaderQuery && this.wideHeaderQuery.removeEventListener) {
-      this.wideHeaderQuery.removeEventListener('change', this.onWideHeaderChange);
-    }
     bus.$off('openChangelogModal', this.openChangelogModal);
     bus.$off('closeChangelogModal', this.closeChangelogModal);
     bus.$off('openSettingsModal', this.openSettingsModal);
@@ -287,9 +271,6 @@ export default {
     bus.$off('importSettings', this.setActiveMenuOptions);
   },
   methods: {
-    onWideHeaderChange() {
-      this.headerAdInHeader = !!(this.wideHeaderQuery && this.wideHeaderQuery.matches);
-    },
     onStageReady(stage) {
       this.stage = stage;
       this.stageReady = true;
@@ -643,15 +624,10 @@ export default {
   padding: 40px 24px 64px;
 }
 
-.ad-slot {
-  display: flex;
-  justify-content: center;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.ad-slot:empty {
-  display: none;
+.ad-row {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
 }
 
 .info-nav {

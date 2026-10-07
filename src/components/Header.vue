@@ -17,7 +17,9 @@
         />
       </nav>
 
-      <div v-if="showHeaderAd" class="header-ad" v-html="headerAd"></div>
+      <div v-if="showHeaderAd" class="header-ad">
+        <AdSlot name="header" />
+      </div>
 
       <div class="app-header__spacer"></div>
 
@@ -137,6 +139,7 @@
 import ShareButtons from './ShareButtons.vue';
 import LanguageSelector from './LanguageSelector.vue';
 import UiIcon from './ui/UiIcon.vue';
+import AdSlot from './AdSlot.vue';
 import UiSegmented from './ui/UiSegmented.vue';
 import UiPopover from './ui/UiPopover.vue';
 import packageJson from '../../package.json';
@@ -148,6 +151,7 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigat
 export default {
   name: 'Header',
   components: {
+    AdSlot,
     ShareButtons,
     LanguageSelector,
     UiIcon,
@@ -158,10 +162,6 @@ export default {
     mode: {
       type: String,
       default: 'QR',
-    },
-    headerAd: {
-      type: String,
-      default: '',
     },
     showHeaderAd: {
       type: Boolean,
@@ -242,15 +242,19 @@ export default {
     toggleTheme() {
       toggleTheme();
     },
-    /** Hides the button labels only when they would not fit (labels differ a lot per language). */
+    /**
+     * Hides labels only when they would not fit (they differ a lot per language):
+     * first the header button labels, then the mode switch labels.
+     */
     fitHeader() {
       const { inner } = this.$refs;
       if (!inner) {
         return;
       }
-      inner.classList.remove('is-compact');
-      const overflows = inner.scrollWidth > inner.clientWidth + 1;
-      inner.classList.toggle('is-compact', overflows);
+      const overflows = () => inner.scrollWidth > inner.clientWidth + 1;
+      inner.classList.remove('is-compact', 'is-tight');
+      inner.classList.toggle('is-compact', overflows());
+      inner.classList.toggle('is-tight', overflows());
     },
   },
 };
@@ -324,9 +328,10 @@ export default {
 
 .header-ad {
   display: flex;
+  flex: none;
   align-items: center;
-  max-height: 60px;
-  overflow: hidden;
+  width: 468px;
+  height: 60px;
 }
 
 .app-header__spacer {
@@ -401,6 +406,15 @@ export default {
 
 .app-header__inner.is-compact .header-btn {
   width: 42px;
+  padding: 0;
+}
+
+.app-header__inner.is-tight .mode-switch .segmented__item span {
+  display: none;
+}
+
+.app-header__inner.is-tight .mode-switch .segmented__item {
+  width: 46px;
   padding: 0;
 }
 

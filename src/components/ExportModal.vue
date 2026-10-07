@@ -2,11 +2,13 @@
   <UiModal
     :title="kind === 'png' ? $t('exportingPng') : $t('exportingStl')"
     :icon="kind === 'png' ? 'image' : 'download'"
-    :size="exportAd && !adblockEnabled ? 'md' : 'sm'"
+    :size="showAd ? 'md' : 'sm'"
     @close="close"
   >
-    <div class="export-modal" :class="{ 'has-ad': exportAd && !adblockEnabled }">
-      <div v-if="exportAd && !adblockEnabled" class="export-modal__ad" v-html="exportAd"></div>
+    <div class="export-modal" :class="{ 'has-ad': showAd }">
+      <div v-if="showAd" class="export-modal__ad">
+        <AdSlot name="export" label @state="adState = $event" />
+      </div>
       <div class="export-modal__status">
         <div class="countdown" :class="{ 'is-done': seconds === 0 }" aria-hidden="true">
           <svg viewBox="0 0 120 120" class="countdown__ring">
@@ -24,7 +26,7 @@
           <template v-if="seconds > 0">{{ $t('batchDownloadCountdown', { seconds }) }}</template>
           <template v-else>{{ $t('batchDownloadStarting') }}</template>
         </p>
-        <p v-if="!adblockEnabled" class="export-modal__text">{{ $t('batchThankYou') }}</p>
+        <p v-if="!adBlocked" class="export-modal__text">{{ $t('batchThankYou') }}</p>
         <template v-else>
           <p class="export-modal__text">{{ $t('batchAdblockMessage') }}</p>
           <a
@@ -49,15 +51,15 @@
 </template>
 
 <script>
-import { getRandomBanner } from '../utils';
 import UiModal from './ui/UiModal.vue';
 import UiIcon from './ui/UiIcon.vue';
+import AdSlot from './AdSlot.vue';
 
 const COUNTDOWN_SECONDS = 5;
 
 export default {
   name: 'ExportModal',
-  components: { UiModal, UiIcon },
+  components: { UiModal, UiIcon, AdSlot },
   props: {
     kind: {
       type: String,
@@ -66,14 +68,20 @@ export default {
   },
   data() {
     return {
-      adblockEnabled: false,
+      // 'loading' | 'filled' | 'unfilled' | 'blocked', reported by the ad slot
+      adState: 'loading',
       seconds: COUNTDOWN_SECONDS,
-      exportAd: '',
       showingThankYou: false,
       started: false,
     };
   },
   computed: {
+    showAd() {
+      return this.adState === 'loading' || this.adState === 'filled';
+    },
+    adBlocked() {
+      return this.adState === 'blocked';
+    },
     progressStyle() {
       const circumference = 2 * Math.PI * 52;
       return {
@@ -84,14 +92,6 @@ export default {
     },
   },
   mounted() {
-    // eslint-disable-next-line camelcase
-    if (typeof __google_ad_urls === 'undefined') {
-      // this.adblockEnabled = true;
-      this.exportAd = getRandomBanner('300x250');
-    } else {
-      const source = document.getElementById('adsenseloader-export');
-      this.exportAd = source ? source.innerHTML : '';
-    }
     requestAnimationFrame(() => {
       this.started = true;
     });
