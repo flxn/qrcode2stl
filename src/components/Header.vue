@@ -1,9 +1,12 @@
 <template>
   <header class="app-header">
     <div ref="inner" class="app-header__inner">
-      <a class="brand" href="/" aria-label="QR2STL">
-        <img src="../assets/logo.png" alt="QR2STL" class="brand__logo" width="152" height="30" />
-      </a>
+      <div class="brand-group">
+        <a class="brand" href="/" aria-label="QR2STL">
+          <img src="../assets/logo.png" alt="QR2STL" class="brand__logo" width="152" height="30" />
+        </a>
+        <ToolSwitcher />
+      </div>
 
       <nav class="mode-switch" aria-label="QR Code type selection">
         <UiSegmented
@@ -138,6 +141,7 @@
 <script>
 import ShareButtons from './ShareButtons.vue';
 import LanguageSelector from './LanguageSelector.vue';
+import ToolSwitcher from './ToolSwitcher.vue';
 import UiIcon from './ui/UiIcon.vue';
 import AdSlot from './AdSlot.vue';
 import UiSegmented from './ui/UiSegmented.vue';
@@ -151,6 +155,7 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigat
 export default {
   name: 'Header',
   components: {
+    ToolSwitcher,
     AdSlot,
     ShareButtons,
     LanguageSelector,
@@ -461,17 +466,58 @@ export default {
 }
 
 @media (max-width: 520px) {
+  .app-shell {
+    --header-height: 108px;
+  }
+
   .brand {
     display: none;
   }
 
   .app-header__inner {
-    gap: 8px;
-    padding: 0 8px;
+    flex-wrap: wrap;
+    align-content: center;
+    gap: 4px 8px;
+    padding: 4px 8px;
   }
 
-  .mode-switch .segmented__item {
-    width: 42px;
+  .app-header__spacer {
+    display: none;
+  }
+
+  .brand-group {
+    margin-right: auto;
+  }
+
+  .mode-switch {
+    order: 3;
+    width: 100%;
+  }
+
+  .mode-switch .segmented {
+    width: 100%;
+  }
+
+  .mode-switch .segmented__item,
+  .app-header__inner.is-tight .mode-switch .segmented__item {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    gap: 4px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+
+  .mode-switch .segmented__item span,
+  .app-header__inner.is-tight .mode-switch .segmented__item span {
+    display: inline;
+  }
+
+  .mode-switch .segmented__item .svg-icon,
+  .mode-switch .segmented__item .fab {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
   }
 
   .app-header__actions .header-btn,

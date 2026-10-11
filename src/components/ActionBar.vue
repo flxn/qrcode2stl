@@ -323,7 +323,7 @@ export default {
   }
 }
 
-@container actionbar (max-width: 940px) {
+@container actionbar (max-width: 1040px) {
   .export-png__label {
     display: none;
   }

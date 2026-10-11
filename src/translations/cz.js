@@ -1,4 +1,13 @@
 export default {
+  crossPromo: {
+    "moreTools": "Další nástroje",
+    "allTools": "Všechny nástroje printer.tools",
+    "title": "Co dalšího vytisknout",
+    "footer": "Vyzkoušejte také",
+    "qrcode2stl": "Tiskněte QR štítky, cedulky s Wi-Fi a kódy Spotify.",
+    "businesscard2stl": "Vytvořte vizitku se svými kontaktními údaji a logem.",
+    "coaster2stl": "Navrhněte podtácky s nápisy, ikonami a vzory."
+  },
   //
   //  Local name of the language
   //

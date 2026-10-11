@@ -1,4 +1,13 @@
 export default {
+  crossPromo: {
+    "moreTools": "Máis ferramentas",
+    "allTools": "Todas as ferramentas printer.tools",
+    "title": "Máis cousas para imprimir",
+    "footer": "Proba tamén",
+    "qrcode2stl": "Imprime etiquetas QR, carteis wifi e códigos de Spotify.",
+    "businesscard2stl": "Crea unha tarxeta de visita cos teus datos de contacto e logotipo.",
+    "coaster2stl": "Deseña pousavasos con texto, iconas e patróns."
+  },
   //
   //  Local name of the language
   //

@@ -1,4 +1,13 @@
 export default {
+  crossPromo: {
+    "moreTools": "More tools",
+    "allTools": "All printer.tools",
+    "title": "More things to print",
+    "footer": "Also try",
+    "qrcode2stl": "Print QR tags, Wi-Fi signs, and Spotify codes.",
+    "businesscard2stl": "Make a business card with your contact details and logo.",
+    "coaster2stl": "Design coasters with lettering, icons, and patterns."
+  },
   //
   //  Local name of the language
   //

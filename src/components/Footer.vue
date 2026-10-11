@@ -25,17 +25,20 @@
         📢 Check out my latest project "foldericon.app" where you can
         <a href="https://foldericon.app"><i class="fa fa-folder" aria-hidden="true"></i> create customized macOS and Windows folder icons</a>
       </p>
+      <ToolLinks />
       <ShareButtons class="site-footer__share" />
     </div>
   </footer>
 </template>
 
 <script>
+import ToolLinks from './ToolLinks.vue';
 import ShareButtons from './ShareButtons.vue';
 
 export default {
   name: 'Footer',
   components: {
+    ToolLinks,
     ShareButtons,
   },
 };

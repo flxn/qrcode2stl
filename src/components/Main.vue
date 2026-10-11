@@ -76,6 +76,8 @@
         <AdSlot v-if="!headerAdInHeader" name="header" label />
       </div>
 
+      <ToolPromotions />
+
       <nav class="info-nav" :aria-label="$t('help')">
         <a class="info-nav__link" href="#printguide">
           <UiIcon name="book-open" />
@@ -146,6 +148,7 @@ import ActionBar from './ActionBar.vue';
 import ChangelogModal from './ChangelogModal.vue';
 import ReleaseBanner from './ReleaseBanner.vue';
 import AdSlot from './AdSlot.vue';
+import ToolPromotions from './ToolPromotions.vue';
 import UiIcon from './ui/UiIcon.vue';
 
 const LIVE_UPDATE_DELAY = 380;
@@ -167,6 +170,7 @@ const changelogEntries = changelogBody.split(/\n(?=## )/);
 export default {
   name: 'Main',
   components: {
+    ToolPromotions,
     Header,
     QRCodeMenu,
     SpotifyMenu: () => import('./SpotifyMenu.vue'),
